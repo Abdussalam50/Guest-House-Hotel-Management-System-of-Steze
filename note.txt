@@ -1,0 +1,39 @@
+- grafik dan laporan cek harus sesuai kapan dia bayarnya checkin atau checkout sesuaikan tanggalnya
+
+---------------- (1hari)
+1. transaksi  biasa (oke)
+2. lunas tambahan biaya checkin
+3. lunas tambahan biaya checkoutt
+4. lunas di checkin
+5. belum lunas dicheckin
+6. belum lunas tambahan di checkin
+7. belum lunas tambahan di checkout
+8. diskon
+9. diskon tambahan checkin
+10. diskon tambahan checkout
+11. uji 60 hari
+12. input nominal bayar
+13. input operasional
+
+
+-----------
+note : 
+- default checkin hari ini 
+- hari default 1
+- checout defaut + 1
+- dewasa default 1
+- anak anak default 0
+- metode transaksi default tunai
+- no rekening default (kosong)
+- kalau lunas otomatis lunas
+- kalau pelanggan masih kosong tidak bisa proses
+- pelanggan ada minimal 10 baris
+
+
+-------
+
+belum didesain
+1. desain check in dan chekout
+2. login pemilik
+3. note check in dan checout (jika ada tamahan di checkout)
+4. bayar dan kembalian belum disimpan
