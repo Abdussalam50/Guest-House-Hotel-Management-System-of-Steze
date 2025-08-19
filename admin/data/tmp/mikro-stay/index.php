@@ -923,45 +923,51 @@ $color_type = "danger";
                         include 'home.php';
                     }
                 } else {
+
+
+                    if (lastpath("data_transaksi") && isset($_GET['input']) && $_GET['input'] == "tambah") {
+                        include 'halaman.php';
+                    } else {
                 ?>
 
-                    <div class="app-main flex-column flex-row-fluid " id="kt_app_main">
-                        <!--begin::Content wrapper-->
-                        <div class="d-flex flex-column flex-column-fluid">
+                        <div class="app-main flex-column flex-row-fluid " id="kt_app_main">
+                            <!--begin::Content wrapper-->
+                            <div class="d-flex flex-column flex-column-fluid">
 
 
-                            <!--begin::Content-->
-                            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+                                <!--begin::Content-->
+                                <div id="kt_app_content" class="app-content  flex-column-fluid ">
 
 
-                                <!--begin::Content container-->
-                                <div id="kt_app_content_container" class="app-container  container-xxl ">
-                                    <!--begin::Card-->
-                                    <div class="card">
+                                    <!--begin::Content container-->
+                                    <div id="kt_app_content_container" class="app-container  container-xxl ">
+                                        <!--begin::Card-->
+                                        <div class="card">
 
 
-                                        <!--begin::Card body-->
-                                        <div class="card-body ">
-                                            <h2> <?php tabelnomin(); ?> </h2>
-                                            <br>
-                                            <?php include 'halaman.php'; ?>
+                                            <!--begin::Card body-->
+                                            <div class="card-body ">
+                                                <h2> <?php tabelnomin(); ?> </h2>
+                                                <br>
+                                                <?php include 'halaman.php'; ?>
 
+                                            </div>
+                                            <!--end::Card body-->
                                         </div>
-                                        <!--end::Card body-->
+                                        <!--end::Card-->
                                     </div>
-                                    <!--end::Card-->
+                                    <!--end::Content container-->
                                 </div>
-                                <!--end::Content container-->
+                                <!--end::Content-->
+
                             </div>
-                            <!--end::Content-->
+                            <!--end::Content wrapper-->
+
 
                         </div>
-                        <!--end::Content wrapper-->
-
-
-                    </div>
 
                 <?php
+                    }
                 }
 
 
@@ -984,7 +990,7 @@ $color_type = "danger";
     <script src="<?php echo $url; ?>files/create-app.js"></script>
     <script src="<?php echo $url; ?>files/users-search.js"></script>
 
-    <script src="http://localhost/PROJECT/GIT/Kasir%20Mikro%20Web/admin/data/tmp/micro/assets/js/jquery.js"></script>
+    <!-- <script src="http://localhost/PROJECT/GIT/Kasir%20Mikro%20Web/admin/data/tmp/micro/assets/js/jquery.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <?php

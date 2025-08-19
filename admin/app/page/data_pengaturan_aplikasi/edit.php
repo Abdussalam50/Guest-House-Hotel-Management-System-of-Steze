@@ -53,6 +53,8 @@
                             <td width="2%">:</td>
                             <td>
                                 <textarea class="form-control" style="width:50%" name="value" id="value" placeholder="Value" required="required"><?php echo ($data['value']); ?></textarea>
+                                <br>
+                                Note : <?php echo ($data['catatan']); ?>
                             </td>
                         </tr>
 

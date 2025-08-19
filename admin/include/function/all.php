@@ -474,6 +474,12 @@ function rupiah($rp)
 	echo "Rp" . number_format($rp, 0, ",", ".");
 }
 
+function rupiah_format($rp)
+{
+
+	return number_format($rp, 0, ",", ".");
+}
+
 //BACA DATABASE
 function baca_database($tabel, $field, $query)
 {

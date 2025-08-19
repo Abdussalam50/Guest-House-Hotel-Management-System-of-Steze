@@ -67,7 +67,8 @@ $jumlah_dewasa = is_numeric($_POST['jumlah_dewasa']) ? $_POST['jumlah_dewasa'] :
 $jumlah_anak_anak = is_numeric($_POST['jumlah_anak_anak']) ? $_POST['jumlah_anak_anak'] : 0;
 $discount = is_numeric($_POST['discount']) ? $_POST['discount'] : 0;
 $status_transaksi = xss($_POST['status']);
-
+$id_channel = xss($_POST['id_channel']);
+$channel = baca_database("", "channel", "select * from data_channel where id_channel='$id_channel'");
 // Harga kamar
 $harga_kamar_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$id_kamar'");
 $harga_kamar_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$id_kamar'");
@@ -146,6 +147,7 @@ $query_transaksi = mysql_query("INSERT INTO data_transaksi VALUES (
 '$jam_checkin','$jam_checkout','$jumlah_hari','$jenis_transaksi','$id_admin','$nama_admin','$id_hotel','$nama_hotel',
 '$waktu','$id_bank','$nama_bank','$biaya_tambahan_checkin','$deskripsi_biaya_checkin','$biaya_tambahan_checkout','$deskripsi_biaya_checkout',
 '$catatan','$harga_kamar_harian','$harga_kamar_bulanan','$potongan_harga','$persentase_pajak','$pajak','$harga_sebelum_pajak','$total_bayar','$nominal_bayar','$kembalian','$sisa_bayar'
+,'$id_channel','$channel'
 )");
 
 // INSERT DATA PAJAK
@@ -165,7 +167,7 @@ if ($persentase_pajak > 0) {
 $id_pemasukan = id_otomatis("data_pemasukan", "id_pemasukan", "10");
 $keterangan = 'Pembayaran Checkin A.n ' . $nama_pelanggan . ', Kamar Nomor ' . $nomor_kamar . ' (' . ($tipe_kamar) . ")";
 $query_pemasukan = mysql_query("INSERT INTO data_pemasukan VALUES (
-    '$id_pemasukan','$waktu','$id_transaksi','$nominal_bayar','$metode_transaksi','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
+    '$id_pemasukan','$waktu','$id_transaksi','$total_bayar','$metode_transaksi','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
 )");
 
 // UPDATE STATUS KAMAR

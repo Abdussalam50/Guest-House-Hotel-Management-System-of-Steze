@@ -8,7 +8,7 @@ use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\EscposImage;
 
-$preview = false;
+$preview = true;
 
 // Fungsi untuk preview di browser sekaligus tetap kirim ke printer
 function printer_text($text, $newline = true)

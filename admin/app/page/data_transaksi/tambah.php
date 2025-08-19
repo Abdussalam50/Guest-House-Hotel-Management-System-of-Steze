@@ -1,524 +1,808 @@
-<style>
-    .swal2-container {
-        align-items: flex-start !important;
-        /* agar popup muncul di atas, bukan di tengah */
-        padding-top: 50px;
-    }
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
 
-    .custom-height {
-        height: auto !important;
-        max-height: 500px !important;
-        overflow-y: scroll
-    }
-
-    .my-html {
-        height: auto !important;
-        max-height: 500px !important;
-
-    }
-</style>
-
-<div class="content-box">
-    <form action="proses_simpan.php" enctype="multipart/form-data" method="post" id='formini'>
-        <div class="content-box-content">
-            <div id="postcustom">
-                <table class="table table-striped">
-                    <tbody>
-                        <tr>
-
-                            <td colspan="3">
-                                <center><img src="../../../data/image/logo/steze-2.png" alt="" srcset="" width='100'>
-                                    <br>
-                                    <br>
-                                    <h2 style="color: #75cc68;"><i class='fas fa-sign-in-alt text-success'></i> Check-in</h2>
-
-                                    <?php echo $alamat; ?>
-                                </center>
-                                <br>
-                            </td>
-
-                        </tr>
-                        <input type="hidden" class="form-control" readonly value="<?php echo id_otomatis("data_transaksi", "id_transaksi", "10"); ?>" name="id_transaksi" placeholder="Id Transaksi " id="id_transaksi" required="required">
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Nama <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <div class="input-group" style='width:80%'>
-                                    <select onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")' class="form-control" type="text" name="id_pelanggan" id="id_pelanggan" placeholder="Id Pelanggan " required="required">
-                                        <option value="">--Pilih Pelanggan--</option>
-
-                                    </select>
-                                    <?php
-                                    $idHotel = decrypt($_COOKIE["id_hotel"]);
-                                    $namaHotel = baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'");
-                                    ?>
-
-                                    <button class="btn btn-sm btn-secondary" type='button' onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'><i class="fs fa-plus"></i>Tambah Pelanggan</button>
+            <div class="card">
 
 
-                                </div>
 
-                            </td>
 
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Kamar <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <select class="form-control" style="width:80%" type="text" name="id_kamar" id="id_kamar" placeholder="Id kamar " required="required">
-                                    <?php
-                                    if (isset($_GET['id'])) {
-                                        $idKamar = $_GET['id'];
-                                        $noKamar = baca_database('', 'no_kamar', "select * from data_kamar where id_hotel='$id_hotel' and id_kamar='$_GET[id]'");
-                                    } else {
-                                        $idKamar = '';
-                                        $noKamar = '';
-                                    }
-                                    ?>
-                                    <option value="<?php echo $idKamar ?>"><?php echo $noKamar ?></option>
-                                    <?php
-                                    if (!isset($_GET['id'])) {
-                                        combo_database_v2('', 'id_kamar', 'no_kamar', "select * from data_kamar where id_hotel='$id_hotel'");
-                                    }
-                                    ?>
-                                </select>
-                            </td>
-                        </tr>
 
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Waktu Checkin <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" value="<?php echo date("Y-m-d") ?>" style="width:80%" type="date" min='<?php echo date("Y-m-d") ?>' name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
-                            </td>
-                        </tr>
+                <style>
+                    /* ===== Custom Checkin Card Style (tidak ganggu bootstrap) ===== */
+                    .cardcheckin {
+                        background: #fff;
+                        border-radius: 12px;
+                        border: 1px solid #e0e0e0;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                        transition: all 0.2s ease-in-out;
+                    }
 
-                        <?php if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") { ?>
-                            <tr>
-                                <td width="25%" class="leftrowcms">
-                                    <label>Jumlah Bulan<span class="highlight"></span></label>
-                                </td>
-                                <td width="2%">:</td>
-                                <td>
+                    .cardcheckin:hover {
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 
-                                    <input class="form-control" style="width:80%" type="number" name="jumlah_bulan" id="jumlah_bulan" placeholder="Jumlah Bulan">
+                    }
 
-                                </td>
-                            </tr>
-                        <?php } else {
-                        ?>
-                            <input class="form-control" style="width:80%" type="hidden" name="jumlah_bulan" id="jumlah_bulan" placeholder="Jumlah Bulan">
+                    .cardcheckin-body {
+                        padding: 18px;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
+
+                    .cardcheckin .card-group-title {
+                        font-weight: bold;
+                        background: #f8f9fa;
+                        padding: 6px 10px;
+                        border-radius: 6px;
+                        margin-bottom: 12px;
+                        border: 1px solid #dee2e6;
+                    }
+
+                    .room-badge {
+                        background-color: #bf2b27;
+                        color: white;
+                        font-size: 2rem;
+                        font-weight: bold;
+                        width: 70px;
+                        height: 70px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 8px;
+                        margin-right: 12px;
+                    }
+
+                    .cardcheckin .form-control,
+                    .cardcheckin .form-select {
+                        border-radius: 8px;
+                        border: 1px solid #ced4da;
+                        padding: 8px 12px;
+                    }
+
+                    .cardcheckin .form-control:focus,
+                    .cardcheckin .form-select:focus {
+                        border-color: #0d6efd;
+                        box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+                    }
+
+                    .input-group .btn,
+                    .input-group .input-group-text {
+                        border-radius: 8px;
+                        border: 1px solid #ced4da;
+                        padding: 8px 12px;
+                    }
+
+                    .btn-minus {
+                        background: #bf2b27;
+                        color: white;
+                        border: none;
+                    }
+
+                    .btn-plus {
+                        background: #28a745;
+                        color: white;
+                        border: none;
+                    }
+
+                    .btn-minus:hover {
+                        background: #c82333;
+                    }
+
+                    .btn-plus:hover {
+                        background: #218838;
+                    }
+                </style>
+
+                <body class="bg-light p-4">
+                    <form action="proses_simpan.php" enctype="multipart/form-data" method="post" id='formini'>
+
                         <?php
+                        $idHotel = decrypt($_COOKIE["id_hotel"]);
+                        $namaHotel = baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'");
 
+                        if (isset($_GET['id'])) {
+                            $idKamar = $_GET['id'];
+                            $noKamar = baca_database('', 'no_kamar', "select * from data_kamar where id_hotel='$id_hotel' and id_kamar='$_GET[id]'");
+                        } else {
+                            $idKamar = '';
+                            $noKamar = '';
                         }
                         ?>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Jumlah Hari <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-
-                                <input class="form-control" style="width:80%" type="number" name="jumlah_hari" min="1" id="jumlah_hari" placeholder="Jumlah Hari " required="required">
-
-
-
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Waktu Check Out <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" type="date" min='<?php echo date("Y-m-d") ?>' name="waktu_check_out" id="waktu_check_out" placeholder="Waktu Check Out " required="required">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Jumlah Dewasa <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" min="1" value="1" type="number" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa " required="required">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Jumlah Anak Anak <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" value="0" min="0" style="width:80%" type="number" name="jumlah_anak_anak" id="jumlah_anak_anak" placeholder="Jumlah Anak Anak " required="required">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Metode Transaksi <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <div class="input-group" style='width:80%'>
-                                    <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran">
-                                    <input type="text" class="form-control" name="metode_transaksi" id="metode_transaksi" value='-' required="required">
-                                    <button class="btn btn-secondary" type='button' onclick='pilih_metode_transaksi()'><i class="fa fa-dollar"></i> Pilih Metode Transaksi</button>
-                                </div>
-
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>No Rekening <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" type="varchar" name="no_rekening" id="no_rekening" placeholder="No Rekening " value='-' required="required">
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Discount harga Kamar(%) <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" type="number" name="discount" id="discount" placeholder="Discount " value='0' required="required">
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>potongan_harga <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" type="number" name="potongan_harga" id="potongan_harga" placeholder="potongan_harga " value='0' required="required">
-                            </td>
-                        </tr>
-
-
-
-
-
-
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Biaya Tambahan Checkin <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <div class="" style="width:80%">
-                                    <input class="form-control" type="varchar" name="tambahan" id="tambahan" placeholder="Biaya Tambahan " value='0' required="required">
-                                    <p class="text-start" id='tambahan_nom'></p>
-                                    <textarea name="deskripsi" id="deskripsi" class='form-control'>-</textarea>
-                                </div>
-                            </td>
-                        </tr>
 
                         <?php
-                        if (pengaturan_aplikasi('persentase_pajak') == 0) { ?>
-
-                            <input class="form-control" style="width:80%" type="hidden" name="persentase_pajak" id="persentase_pajak" placeholder="Persentase Pajak " value='0' required="required">
-
-
-                        <?php } else { ?>
-                            <tr>
-                                <td width="25%" class="leftrowcms">
-                                    <label>Persentase Pajak <span class="highlight"></span></label>
-                                </td>
-                                <td width="2%">:</td>
-                                <td>
-                                    <input class="form-control" style="width:80%" type="number" name="persentase_pajak" id="persentase_pajak" placeholder="Persentase Pajak " value='<?php echo pengaturan_aplikasi('persentase_pajak'); ?>' required="required">
-                                </td>
-                            </tr>
-                        <?php } ?>
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Catatan <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <div class="" style="width:80%">
-
-                                    <textarea name="catatan" id="catatan" class='form-control'></textarea>
-                                </div>
-                            </td>
-                        </tr>
+                        $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$_GET[id]'");
+                        $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$_GET[id]'");
+                        $kapasitas = baca_database("", "kapasitas", "select * from data_kamar where id_kamar='$_GET[id]'");
+                        $id_tipe_kamar = baca_database("", "id_tipe_kamar", "select * from data_kamar where id_kamar='$_GET[id]'");
+                        $tipe_kamar = baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$id_tipe_kamar'");
 
 
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Total Harga (Rp) <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td style="font-size: 1.2em;">
-
-
-                                <div>Harga Kamar : <span id="total_harga_kamar">Rp 0</span></div>
-
-                                <?php
-                                if (pengaturan_aplikasi('persentase_pajak') == 0) { ?>
-                                    <input type="hidden" name="total_harga_kamar" id='harga_kamar'>
-                                    <input type="hidden" name="harga" id='harga_input'>
-                                    <p class="text-start" id='harga'>Rp 0</p>
-                                    <span id="harga_sebelum_pajak" style="visibility: hidden;">Rp 0</span>
-
-                                <?php } else {  ?>
-                                    <div>Harga Sebelum Pajak: <span id="harga_sebelum_pajak">Rp 0</span></div>
-                                    <input type="text" name="total_harga_kamar" id='harga_kamar'>
-                                    <input type="text" name="harga" id='harga_input'>
-                                    <p class="text-start" id='harga'>Rp 0</p>
-
-                                <?php } ?>
-
-
-
-
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Nominal Bayar <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input class="form-control" style="width:80%" type="varchar" name="nominal_bayar" id="nominal_bayar" value="">
-                                <p class="text-start" id='nominal'></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Jumlah Kembalian <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input type="hidden" name="kembalian" id='kembalian' value='0'>
-                                <p class="text-start" id='kembalian_value' style='font-size:1.5em'>Rp 0</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Sisa Pembayaran <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <input type="hidden" name="sisa" id='sisa' value='0'>
-                                <p class="text-start" id='sisa_value' style='font-size:1.5em'>Rp 0</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="25%" class="leftrowcms">
-                                <label>Status Transaksi <span class="highlight"></span></label>
-                            </td>
-                            <td width="2%">:</td>
-                            <td>
-                                <select class="form-control" style="width:80%" name="status" id="status" placeholder="Status " required="required">
-                                    <option value="Lunas">Lunas</option>
-
-                                    <option value="Belum Lunas">Belum Lunas</option>
-
-                                </select>
-                                <input type="hidden" name="id_admin" value='<?php
-                                                                            $username = decrypt($_COOKIE['jenenge']);
-                                                                            $id_admin = baca_database("", "id_admin", "select * from data_admin where username='$username'");
-                                                                            echo $id_admin;
-                                                                            ?>'>
-                                <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
-                            </td>
-                        </tr>
-
-
-
-                    </tbody>
-                </table>
-                <div class="content-box-content">
-                    <center>
-                        <button type="button" class='btn btn-danger' id='simpan_data'><i class="fa fa-check"></i> Proses CheckIn</button>
-
-                        <?php
-                        // btn_simpan(' PROSES SIMPAN DATA'); 
                         ?>
-                    </center>
+
+                        <input type="hidden" value="<?php echo id_otomatis("data_transaksi", "id_transaksi", "10"); ?>" name="id_transaksi" placeholder="Id Transaksi " id="id_transaksi" required="required">
+                        <input type="hidden" value="<?php echo  $idKamar; ?>" style="width:80%" name="id_kamar" id="id_kamar" placeholder="Id kamar " required="required">
+                        <input type="hidden" name="jumlah_bulan" id="jumlah_bulan" placeholder="Jumlah Bulan">
+                        <input type="hidden" name="status" id="status" value="Lunas">
+                        <input type="hidden" name="id_admin" value='<?php
+                                                                    $username = decrypt($_COOKIE['jenenge']);
+                                                                    $id_admin = baca_database("", "id_admin", "select * from data_admin where username='$username'");
+                                                                    echo $id_admin;
+                                                                    ?>'>
+                        <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
+                        <div class="mb-4">
+                            <div class="cardcheckin-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="room-badge"><?php echo $noKamar ?></div>
+                                    <h4 class="mb-0"><i class="fas fa-sign-in-alt text-success"></i> Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?></h4>
+                                </div>
+
+                                <div class="row g-3">
+                                    <!-- Informasi Kamar -->
+                                    <div class="col-md-4">
+                                        <div class="cardcheckin h-100">
+                                            <div class="cardcheckin-body">
+                                                <div class="card-group-title">Informasi Kamar</div>
+
+                                                <label class="form-label">Tanggal</label>
+                                                <input type="date" class="form-control mb-2" name="tanggal" value="2013-05-20">
+
+                                                <label class="form-label">Channel</label>
+                                                <select class="form-select mb-2" name="id_channel">
+                                                    <?php combo_database_v2("data_channel", "id_channel", "channel", ""); ?>
+                                                </select>
+
+
+
+
+
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <label class="form-label">Tipe Kamar</label>
+                                                        <div class="input-group">
+                                                            <input class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label">Jenis Ranjang</label>
+                                                        <div class="input-group">
+                                                            <?php
+                                                            $kapasitas = 2; // contoh nilai jumlah
+
+                                                            if ($kapasitas == 1) {
+                                                                $ranjang = "Single Bed";
+                                                            } elseif ($kapasitas == 2) {
+                                                                $ranjang = "Double Bed";
+                                                            } elseif ($kapasitas == 3) {
+                                                                $ranjang = "Triple Bed";
+                                                            } elseif ($kapasitas == 4) {
+                                                                $ranjang = "Quad Bed";
+                                                            } else {
+                                                                $ranjang = "Custom Bed";
+                                                            }
+                                                            ?>
+
+                                                            <input type="text" readonly class="form-control mb-2" name="jenis_ranjang" value="<?= $ranjang ?>" readonly>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <label class="form-label">Tanggal Cek In</label>
+                                                <input class="form-control mb-2" value="<?php echo date("Y-m-d") ?>" type="date" min='<?php echo date("Y-m-d") ?>' name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
+
+                                                <label class="form-label">Tanggal Cek Out</label>
+
+                                                <input class="form-control mb-2"
+                                                    type="date"
+                                                    min="<?php echo date("Y-m-d"); ?>"
+                                                    value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>"
+                                                    name="waktu_check_out"
+                                                    id="waktu_check_out"
+                                                    placeholder="Waktu Check Out"
+                                                    required="required">
+
+
+                                                <label class="form-label">Jumlah Hari</label>
+                                                <div class="input-group mb-2">
+                                                    <button id="btn-minus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">-</button>
+                                                    <input class="form-control" style="height: 38px;text-align: center;" type="number" name="jumlah_hari" min="1" id="jumlah_hari" value="1" placeholder="Jumlah Hari" required>
+                                                    <button id="btn-plus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">+</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Informasi Pelanggan -->
+                                    <div class="col-md-4">
+                                        <div class="cardcheckin h-100">
+                                            <div class="cardcheckin-body">
+                                                <div class="card-group-title">Informasi Pelanggan</div>
+
+
+                                                <label class="form-label">Nama</label>
+
+                                                <!-- 
+                                                <select onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")' class="form-select mb-2" type="text" name="id_pelanggan" id="id_pelanggan" placeholder="Id Pelanggan " required="required">
+                                                    <option value="">Pilih Pelanggan</option>
+
+                                                </select> -->
+
+
+                                                <div class="input-group mb-2">
+
+                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan">
+                                                    <input type="hidden" name="id_pelanggan" id="id_pelanggan">
+
+
+                                                    <button type="button" class="btn btn-secondary" onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'>
+                                                        Cari
+                                                    </button>
+                                                </div>
+
+
+                                                <label class="form-label">Identitas</label>
+                                                <input class="form-control mb-2" name="identitas" id="identitas" placeholder="Identitas">
+
+
+
+
+                                                <label class="form-label">No. Identitas</label>
+                                                <div class="input-group mb-2">
+                                                    <input type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
+
+                                                </div>
+
+
+
+
+
+
+                                                <label class="form-label">Alamat</label>
+                                                <input type="text" class="form-control mb-2" name="alamat" id="alamat" placeholder="Alamat">
+
+                                                <label class="form-label">No. Telp</label>
+                                                <input type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp">
+
+                                                <label class="form-label">Jumlah Tamu</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Dewasa</span>
+                                                    <input class="form-control" min="1" value="1" style="text-align: center;" type="number" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa " required="required">
+
+                                                    <span class="input-group-text">Anak</span>
+                                                    <input class="form-control" value="0" min="0" style="text-align: center;" type="number" name="jumlah_anak_anak" id="jumlah_anak_anak" placeholder="Jumlah Anak Anak ">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- Informasi Transaksi -->
+                                    <div class="col-md-4">
+                                        <div class="cardcheckin h-100">
+                                            <div class="cardcheckin-body">
+                                                <div class="card-group-title">Informasi Transaksi</div>
+
+                                                <label class="form-label">Harga Sewa / Hari</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" name="harga_hari" readonly value="<?php echo rupiah_format($harga_harian); ?>">
+                                                </div>
+
+                                                <label class="form-label">Total Harga Sewa</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="hidden" name="total_harga_kamar" id='harga_kamar'>
+                                                    <input type="text" readonly class="form-control" id="total_harga_kamar">
+                                                </div>
+
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label">Diskon</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">%</span>
+
+                                                            <input class="form-control" type="number" name="discount" id="discount" placeholder="Discount " value='0'>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label">Potongan</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">Rp</span>
+
+                                                            <input class="form-control" type="number" name="potongan_harga" id="potongan_harga" placeholder="potongan_harga " value='0'>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Tambahan Biaya -->
+                                                <label class="form-label">Tambahan Biaya</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+
+                                                    <input class="form-control" type="varchar" name="tambahan" id="tambahan" placeholder="Biaya Tambahan " value='0'>
+
+
+
+                                                    <!-- Tombol untuk Note -->
+                                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#noteModal">
+                                                        Note
+                                                    </button>
+                                                </div>
+
+                                                <!-- Modal untuk Note -->
+                                                <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="noteModalLabel">Catatan Tambahan Biaya</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <textarea class="form-control" name="deskripsi" rows="4" placeholder="Tulis catatan di sini..."></textarea>
+                                                                <input type="hidden" name="catatan" id="catatan" class='form-control'>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Simpan</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- Grandtotal -->
+                                                <label class="form-label">Grandtotal</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="hidden" name="harga" id='harga_input'>
+                                                    <input type="text" readonly class="form-control" id='harga'>
+
+
+
+
+
+                                                </div>
+
+                                                <!-- Pajak Checkbox -->
+                                                <div class="form-check mt-2 mb-3">
+                                                    <?php
+                                                    $nilai_pajak = pengaturan_aplikasi('persentase_pajak');
+                                                    $defaut_checklist = pengaturan_aplikasi('default_checklist_pajak');
+                                                    if ($defaut_checklist == "1") {
+                                                        $checked = ($nilai_pajak > 0) ? "checked" : "";
+                                                    } else {
+                                                        $checked =  "";
+                                                    }
+
+                                                    $nilai_input = ($nilai_pajak > 0) ? $nilai_pajak : 0;
+                                                    ?>
+                                                    <div class="d-flex align-items-center">
+                                                        <input class="form-check-input me-2" type="checkbox" value="1" id="pajakCheck" name="pajak" <?= $checked; ?>>
+
+                                                        <input class="form-control me-2" style="width:80%"
+                                                            type="hidden" name="persentase_pajak"
+                                                            id="persentase_pajak"
+                                                            placeholder="Persentase Pajak"
+                                                            value="<?= $nilai_input; ?>">
+
+                                                        <label class="" for="pajakCheck">
+                                                            Pajak (<?= $nilai_input; ?>%)
+                                                        </label>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                                <div class="mt-auto d-flex justify-content-end">
+                                                    <button class="btn btn-secondary me-2" type="reset">Batal</button>
+                                                    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalPembayaran">Check-in</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Pembayaran -->
+                        <div class="modal fade" id="modalPembayaran" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Proses Pembayaran</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        <label class="form-label">Grand Total</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+
+                                            <input type="text" readonly class="form-control" id="grand_total" name="grand_total">
+                                        </div>
+
+
+                                        <label class="form-label">Metode Pembayaran</label>
+
+
+                                        <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran">
+                                        <input type="hidden" name="no_rekening" id="no_rekening" value='-'>
+                                        <div class="input-group mb-2">
+
+                                            <input type="text" onclick='pilih_metode_transaksi()' class="form-control" name="metode_transaksi" id="metode_transaksi" value='' required readonly>
+
+                                            <button type="button" onclick='pilih_metode_transaksi()' class="btn btn-secondary">
+                                                Pilih
+                                            </button>
+                                        </div>
+
+
+
+                                        <label class="form-label">Nominal Bayar</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="hidden" class="form-control" id="nominal" name="nominal">
+                                            <input class="form-control" type="varchar" name="nominal_bayar" id="nominal_bayar" required value="">
+                                        </div>
+
+                                        <label class="form-label">Kembalian</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+
+                                            <input type="hidden" class="form-control" name="kembalian" id='kembalian' value='0'>
+                                            <input type="text" class="form-control" name="kembalian_value" id='kembalian_value' value='0'>
+
+                                        </div>
+
+
+                                        <input type="hidden" class="form-control" name="sisa" id='sisa' value='0'>
+                                        <input type="hidden" class="form-control" name="sisa_value" id='sisa_value' value='0'>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" id='simpan_data'>Proses Check-in</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </form>
+                </body>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalPelanggan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height:80vh;">
+            <div class="modal-header py-2">
+                <h5 class="modal-title"> <i class="fa fa-user fa-3x text-muted mb-2"></i> Pilih Pelanggan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-5 mb-10 overflow-auto">
+
+                <!-- Tab Nav -->
+                <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="cari-tab" data-bs-toggle="tab" data-bs-target="#cari" type="button">Cari Pelanggan</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#form" type="button">Tambah Baru</button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Tab Cari -->
+                    <div class="tab-pane fade show active" id="cari">
+                        <div class="border border-secondary rounded p-2">
+                            <table class="table table-sm mb-2">
+                                <tr>
+                                    <td style="max-width: 40px;">Pencarian Pelanggan </td>
+                                    <td width="1%">:</td>
+                                    <td><input type="text" id="search" class="form-control form-control-sm"></td>
+                                    <td colspan="4"></td>
+                                </tr>
+                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Identitas</th>
+                                            <th>No&nbsp;Identitas</th>
+                                            <th>No&nbsp;Tlp</th>
+                                            <th>Jenis Kelamin</th>
+                                            <th>Alamat</th>
+
+                                            <th>Pilih</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="results"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Tambah Baru -->
+                    <div class="tab-pane fade" id="form">
+                        <div class="border border-secondary rounded p-2" style="max-width: 50%;">
+                            <form id="simpan_baru">
+                                <table class="table table-sm mb-2">
+                                    <tr>
+                                        <td>Nama</td>
+                                        <td><input type="text" id="nama_baru" name="nama_baru" class="form-control form-control-sm"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Identitas</td>
+                                        <td><input type="text" id="identitas_baru" name="identitas_baru" class="form-control form-control-sm"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>No Identitas</td>
+                                        <td><input type="text" id="no_identitas_baru" name="no_identitas_baru" class="form-control form-control-sm"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alamat</td>
+                                        <td><input type="text" id="alamat_baru" name="alamat_baru" class="form-control form-control-sm"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jenis Kelamin</td>
+                                        <td>
+                                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-control form-control-sm">
+                                                <option value="Laki-Laki">Laki-Laki</option>
+                                                <option value="Perempuan">Perempuan</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>No HP</td>
+                                        <td><input type="text" id="hp_baru" name="hp_baru" class="form-control form-control-sm"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
+                                            <button type="button" id="btn_simpan" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-save"></i> Simpan Pelanggan
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </form>
-    <?php
-    $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$_GET[id]'");
-    $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$_GET[id]'");
-
-    ?>
-    <script src="../../../../node_modules/sweetalert2/dist/sweetalert2.all.min.js">
-
-    </script>
-
-    <script src='./js/main.js'></script>
+    </div>
+</div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // DOM Elements
-            const elements = {
-                checkin: document.getElementById('waktu_checkin'),
-                checkout: document.getElementById('waktu_check_out'),
-                days: document.getElementById('jumlah_hari'),
-                months: document.getElementById('jumlah_bulan'),
-                priceDisplay: document.getElementById('harga'),
-                priceInput: document.getElementById('harga_input'),
-                roomPrice: document.getElementById('total_harga_kamar'),
-                discount: document.getElementById('discount'),
-                additionalFee: document.getElementById('tambahan'),
-                additionalFeeDisplay: document.getElementById('tambahan_nom'),
-                taxPercent: document.getElementById('persentase_pajak'),
-                preTaxPrice: document.getElementById('harga_sebelum_pajak'),
-                payment: document.getElementById('nominal_bayar'),
-                paymentDisplay: document.getElementById('nominal'),
-                change: document.getElementById('kembalian'),
-                changeDisplay: document.getElementById('kembalian_value'),
-                remaining: document.getElementById('sisa'),
-                remainingDisplay: document.getElementById('sisa_value'),
-                harga_kamar: document.getElementById('harga_kamar'),
-                priceCut: document.getElementById('potongan_harga'),
-                form: document.getElementById('formini'),
-                saveButton: document.getElementById('simpan_data')
-            };
 
-            // Constants
-            const DAILY_RATE = <?php echo intval($harga_harian) ?>;
-            const MONTHLY_RATE = <?php echo intval($harga_bulanan) ?>;
-            const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-            // Format number to Rupiah
-            const formatRupiah = (value) => new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(value);
+<script src="../../../../node_modules/sweetalert2/dist/sweetalert2.all.min.js">
 
-            // Calculate base price based on days or months
-            const calculateBasePrice = (days) => {
-                days = parseInt(days) || 0;
-                return days < 30 || days % 30 !== 0 ?
-                    days * DAILY_RATE :
-                    Math.floor(days / 30) * MONTHLY_RATE;
-            };
+</script>
 
-            // Update final price with discount applied only to room price
-            const updateFinalPrice = () => {
-                const basePrice = Number(elements.harga_kamar.value) || 0;
-                const additional = Number(elements.additionalFee.value) || 0;
-                const discountPercent = Number(elements.discount.value) || 0;
-                const priceCut = Number(elements.priceCut.value) || 0;
-                const taxPercent = Number(elements.taxPercent.value) || 0;
+<script src='js/main.js'></script>
 
-                // Apply discount only to room price (basePrice)
-                const discountedRoomPrice = basePrice * (1 - discountPercent / 100);
 
-                // Calculate subtotal (discounted room price + additional - price cut)
-                const subtotal = discountedRoomPrice + additional - priceCut;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // DOM Elements
+        const elements = {
+            checkin: document.getElementById('waktu_checkin'),
+            checkout: document.getElementById('waktu_check_out'),
+            days: document.getElementById('jumlah_hari'),
+            months: document.getElementById('jumlah_bulan'),
+            priceDisplay: document.getElementById('harga'),
+            grandtotal: document.getElementById('grand_total'),
+            priceInput: document.getElementById('harga_input'),
+            roomPrice: document.getElementById('total_harga_kamar'),
+            discount: document.getElementById('discount'),
+            additionalFee: document.getElementById('tambahan'),
+            additionalFeeDisplay: document.getElementById('tambahan_nom'),
+            taxPercent: document.getElementById('persentase_pajak'),
+            payment: document.getElementById('nominal_bayar'),
+            paymentDisplay: document.getElementById('nominal'),
+            change: document.getElementById('kembalian'),
+            changeDisplay: document.getElementById('kembalian_value'),
+            remaining: document.getElementById('sisa'),
+            remainingDisplay: document.getElementById('sisa_value'),
+            harga_kamar: document.getElementById('harga_kamar'),
+            priceCut: document.getElementById('potongan_harga'),
+            form: document.getElementById('formini'),
+            saveButton: document.getElementById('simpan_data')
+        };
 
-                // Apply tax to the subtotal
-                const finalPrice = subtotal * (1 + taxPercent / 100);
 
-                // Update displays
-                elements.roomPrice.innerHTML = formatRupiah(basePrice);
-                elements.preTaxPrice.innerHTML = formatRupiah(subtotal);
-                elements.priceInput.value = Math.floor(finalPrice);
-                elements.priceDisplay.innerHTML = formatRupiah(Math.floor(finalPrice));
 
-                updatePaymentCalculations();
-            };
+        // Constants
+        const DAILY_RATE = <?php echo intval($harga_harian) ?>;
+        const MONTHLY_RATE = <?php echo intval($harga_bulanan) ?>;
+        const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-            // Update payment calculations
-            const updatePaymentCalculations = () => {
-                const payment = Number(elements.payment.value) || 0;
-                const total = Number(elements.priceInput.value) || 0;
+        // Format number to Rupiah
+        const formatRupiah = (value) => new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value)
 
-                elements.paymentDisplay.innerHTML = formatRupiah(payment);
+        // Calculate base price based on days or months
+        const calculateBasePrice = (days) => {
+            days = parseInt(days) || 0;
+            return days < 30 || days % 30 !== 0 ?
+                days * DAILY_RATE :
+                Math.floor(days / 30) * MONTHLY_RATE;
+        };
 
-                if (payment >= total) {
-                    const change = payment - total;
-                    elements.change.value = change;
-                    elements.changeDisplay.innerHTML = formatRupiah(change);
-                    elements.remaining.value = 0;
-                    elements.remainingDisplay.innerHTML = 'Rp 0';
-                } else {
-                    const remaining = total - payment;
-                    elements.change.value = 0;
-                    elements.changeDisplay.innerHTML = 'Rp 0';
-                    elements.remaining.value = remaining;
-                    elements.remainingDisplay.innerHTML = formatRupiah(remaining);
-                }
-            };
+        // Update final price with discount applied only to room price
+        const updateFinalPrice = () => {
+            const basePrice = Number(elements.harga_kamar.value) || 0;
+            const additional = Number(elements.additionalFee.value) || 0;
+            const discountPercent = Number(elements.discount.value) || 0;
+            const priceCut = Number(elements.priceCut.value) || 0;
+            const taxPercent = Number(elements.taxPercent.value) || 0;
 
-            // Update checkout date based on checkin and days
-            const updateCheckoutDate = () => {
-                const checkin = new Date(elements.checkin.value);
-                const days = parseInt(elements.days.value) || 0;
-                const checkout = new Date(checkin.getTime() + days * MS_PER_DAY);
-                elements.checkout.value = checkout.toISOString().split('T')[0];
+            // Apply discount only to room price (basePrice)
+            const discountedRoomPrice = basePrice * (1 - discountPercent / 100);
 
-                elements.harga_kamar.value = calculateBasePrice(days);
-                updateFinalPrice();
-            };
+            // Calculate subtotal (discounted room price + additional - price cut)
+            const subtotal = discountedRoomPrice + additional - priceCut;
 
-            // Update days based on checkin and checkout
-            const updateDays = () => {
-                const checkin = new Date(elements.checkin.value);
-                const checkout = new Date(elements.checkout.value);
-                const days = Math.floor((checkout - checkin) / MS_PER_DAY);
-                elements.days.value = days;
+            // Apply tax to the subtotal
+            const finalPrice = subtotal * (1 + taxPercent / 100);
 
-                elements.harga_kamar.value = calculateBasePrice(days);
-                updateFinalPrice();
-            };
+            // Update displays
+            elements.roomPrice.value = formatRupiah(basePrice);
 
-            // Update based on months
-            const updateByMonths = () => {
-                const months = parseInt(elements.months.value) || 0;
-                const days = months * 30;
-                elements.days.value = days;
-                updateCheckoutDate();
-            };
+            elements.priceInput.value = Math.floor(finalPrice);
+            elements.priceDisplay.value = formatRupiah(Math.floor(finalPrice));
+            elements.grandtotal.value = formatRupiah(Math.floor(finalPrice));
 
-            // Event Listeners
-            elements.months.addEventListener('change', updateByMonths);
-            elements.days.addEventListener('input', updateCheckoutDate);
-            elements.checkin.addEventListener('change', updateCheckoutDate);
-            elements.checkout.addEventListener('change', updateDays);
-            [elements.additionalFee, elements.discount, elements.priceCut, elements.taxPercent]
-            .forEach(el => el.addEventListener('input', updateFinalPrice));
-            elements.payment.addEventListener('input', updatePaymentCalculations);
-            elements.additionalFee.addEventListener('input', () => {
-                elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
-            });
+            updatePaymentCalculations();
+        };
 
-            // Form submission
-            elements.saveButton.addEventListener('click', () => {
-                if (elements.form.checkValidity()) {
-                    elements.form.submit();
-                } else {
-                    elements.form.reportValidity();
-                }
-            });
+        // Update payment calculations
+        const updatePaymentCalculations = () => {
+            const payment = Number(elements.payment.value) || 0;
+            const total = Number(elements.priceInput.value) || 0;
 
-            // Payment method selection
-            window.pilih_metode_transaksi = () => {
-                Swal.fire({
-                    title: 'Pilih Metode Transaksi',
-                    icon: 'info',
-                    width: '850px',
-                    html: `
+            elements.paymentDisplay.value = formatRupiah(payment);
+
+            if (payment >= total) {
+                const change = payment - total;
+                elements.change.value = change;
+                elements.changeDisplay.value = formatRupiah(change);
+                elements.remaining.value = 0;
+                elements.remainingDisplay.value = '0';
+            } else {
+                const remaining = total - payment;
+                elements.change.value = 0;
+                elements.changeDisplay.value = '0';
+                elements.remaining.value = remaining;
+                elements.remainingDisplay.value = formatRupiah(remaining);
+            }
+        };
+
+        // Update checkout date based on checkin and days
+        const updateCheckoutDate = () => {
+            const checkin = new Date(elements.checkin.value);
+            const days = parseInt(elements.days.value) || 0;
+            const checkout = new Date(checkin.getTime() + days * MS_PER_DAY);
+            elements.checkout.value = checkout.toISOString().split('T')[0];
+
+            elements.harga_kamar.value = calculateBasePrice(days);
+            updateFinalPrice();
+        };
+
+        // Update days based on checkin and checkout
+        const updateDays = () => {
+            const checkin = new Date(elements.checkin.value);
+            const checkout = new Date(elements.checkout.value);
+            const days = Math.floor((checkout - checkin) / MS_PER_DAY);
+            elements.days.value = days;
+
+            elements.harga_kamar.value = calculateBasePrice(days);
+            updateFinalPrice();
+        };
+
+        // Update based on months
+        const updateByMonths = () => {
+            const months = parseInt(elements.months.value) || 0;
+            const days = months * 30;
+            elements.days.value = days;
+            updateCheckoutDate();
+        };
+
+        // Event Listeners
+        elements.months.addEventListener('change', updateByMonths);
+        elements.days.addEventListener('input', updateCheckoutDate);
+        elements.checkin.addEventListener('change', updateCheckoutDate);
+        elements.checkout.addEventListener('change', updateDays);
+        [elements.additionalFee, elements.discount, elements.priceCut, elements.taxPercent]
+        .forEach(el => el.addEventListener('input', updateFinalPrice));
+        elements.payment.addEventListener('input', updatePaymentCalculations);
+        elements.additionalFee.addEventListener('input', () => {
+            elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
+        });
+
+
+        const checkbox = document.getElementById("pajakCheck");
+        const inputPajak = document.getElementById("persentase_pajak");
+        const defaultValue = <?= (int)$nilai_pajak; ?>;
+
+        function togglePajak() {
+            if (checkbox.checked) {
+                inputPajak.value = defaultValue > 0 ? defaultValue : 0;
+
+            } else {
+                inputPajak.value = 0;
+            }
+            updateCheckoutDate();
+
+        }
+
+        checkbox.addEventListener("change", togglePajak);
+
+        // Jalankan sekali saat load
+        togglePajak();
+
+
+        const inputHari = document.getElementById('jumlah_hari');
+        const btnMinus = document.getElementById('btn-minus');
+        const btnPlus = document.getElementById('btn-plus');
+
+        btnPlus.addEventListener('click', () => {
+            inputHari.value = parseInt(inputHari.value) + 1;
+            updateCheckoutDate();
+        });
+
+        btnMinus.addEventListener('click', () => {
+            let current = parseInt(inputHari.value);
+            if (current > 1) {
+                inputHari.value = current - 1;
+            }
+            updateCheckoutDate();
+        });
+
+
+
+
+
+        // Form submission
+        elements.saveButton.addEventListener('click', () => {
+            if (elements.form.checkValidity()) {
+                elements.form.submit();
+            } else {
+                elements.form.reportValidity();
+            }
+        });
+
+        // Payment method selection
+        window.pilih_metode_transaksi = () => {
+            Swal.fire({
+                title: 'Pilih Metode Transaksi',
+                icon: 'info',
+                width: '850px',
+                html: `
         <div class="container-fluid">
             <div class="table-responsive">
                 <table class="table">
@@ -554,28 +838,184 @@
                 </table>
             </div>
         </div>`,
-                    didOpen: () => {
-                        document.querySelectorAll('.pil_metode').forEach(button => {
-                            button.addEventListener('click', () => {
-                                document.getElementById('id_metode_pembayaran').value = button.dataset.id;
-                                document.getElementById('metode_transaksi').value = button.dataset.name;
-                                document.getElementById('no_rekening').value = button.dataset.rekening;
-                                Swal.close();
-                            });
+                didOpen: () => {
+                    document.querySelectorAll('.pil_metode').forEach(button => {
+                        button.addEventListener('click', () => {
+                            document.getElementById('id_metode_pembayaran').value = button.dataset.id;
+                            document.getElementById('metode_transaksi').value = button.dataset.name;
+                            document.getElementById('no_rekening').value = button.dataset.rekening;
+                            Swal.close();
                         });
-                    }
-                });
-            };
-        });
+                    });
+                }
+            });
+        };
+    });
 
-        document.getElementById('simpan_data').addEventListener('click', function() {
-            var form = document.getElementById('formini');
 
-            // Cek apakah semua field required valid
-            if (form.checkValidity()) {
-                form.submit(); // jika valid, submit form
-            } else {
-                form.reportValidity(); // tampilkan peringatan field yang belum diisi
+    document.getElementById('simpan_data').addEventListener('click', function() {
+        var form = document.getElementById('formini');
+        var inputs = form.querySelectorAll('[required]');
+        var invalidFields = [];
+
+        inputs.forEach(function(input) {
+            if (!input.value.trim()) {
+                var fieldName = input.name || input.id;
+
+                // jika ada prefix "id_", hapus
+                if (fieldName.startsWith("id_")) {
+                    fieldName = fieldName.replace("id_", "");
+                }
+
+                invalidFields.push(fieldName);
             }
         });
-    </script>
+
+        if (invalidFields.length > 0) {
+            alert("Kolom berikut harus diisi:\n- " + invalidFields.join("\n- "));
+        } else {
+            form.submit();
+        }
+    });
+
+
+    function cari_pelanggan(idHotel) {
+        const modal = new bootstrap.Modal(document.getElementById('modalPelanggan'));
+        modal.show();
+
+        const input = document.getElementById("search");
+        const results = document.getElementById("results");
+        const simpan_baru = document.getElementById("simpan_baru");
+        const btn_simpan = document.getElementById("btn_simpan");
+        const id_pelanggan = document.getElementById("id_pelanggan");
+
+        function renderResults(result) {
+            if (result == "null") {
+                results.innerHTML = `
+<tr>
+  <td colspan="7" class="text-center p-4">
+    <i class="fa fa-search-minus fa-3x text-muted mb-2"></i>
+    <div class="fw-bold text-muted">Data Tidak Ditemukan</div>
+  </td>
+</tr>
+`;
+
+            } else {
+                results.innerHTML = "";
+                result.forEach((element) => {
+                    const jsonData = JSON.stringify({
+                        id: element.id,
+                        nama: element.nama,
+                        identitas: element.identitas,
+                        no_identitas: element.no_identitas,
+                        alamat: element.alamat,
+                        no_hp: element.no_hp,
+                        jumlah_dewasa: element.jumlah_dewasa,
+                        jumlah_anak_anak: element.jumlah_anak_anak
+                    });
+
+                    results.innerHTML += `
+      <tr>
+        <td><a href='../data_pelanggan/index.php?input=edit&proses=${element.id}'>&nbsp;&nbsp;${element.nama}</a></td>
+        <td>${element.identitas}</td>
+        <td>${element.no_identitas}</td>
+        <td>${element.no_hp}</td>
+        <td>${element.jenis_kelamin}</td>
+        <td>${element.no_hp}</td>
+        <td>
+          <button class="btn btn-sm btn-danger pil_pelanggan" 
+                  data-json='${jsonData}'>
+            Pilih
+          </button>
+        </td>
+      </tr>`;
+                });
+
+
+            }
+        }
+
+        // load 10 pelanggan terbaru
+        fetch("find_pelanggan.php", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: "",
+                    id_hotel: idHotel
+                }),
+            })
+            .then((res) => res.json())
+            .then((data) => renderResults(data));
+
+        // pencarian realtime
+        input.addEventListener("keyup", () => {
+            fetch("find_pelanggan.php", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: input.value,
+                        id_hotel: idHotel
+                    }),
+                })
+                .then((res) => res.json())
+                .then((data) => renderResults(data));
+        });
+
+        // pilih pelanggan
+        results.addEventListener("click", function(e) {
+            if (e.target && e.target.classList.contains("pil_pelanggan")) {
+                const element = JSON.parse(e.target.getAttribute("data-json")); // ambil data lengkap
+
+                // set field lain
+                document.getElementById("id_pelanggan").value = element.id || '';
+                document.getElementById("nama").value = element.nama || '';
+                document.getElementById("identitas").value = element.identitas || '';
+                document.getElementById("no_identitas").value = element.no_identitas || '';
+                document.getElementById("alamat").value = element.alamat || '';
+                document.getElementById("no_telp").value = element.no_hp || '';
+                document.getElementById("jumlah_dewasa").value = element.jumlah_dewasa || 1;
+                document.getElementById("jumlah_anak_anak").value = element.jumlah_anak_anak || 0;
+
+                modal.hide();
+            }
+        });
+
+        // simpan pelanggan baru
+        btn_simpan.addEventListener("click", function() {
+            const dataform = new FormData(simpan_baru);
+            fetch("simpan_pelanggan_v2.php", {
+                    method: "POST",
+                    body: dataform
+                })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data !== "false") {
+                        // set value select dan input lain
+                        document.getElementById("id_pelanggan").value = data.id || '';
+                        document.getElementById("nama").value = data.nama || '';
+                        document.getElementById("identitas").value = data.identitas || '';
+                        document.getElementById("no_identitas").value = data.no_identitas || '';
+                        document.getElementById("alamat").value = data.alamat || '';
+                        document.getElementById("no_telp").value = data.no_hp || '';
+                        document.getElementById("jumlah_dewasa").value = data.jumlah_dewasa || 1;
+                        document.getElementById("jumlah_anak_anak").value = data.jumlah_anak_anak || 0;
+
+                        // reset form input tambah baru
+                        simpan_baru.reset();
+
+                        // tutup modal
+                        modal.hide();
+
+                        // SweetAlert notifikasi sukses
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Pelanggan baru berhasil ditambahkan',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+                .catch((err) => console.error(err));
+        });
+
+    }
+</script>
