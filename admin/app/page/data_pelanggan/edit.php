@@ -63,6 +63,33 @@
                         </tr>
                         <tr>
                             <td width="25%" class="leftrowcms">
+                                <label>Identitas <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <input class="form-control" style="width:50%" type="text" name="identitas" id="identitas" placeholder="Identitas" value="<?php echo ($data['identitas']); ?>" required="required">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>No identitas <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <input class="form-control" style="width:50%" type="text" name="no_identitas" id="no_identitas" placeholder="No identitas" value="<?php echo ($data['no_identitas']); ?>" required="required">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>Alamat <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <textarea class="form-control" style="width:50%" name="alamat" id="alamat" placeholder="Alamat" required="required"><?php echo ($data['alamat']); ?></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="25%" class="leftrowcms">
                                 <label>Jenis Kelamin <span class="highlight"></span></label>
                             </td>
                             <td width="2%">:</td>
@@ -101,7 +128,7 @@
                     <center>
                         <?php btn_update(' PROSES UPDATE DATA'); ?>
                     </center>
-                    <a href="<?php index() ?>?input=hapus&proses=<?php echo $_GET['proses'] ?>" class="btn btn-danger ms-5"><i class="fas fa-remove"></i> Hapus Pelanggan</a>
+                    <a href="<?php index() ?>?input=hapus&proses=<?php echo  encrypt($data['id_pelanggan']); ?>" class="btn btn-danger ms-5"><i class="fas fa-remove"></i> Hapus Pelanggan</a>
                 </div>
             </div>
         </div>

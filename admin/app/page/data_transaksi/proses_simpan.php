@@ -8,7 +8,7 @@ if (!isset($_POST['id_transaksi'])) {
     alert("AKSES DITOLAK");
     location.href = "index.php";
   </script>
-<?php
+  <?php
   die();
 }
 
@@ -30,15 +30,30 @@ $nama_hotel = baca_database("", "nama", "select * from data_hotel where id_hotel
 // DATA PELANGGAN
 // ================================
 $id_pelanggan = xss($_POST['id_pelanggan']);
+$nama = xss($_POST['nama']);
+$identitas = xss($_POST['identitas']);
+$no_identitas = xss($_POST['no_identitas']);
+$alamat = xss($_POST['alamat']);
+$no_telp = xss($_POST['no_telp']);
+$jenis_kelamin = xss($_POST['jenis_kelamin']);
+
 if ($id_pelanggan == "") {
-?>
-  <script>
-    alert("SILAHKAN INPUT PELANGGAN TERLEBIH DAHULU");
-    history.back();
-  </script>
-<?php
-  die();
+  $id_pelanggan = id_otomatis("data_pelanggan", "id_pelanggan", 10);
+  $query = mysql_query("INSERT INTO data_pelanggan 
+        (id_pelanggan, nama, identitas, no_identitas, alamat, jenis_kelamin, id_hotel, no_hp) 
+        VALUES ('$id_pelanggan','$nama','$identitas','$no_identitas','$alamat','$jenis_kelamin','$id_hotel','$no_telp')");
+} else {
+  // Update data pelanggan
+  $query = mysql_query("UPDATE data_pelanggan SET
+        nama = '$nama',
+        identitas = '$identitas',
+        no_identitas = '$no_identitas',
+        alamat = '$alamat',
+        jenis_kelamin = '$jenis_kelamin',
+        no_hp = '$no_telp'
+        WHERE id_pelanggan = '$id_pelanggan'");
 }
+
 
 $nama_pelanggan = baca_database("", "nama", "select * from data_pelanggan where id_pelanggan='$id_pelanggan'");
 $no_hp_pelanggan = baca_database("", "no_hp", "select * from data_pelanggan where id_pelanggan='$id_pelanggan'");
@@ -176,13 +191,22 @@ $query_status = mysql_query("UPDATE data_kamar SET status_kamar='Terisi' WHERE i
 // CEK SEMUA QUERY
 if ($query_transaksi && $query_pajak && $query_pemasukan && $query_status) {
   mysql_query("COMMIT");
-?>
-  <script>
-    // Redirect nota
-    window.open("../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi ?>&status=checkin", "_blank");
-    location.href = "../<?php index() ?>?input=popup_tambah";
-  </script>
+
+
+  if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
+  ?>
+    <script>
+      window.location.href = "../checkout/notaA4.php?id_trx=<?php echo $id_transaksi ?>&status=checkin";
+    </script>
+  <?php
+  } else {
+  ?>
+    <script>
+      // Redirect nota
+      window.location.href = "../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi ?>&status=checkin";
+    </script>
 <?php
+  }
 } else {
   mysql_query("ROLLBACK");
   echo "Terjadi kesalahan: " . mysql_error();

@@ -7,7 +7,7 @@ $id_pelanggan = id_otomatis("data_pelanggan", "id_pelanggan", 10);
 
 // ambil data POST dan escape
 $nama = mysql_real_escape_string($_POST['nama_baru']);
-$jenis_kelamin = mysql_real_escape_string($_POST['jenis_kelamin']);
+$jenis_kelamin = mysql_real_escape_string($_POST['jenis_kelamin_baru']);
 $id_hotel = mysql_real_escape_string($_POST['id_hotel']);
 $hp_baru = mysql_real_escape_string($_POST['hp_baru']);
 $identitas = mysql_real_escape_string($_POST['identitas_baru']);
@@ -27,6 +27,7 @@ if ($query) {
         "identitas" => $identitas,
         "no_identitas" => $no_identitas,
         "alamat" => $alamat,
+        "jenis_kelamin" => $jenis_kelamin,
         "no_hp" => $hp_baru,
         "jumlah_dewasa" => 1,
         "jumlah_anak_anak" => 0

@@ -21,13 +21,12 @@
         }
         ?>
         <br>
-        <br>
-        <br>
+
+        <hr>
 
 
 
 
-
-        <a href="<?php index() ?>?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?php echo $_COOKIE['jenenge'] ?>" class='btn btn-danger me-4'><i class="fa fa-remove"></i> Hapus Transaksi</a>
+        <a href="<?php index() ?>?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?php echo $_COOKIE['jenenge'] ?>" class='btn btn-sm btn-secondary fw-semibold'><i class="fa fa-remove"></i> Hapus Transaksi</a>
     </div>
 </div>

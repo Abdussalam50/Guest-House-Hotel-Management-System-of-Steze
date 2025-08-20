@@ -1289,6 +1289,11 @@ function temp()
 		{
 			return baca_database("", "value", "select * from data_pengaturan_aplikasi where nama_pengaturan='$nama_pengaturan'");
 		}
+
+		function pengaturan_printer($kolom, $id_hotel)
+		{
+			return baca_database("", $kolom, "select * from data_pengaturan_printer where id_hotel='$id_hotel'");
+		}
 ?>
 
 
@@ -1485,8 +1490,18 @@ function detail_transaksi($id_transaksi)
 	<?php if ($id_hotel == decrypt($_COOKIE['id_hotel'])) { ?>
 		<?php if ($data['status_transaksi'] == "Selesai") {
 		} else {
+
+			if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
 		?>
-			<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi; ?>'">Cetak Ulang Nota</button>
+				<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/notaA4.php?id_trx=<?php echo $id_transaksi; ?>&status=checkin'">Cetak Ulang Nota</button>
+			<?php
+			} else {
+			?>
+				<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi; ?>'">Cetak Ulang Nota</button>
+			<?php
+			}
+			?>
+
 
 
 			<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $data['id_kamar'] ?>&trx=<?php echo encrypt($data['id_transaksi']) ?>'">Check Out</button>

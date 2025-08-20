@@ -157,37 +157,14 @@
 
 
                                                 <div class="row">
-                                                    <div class="col-6">
-                                                        <label class="form-label">Tipe Kamar</label>
-                                                        <div class="input-group">
-                                                            <input class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
 
-                                                        </div>
+                                                    <label class="form-label">Tipe Kamar</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
+
                                                     </div>
-                                                    <div class="col-6">
-                                                        <label class="form-label">Jenis Ranjang</label>
-                                                        <div class="input-group">
-                                                            <?php
-                                                            $kapasitas = 2; // contoh nilai jumlah
-
-                                                            if ($kapasitas == 1) {
-                                                                $ranjang = "Single Bed";
-                                                            } elseif ($kapasitas == 2) {
-                                                                $ranjang = "Double Bed";
-                                                            } elseif ($kapasitas == 3) {
-                                                                $ranjang = "Triple Bed";
-                                                            } elseif ($kapasitas == 4) {
-                                                                $ranjang = "Quad Bed";
-                                                            } else {
-                                                                $ranjang = "Custom Bed";
-                                                            }
-                                                            ?>
-
-                                                            <input type="text" readonly class="form-control mb-2" name="jenis_ranjang" value="<?= $ranjang ?>" readonly>
 
 
-                                                        </div>
-                                                    </div>
                                                 </div>
 
 
@@ -235,38 +212,47 @@
 
                                                 <div class="input-group mb-2">
 
-                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan">
+                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan" required>
                                                     <input type="hidden" name="id_pelanggan" id="id_pelanggan">
 
 
                                                     <button type="button" class="btn btn-secondary" onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'>
-                                                        Cari
+                                                        <i class="fas fa-search"></i>
                                                     </button>
                                                 </div>
 
 
-                                                <label class="form-label">Identitas</label>
-                                                <input class="form-control mb-2" name="identitas" id="identitas" placeholder="Identitas">
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-4">
+                                                        <label class="form-label">Identitas</label>
+                                                        <input required class="form-control mb-2" name="identitas" id="identitas" placeholder="Identitas">
 
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <label class="form-label">No. Identitas</label>
+                                                        <div class="input-group mb-2">
+                                                            <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
 
-
-
-                                                <label class="form-label">No. Identitas</label>
-                                                <div class="input-group mb-2">
-                                                    <input type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
-
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-
-
-
-
-
                                                 <label class="form-label">Alamat</label>
-                                                <input type="text" class="form-control mb-2" name="alamat" id="alamat" placeholder="Alamat">
+                                                <input required type="text" class="form-control mb-2" name="alamat" id="alamat" placeholder="Alamat">
 
                                                 <label class="form-label">No. Telp</label>
-                                                <input type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp">
+                                                <input required type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp">
+
+                                                <label class="form-label">Jenis Kelamin</label>
+                                                <select required class="form-control mb-2" name="jenis_kelamin" id="jenis_kelamin">
+                                                    <option value="" disabled selected>Jenis Kelamin</option>
+                                                    <option value="laki-laki">Laki-laki</option>
+                                                    <option value="perempuan">Perempuan</option>
+                                                </select>
+
+
+
+
 
                                                 <label class="form-label">Jumlah Tamu</label>
                                                 <div class="input-group">
@@ -332,7 +318,7 @@
 
                                                     <!-- Tombol untuk Note -->
                                                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#noteModal">
-                                                        Note
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
                                                 </div>
 
@@ -454,8 +440,21 @@
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
                                             <input type="hidden" class="form-control" id="nominal" name="nominal">
-                                            <input class="form-control" type="varchar" name="nominal_bayar" id="nominal_bayar" required value="">
+                                            <input class="form-control" type="text" name="nominal_bayar" id="nominal_bayar" value="">
                                         </div>
+
+
+                                        <div class="mb-2">
+                                            <small class="text-muted" style="font-size:0.7rem;">Estimasi Nominal Pembayaran:</small>
+
+                                            <!-- Tombol Prediksi Bayar Kecil -->
+                                            <div class="mb-2" id="prediksi_buttons" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
+
+                                        </div>
+
+
+
+
 
                                         <label class="form-label">Kembalian</label>
                                         <div class="input-group mb-3">
@@ -563,9 +562,9 @@
                                     <tr>
                                         <td>Jenis Kelamin</td>
                                         <td>
-                                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-control form-control-sm">
-                                                <option value="Laki-Laki">Laki-Laki</option>
-                                                <option value="Perempuan">Perempuan</option>
+                                            <select name="jenis_kelamin_baru" id="jenis_kelamin_baru" class="form-control form-control-sm">
+                                                <option value="laki-Laki">laki-Laki</option>
+                                                <option value="perempuan">perempuan</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -678,10 +677,53 @@
             elements.grandtotal.value = formatRupiah(Math.floor(finalPrice));
 
             updatePaymentCalculations();
+
+            createPrediksiButtons(Math.floor(finalPrice));
+            // Set default prediksi pertama
+            document.getElementById('nominal_bayar').value = "";
+            document.getElementById('nominal').value = "";
+
         };
+
+
+
+        function createPrediksiButtons(total) {
+            var container = document.getElementById('prediksi_buttons');
+            container.innerHTML = '';
+
+            // Prediksi: total asli, bulat 5.000 terdekat, bulat 200.000
+            var nearest5k = Math.ceil(total / 5000) * 5000;
+            var round200k = Math.ceil(total / 200000) * 200000;
+
+            var prediksiArr = [total];
+            if (nearest5k !== total) prediksiArr.push(nearest5k);
+            if (round200k !== total && round200k !== nearest5k) prediksiArr.push(round200k);
+
+            prediksiArr.forEach(function(val) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-light btn-sm'; // tombol lebih kecil dan soft
+                btn.style.padding = '4px 12px'; // memperkecil ukuran tombol
+                btn.style.fontSize = '0.75rem'; // font lebih kecil
+                btn.style.opacity = '0.8'; // membuat tombol lebih samar
+                btn.style.borderColor = '#ccc'; // border lebih halus
+
+                btn.innerText = val.toLocaleString('id-ID');
+                btn.addEventListener('click', function() {
+                    document.getElementById('nominal_bayar').value = val;
+                    document.getElementById('nominal').value = val;
+
+                    updatePaymentCalculations();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+
 
         // Update payment calculations
         const updatePaymentCalculations = () => {
+
             const payment = Number(elements.payment.value) || 0;
             const total = Number(elements.priceInput.value) || 0;
 
@@ -801,11 +843,13 @@
             Swal.fire({
                 title: 'Pilih Metode Transaksi',
                 icon: 'info',
+                cancelButton: false,
+                submitButton: false,
                 width: '850px',
                 html: `
         <div class="container-fluid">
             <div class="table-responsive">
-                <table class="table">
+               <table class="table text-start">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -813,7 +857,7 @@
                             <th>Bank</th>
                             <th>Rekening</th>
                             <th>Atas Nama</th>
-                            <th>Hotel</th>
+                           
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -830,8 +874,8 @@
                                 <td><?php echo ucwords($data['nama_bank']); ?></td>
                                 <td><?php echo $data['rekening']; ?></td>
                                 <td><?php echo ucwords($data['atas_nama']); ?></td>
-                                <td><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='{$data['id_hotel']}'"); ?></td>
-                                <td><button style='background-color:#6c757d;border-radius:10px;color:#fff;width:120px;height:30px;border:none;' class='pil_metode' data-id='<?php echo $data['id_metode_pembayaran']; ?>' data-name='<?php echo ucwords($data['metode_pembayaran']); ?>' data-rekening='<?php echo $data['rekening'] ?>'>Pilih</button></td>
+                              
+                                <td><button style='background-color:#8b1815;border-radius:10px;color:#fff;width:120px;height:30px;border:none;' class='pil_metode' data-id='<?php echo $data['id_metode_pembayaran']; ?>' data-name='<?php echo ucwords($data['metode_pembayaran']); ?>' data-rekening='<?php echo $data['rekening'] ?>'>Pilih</button></td>
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -910,6 +954,7 @@
                         no_identitas: element.no_identitas,
                         alamat: element.alamat,
                         no_hp: element.no_hp,
+                        jenis_kelamin: element.jenis_kelamin,
                         jumlah_dewasa: element.jumlah_dewasa,
                         jumlah_anak_anak: element.jumlah_anak_anak
                     });
@@ -973,6 +1018,8 @@
                 document.getElementById("no_telp").value = element.no_hp || '';
                 document.getElementById("jumlah_dewasa").value = element.jumlah_dewasa || 1;
                 document.getElementById("jumlah_anak_anak").value = element.jumlah_anak_anak || 0;
+                document.getElementById("jenis_kelamin").value = element.jenis_kelamin || 'laki-laki';
+
 
                 modal.hide();
             }
@@ -997,6 +1044,7 @@
                         document.getElementById("no_telp").value = data.no_hp || '';
                         document.getElementById("jumlah_dewasa").value = data.jumlah_dewasa || 1;
                         document.getElementById("jumlah_anak_anak").value = data.jumlah_anak_anak || 0;
+                        document.getElementById("jenis_kelamin").value = data.jenis_kelamin || 'laki-laki';
 
                         // reset form input tambah baru
                         simpan_baru.reset();

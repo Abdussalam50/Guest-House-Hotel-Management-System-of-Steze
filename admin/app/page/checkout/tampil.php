@@ -461,7 +461,7 @@
                     })
                     .then(data => {
                         if (data.response == 'yes') {
-                            return fetch('cetak_nota.php', {
+                            return fetch('proses_checkout.php', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'

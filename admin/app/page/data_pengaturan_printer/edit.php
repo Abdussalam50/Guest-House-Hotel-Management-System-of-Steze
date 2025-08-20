@@ -52,7 +52,7 @@
 						<td width="2%">:</td>
 						<td>
 							<select class="form-control form-control-solid form-control-xs" required="required" type="text" name="ukuran_kertas" id="ukuran_kertas" placeholder="Nama&nbsp;Printer&nbsp;Nota" value="<?php echo ($data['nama_printer_nota']); ?>">
-								<option value=""></option><?php combo_enum("data_pengaturan_printer", "ukuran_kertas", "") ?>
+								<option value="<?php echo ($data['ukuran_kertas']); ?>"><?php echo ($data['ukuran_kertas']); ?></option><?php combo_enum("data_pengaturan_printer", "ukuran_kertas", "") ?>
 							</select>
 
 						</td>

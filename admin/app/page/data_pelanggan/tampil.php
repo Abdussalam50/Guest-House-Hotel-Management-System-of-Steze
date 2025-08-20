@@ -24,10 +24,13 @@
 
 
                         <!--h <th>Id Pelanggan </th> h-->
-                        <th align="left" class="th_border cell">Nama </th>
-                        <th align="left" class="th_border cell">Jenis Kelamin </th>
-                        <th align="left" class="th_border cell">Hotel&nbsp;Transaksi </th>
-                        <th align="left" class="th_border cell">No Hp </th>
+                        <th align="left" class="th_border cell">Nama</th>
+                        <th align="left" class="th_border cell">Identitas</th>
+                        <th align="left" class="th_border cell">No identitas</th>
+                        <th align="left" class="th_border cell">Alamat</th>
+                        <th align="left" class="th_border cell">Jenis kelamin</th>
+                        <th align="left" class="th_border cell">Lokasi Transaksi</th>
+                        <th align="left" class="th_border cell">No hp</th>
 
 
                     </tr>
@@ -82,9 +85,12 @@
 
                                     </a>
                                 </td>
-                                <td align="left"><?php echo ucwords($data['jenis_kelamin']); ?></td>
-                                <td align="left"><?php echo ucwords(baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'"))  ?></td>
-                                <td align="left"><?php echo $data['no_hp']; ?></td>
+                                <td align="left"><?php echo $data["identitas"]; ?></td>
+                                <td align="left"><?php echo $data["no_identitas"]; ?></td>
+                                <td align="left"><?php echo readmore($data["alamat"]); ?></td>
+                                <td align="left"><?php echo $data["jenis_kelamin"]; ?></td>
+                                <td align="left"><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'")  ?></td>
+                                <td align="left"><?php echo $data["no_hp"]; ?></td>
 
 
 
