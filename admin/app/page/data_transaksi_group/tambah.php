@@ -42,7 +42,7 @@
                     .room-badge {
                         cursor: pointer;
                         padding: 10px;
-                        background-color: #75cc68;
+                        background-color: #3bc3b6;
                         color: white;
                         font-size: 1rem;
                         font-weight: bold;
@@ -141,32 +141,13 @@
                         <div class="mb-4">
                             <div class="cardcheckin-body">
                                 <div class="d-flex align-items-center mb-3">
-                                    <?php
-                                    $displayKamar = strlen($noKamar) > 5 ? substr($noKamar, 0, 18) . "..." : $noKamar;
-                                    ?>
 
-                                    <div class="room-badge"
-                                        data-full="<?php echo htmlspecialchars($noKamar); ?>">
-                                        <?php echo htmlspecialchars($displayKamar); ?>
+
+                                    <div class="room-badge">
+                                        GROUP
                                     </div>
 
 
-                                    <script>
-                                        document.addEventListener("DOMContentLoaded", function() {
-                                            document.querySelectorAll('.room-badge').forEach(function(el) {
-                                                el.addEventListener('click', function() {
-                                                    const fullName = this.getAttribute('data-full');
-
-                                                    Swal.fire({
-                                                        title: "No. Kamar",
-                                                        text: fullName,
-                                                        icon: "info",
-                                                        confirmButtonText: "OK"
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    </script>
 
 
                                     <h4 class="mb-0"><i class="fas fa-sign-in-alt text-success"></i> Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?></h4>
@@ -177,7 +158,39 @@
                                     <div class="col-md-4">
                                         <div class="cardcheckin h-100">
                                             <div class="cardcheckin-body">
-                                                <div class="card-group-title">Informasi Kamar</div>
+                                                <div class="card-group-title">Informasi Pemesan</div>
+
+
+                                                <label class="form-label">Nama</label>
+
+                                                <!-- 
+                                                <select onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")' class="form-select mb-2" type="text" name="id_pelanggan" id="id_pelanggan" placeholder="Id Pelanggan " required="required">
+                                                    <option value="">Pilih Pelanggan</option>
+
+                                                </select> -->
+
+
+                                                <div class="input-group mb-2">
+
+                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan" required>
+                                                    <input type="hidden" name="id_pelanggan" id="id_pelanggan">
+
+
+                                                    <button type="button" class="btn btn-secondary" onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'>
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+
+
+
+                                                <input required type="hidden" class="form-control" name="identitas" id="identitas" placeholder="Identitas">
+                                                <input required type="hidden" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
+                                                <input required type="hidden" class="form-control" name="alamat" id="alamat" placeholder="Alamat">
+                                                <input required type="hidden" class="form-control" name="no_telp" id="no_telp" placeholder="No Telp">
+                                                <input required type="hidden" class="form-control" name="jenis_kelamin" id="jenis_kelamin">
+
+
+
 
                                                 <label class="form-label">Tanggal</label>
                                                 <input type="date" class="form-control mb-2" name="tanggal" value="2013-05-20">
@@ -191,16 +204,16 @@
 
 
 
-                                                <div class="row">
-
-                                                    <label class="form-label">Tipe Kamar</label>
-                                                    <div class="input-group">
-                                                        <input class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
-
-                                                    </div>
 
 
-                                                </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -233,70 +246,296 @@
                                     <div class="col-md-4">
                                         <div class="cardcheckin h-100">
                                             <div class="cardcheckin-body">
-                                                <div class="card-group-title">Informasi Pelanggan</div>
+                                                <div class="card-group-title">Informasi kamar</div>
 
 
-                                                <label class="form-label">Nama</label>
 
-                                                <!-- 
-                                                <select onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")' class="form-select mb-2" type="text" name="id_pelanggan" id="id_pelanggan" placeholder="Id Pelanggan " required="required">
-                                                    <option value="">Pilih Pelanggan</option>
-
-                                                </select> -->
+                                                <input type="hidden" class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
+                                                <input type="hidden" class="form-control" min="1" value="1" style="text-align: center;" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa " required="required">
+                                                <input type="hidden" class="form-control" value="0" min="0" style="text-align: center;" name="jumlah_anak_anak" id="jumlah_anak_anak" placeholder="Jumlah Anak Anak ">
 
 
+                                                <label class="form-label">Pilih Kamar</label>
                                                 <div class="input-group mb-2">
 
-                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan" required>
-                                                    <input type="hidden" name="id_pelanggan" id="id_pelanggan">
-
-
-                                                    <button type="button" class="btn btn-secondary" onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'>
+                                                    <input class="form-control" type="text" name="pilih_kamar" id="pilih_kamar" placeholder="Pilih Kamar" readonly required="">
+                                                    <button type="button" id="btn_pilih_kamar" class="btn btn-secondary">
                                                         <i class="fas fa-search"></i>
                                                     </button>
+
                                                 </div>
 
 
-                                                <div class="row g-2 mb-1">
-                                                    <div class="col-4">
-                                                        <label class="form-label">Identitas</label>
-                                                        <input required class="form-control " name="identitas" id="identitas" placeholder="Identitas">
+                                                <style>
+                                                    .kamar-card {
+                                                        --bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%);
+                                                        box-shadow: var(--bs-card-box-shadow);
+                                                        cursor: pointer;
+                                                        background-position: right top;
+                                                        background-size: 30%;
+                                                        background-repeat: no-repeat;
+                                                        background-image: url('../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg');
+                                                        border-radius: 12px;
+                                                        transition: 0.2s;
+                                                    }
 
-                                                    </div>
-                                                    <div class="col-8">
-                                                        <label class="form-label">No. Identitas</label>
-                                                        <div class="input-group ">
-                                                            <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
+                                                    .kamar-card:hover {
+                                                        transform: scale(1.05);
+                                                    }
+                                                </style>
+                                                <div class="modal fade" id="modalKamar" tabindex="-1">
+                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                        <div class="modal-content">
+
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Pilih Kamar</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+                                                                <div class="row g-3">
+                                                                    <?php
+                                                                    // Asumsi $idHotel sudah didefinisikan sebelumnya
+                                                                    $query = "SELECT * FROM data_kamar 
+                                                                        WHERE id_hotel = '$idHotel'
+                                                                        ORDER BY no_kamar ASC";
+                                                                    $result = mysql_query($query);
+
+                                                                    if (!$result) {
+                                                                        die('Query Error: ' . mysql_error());
+                                                                    }
+                                                                    ?>
+
+                                                                    <style>
+                                                                        /* Buat semua kartu kamar memiliki tinggi sama */
+                                                                        .kamar-card {
+                                                                            height: 115px;
+                                                                            padding: 10px !important;
+                                                                            display: flex;
+                                                                            flex-direction: column;
+                                                                            justify-content: space-between;
+                                                                        }
+                                                                    </style>
+
+                                                                    <div class="row">
+                                                                        <?php
+                                                                        while ($row = mysql_fetch_assoc($result)) {
+                                                                            $badgeClass = ($row['status_kamar'] == 'Kosong') ? 'bg-success' : 'bg-danger';
+                                                                            $statusText = ($row['status_kamar'] == 'Kosong') ? 'Tersedia' : 'Terisi';
+                                                                        ?>
+                                                                            <div class="col-6 col-md-4 col-lg-3 mb-3">
+                                                                                <div class="card kamar-card p-2 pilih-kamar-item" data-kamar="<?= htmlspecialchars($row['no_kamar']) ?>" style="display: flex; flex-direction: column; justify-content: space-between; height: 150px;">
+                                                                                    <div style="margin-top: 10px;">
+                                                                                        <div class="fw-bold text-primary text-left" style="font-size: 13px;">
+                                                                                            Kamar <?= htmlspecialchars($row['no_kamar']) ?>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                    <!-- Badge selalu di bawah -->
+                                                                                    <div class="mt-auto" style="margin-bottom: 10px;">
+                                                                                        <div class="text-left small mb-2">
+                                                                                            <?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$row[id_tipe_kamar]'")); ?>
+                                                                                            <br>
+                                                                                            <span class="text-dark"><?= rupiah($row['harga_harian']) ?> @ 1 Days</span>
+                                                                                        </div>
+                                                                                        <span class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        <?php
+                                                                        }
+                                                                        ?>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
 
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <label class="form-label">Alamat</label>
-                                                <input required type="text" class="form-control mb-1" name="alamat" id="alamat" placeholder="Alamat">
+                                                <script>
+                                                    function showJumlahTamu() {
 
-                                                <label class="form-label">No. Telp</label>
-                                                <input required type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp">
+                                                        Swal.fire({
+                                                            title: "Jumlah Tamu",
+                                                            width: 500,
+                                                            html: `
+            <style>
+                .tamu-wrapper {
+                    border: 1px solid #cdd2dd;
+                    border-radius: 10px;
+                    display: flex;
+                    overflow: hidden;
+                    width: 100%;
+                    margin-top: 10px;
+                }
+                .tamu-label {
+                    background: #f8f9fa;
+                    color: #3a3f4b;
+                    padding: 10px;
+                    font-size: 15px;
+                    width: 100px;
+                    text-align: center;
+                    border-right: 1px solid #cdd2dd;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 500;
+                }
+                .tamu-input {
+                    width: 60px;
+                    padding: 10px;
+                    text-align: center;
+                    border: none;
+                    outline: none;
+                    font-size: 16px;
+                    color: #3a3f4b;
+                    border-right: 1px solid #cdd2dd;
+                }
+                .tamu-input:last-child {
+                    border-right: none !important;
+                }
+            </style>
 
-                                                <label class="form-label">Jenis Kelamin</label>
-                                                <select required class="form-control mb-2" name="jenis_kelamin" id="jenis_kelamin">
-                                                    <option value="" disabled selected>Jenis Kelamin</option>
-                                                    <option value="laki-laki">Laki-laki</option>
-                                                    <option value="perempuan">Perempuan</option>
-                                                </select>
+            <div class="tamu-wrapper">
+                <div class="tamu-label">Dewasa</div>
+                <input id="dewasaVal" type="number" min="1" value="1" class="tamu-input">
+
+                <div class="tamu-label">Anak</div>
+                <input id="anakVal" type="number" min="0" value="0" class="tamu-input">
+            </div>
+        `,
+                                                            confirmButtonText: "Simpan",
+                                                            preConfirm: () => {
+                                                                return {
+                                                                    dewasa: document.getElementById("dewasaVal").value,
+                                                                    anak: document.getElementById("anakVal").value
+                                                                };
+                                                            }
+                                                        });
+                                                    }
+
+
+                                                    // klik input atau tombol → buka modal
+                                                    document.getElementById("pilih_kamar").addEventListener("click", function() {
+                                                        new bootstrap.Modal(document.getElementById('modalKamar')).show();
+                                                    });
+
+                                                    document.getElementById("btn_pilih_kamar").addEventListener("click", function() {
+                                                        new bootstrap.Modal(document.getElementById('modalKamar')).show();
+                                                    });
+
+                                                    // klik kamar di modal
+                                                    document.querySelectorAll(".pilih-kamar-item").forEach(function(card) {
+                                                        card.addEventListener("click", function() {
+
+                                                            let kamar = this.getAttribute("data-kamar");
+
+                                                            // Tutup modal
+                                                            var modal = bootstrap.Modal.getInstance(document.getElementById('modalKamar'));
+                                                            modal.hide();
+
+                                                            // Minta input jumlah dewasa & anak
+                                                            setTimeout(() => {
+                                                                showJumlahTamu(kamar);
+                                                            }, 300);
+                                                        });
+                                                    });
+                                                </script>
 
 
 
 
 
-                                                <label class="form-label">Jumlah Tamu</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">Dewasa</span>
-                                                    <input class="form-control" min="1" value="1" style="text-align: center;" type="number" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa " required="required">
+                                                <label class="form-label">List Kamar</label>
+                                                <style>
+                                                    .room-table {
+                                                        width: 100%;
+                                                        border-collapse: separate;
 
-                                                    <span class="input-group-text">Anak</span>
-                                                    <input class="form-control" value="0" min="0" style="text-align: center;" type="number" name="jumlah_anak_anak" id="jumlah_anak_anak" placeholder="Jumlah Anak Anak ">
+                                                        border-spacing: 0;
+                                                        border: 2px dashed rgba(99, 102, 241, 0.18);
+                                                        border-radius: 10px;
+                                                        overflow: hidden;
+                                                        background: #fff;
+                                                    }
+
+                                                    .room-table td:first-child,
+                                                    .room-table th:first-child {
+                                                        padding-left: 5px !important;
+                                                    }
+
+                                                    .room-table td:last-child,
+                                                    .room-table th:last-child {
+                                                        padding-right: 5px !important;
+                                                    }
+
+                                                    .table-scroll {
+                                                        max-height: 330px;
+                                                        /* bebas ubah tinggi */
+                                                        overflow-y: auto;
+                                                        overflow-x: hidden;
+                                                        border-radius: 10px;
+                                                        /* biar tetap rapi */
+                                                    }
+                                                </style>
+
+                                                <?php
+                                                // contoh data (bisa dari database)
+                                                $kamarList = [
+                                                    ["nama" => "Deluxe Double", "dewasa" => 2, "anak" => 1],
+                                                    ["nama" => "Family Suite", "dewasa" => 2, "anak" => 2],
+                                                    ["nama" => "Presidential View", "dewasa" => 2, "anak" => 3],
+                                                    ["nama" => "Single Cozy", "dewasa" => 1, "anak" => 0],
+                                                ];
+
+                                                // Jika mau tes kondisi kosong → uncomment ini
+                                                $kamarList = [];
+                                                ?>
+
+                                                <div class="table-scroll">
+                                                    <table class="room-table table align-middle">
+                                                        <thead>
+                                                            <tr style="background-color: #f9f9f9;">
+                                                                <th scope="col">Kamar</th>
+                                                                <th scope="col" class="text-center">Dewasa</th>
+                                                                <th scope="col" class="text-center">Anak</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            <?php if (count($kamarList) > 0): ?>
+
+                                                                <?php foreach ($kamarList as $kamar): ?>
+                                                                    <tr>
+                                                                        <td><?= $kamar["nama"] ?></td>
+                                                                        <td class="text-center"><?= $kamar["dewasa"] ?></td>
+                                                                        <td class="text-center"><?= $kamar["anak"] ?></td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+
+                                                            <?php else: ?>
+
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center py-4">
+                                                                        <img src="https://media.baamboozle.com/uploads/images/113260/1638441135_66175_gif-url.gif"
+                                                                            width="60" class="mb-2 opacity-75">
+                                                                        <div class="fw-semibold text-muted">Belum ada kamar yang dipilih</div>
+                                                                    </td>
+                                                                </tr>
+
+                                                            <?php endif; ?>
+
+                                                        </tbody>
+                                                    </table>
+
                                                 </div>
+
+
+
                                             </div>
                                         </div>
                                     </div>

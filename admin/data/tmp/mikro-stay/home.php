@@ -217,7 +217,7 @@
 															}
 
 
-															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$id_hotel' ORDER BY CAST(REGEXP_SUBSTR(LOWER(no_kamar), '[0-9]+') AS UNSIGNED), REGEXP_SUBSTR(LOWER(no_kamar), '[a-z]+$')");
+															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$id_hotel' ");
 															while ($data_kamar = mysql_fetch_array($queryKamar)) {
 																if ($data_kamar['status_kamar'] == 'Kosong') {
 																?>
@@ -406,8 +406,8 @@
 
 
 
-		<script src="vue.min.js"></script>
-		<script src="app.js"></script>
+		<!-- <script src="vue.min.js"></script>
+		<script src="app.js"></script> -->
 
 
 
@@ -767,8 +767,8 @@
 
 	<script>
 		// inisialisasi popover agar aktif
-		const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-		const popoverList = [...popoverTriggerList].map(el => new bootstrap.Popover(el))
+		//const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+		//const popoverList = [...popoverTriggerList].map(el => new bootstrap.Popover(el))
 	</script>
 
 
