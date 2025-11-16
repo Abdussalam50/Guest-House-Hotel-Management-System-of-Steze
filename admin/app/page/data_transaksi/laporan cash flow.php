@@ -1,4 +1,12 @@
 <?php
+if(isset($_COOKIE['operasional'])){
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+}
 if (isset($_GET['input'])) {
     echo "<h3>Cetak Laporan Cash Flow</h3>";
 ?>
@@ -203,8 +211,8 @@ if (isset($_GET['input'])) {
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Deskripsi</th>
-                <th>Debit</th>
-                <th>Kredit</th>
+                <th>Cash In</th>
+                <th>Cash Out</th>
             </thead>
             <tbody>
                 <?php
@@ -243,15 +251,26 @@ if (isset($_GET['input'])) {
                     <tr>
                         <td><?php echo $no++ ?></td>
                         <td><?php echo format_indo($data['tanggal']) ?></td>
-                        <td><?php echo $data['deskripsi'] ?></td>
+                        <td><?php echo $data['deskripsi'] ?> <?php echo $data['metode_pembayaran'] ?> </td>
                         <td>Rp <?php echo number_format($data['debit']) ?></td>
                         <td>Rp <?php echo number_format($data['kredit']) ?></td>
                     </tr>
                 <?php
                 }
                 ?>
+                <tr style='font-weight:700'>
+                    <td colspan="3">Total Cash In dan Cash Out</td>
+                    <td>Rp <?php
+                            $tot_debit = array_sum($debit);
+                            echo number_format($tot_debit) ?></td>
+                    <td>
+                        Rp <?php
+                            $tot_kredit = array_sum($kredit);
+                            echo number_format($tot_kredit) ?>
+                    </td>
+                </tr>
                 <tr>
-                    <td colspan="4" style='font-weight:700'>
+                    <td colspan="4" style='font-weight:700;'>
                         Total Cashflow
                     </td>
                     <td style='font-weight:700'>Rp <?php

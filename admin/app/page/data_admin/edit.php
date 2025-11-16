@@ -53,9 +53,24 @@
                             </td>
                             <td width="2%">:</td>
                             <td>
-                                <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
-                                    <option value="">- -</option><?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel where id_hotel='$id_hotel'"); ?>
-                                </select>
+                                <?php
+                                if ($_COOKIE['id_hotel'] == "") {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
+                                        <option value="<?php echo $data['id_hotel']; ?>"><?php echo $data['id_hotel']; ?></option><?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel"); ?>
+                                    </select>
+                                <?php
+                                } else {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
+                                        <option value="">- -</option><?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel where id_hotel='$id_hotel'"); ?>
+                                    </select>
+                                <?php
+                                }
+                                ?>
+
+
+
                             </td>
                         </tr>
                         <tr>
@@ -92,6 +107,7 @@
                 <div class="content-box-content">
                     <center>
                         <?php btn_update(' PROSES UPDATE DATA'); ?>
+                        <!-- <a href="index.php?input=hapus&proses=<?= encrypt($proses)?>" class="btn btn-danger"><i class="fas fa-remove"></i> Hapus Data</a> -->
                     </center>
                 </div>
             </div>

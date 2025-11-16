@@ -1,8 +1,17 @@
 <?php
 $id_hotel = decrypt($_COOKIE['id_hotel']);
 
-// bikin filter dinamis
-$filter_hotel = ($id_hotel != "") ? "AND id_hotel = '$id_hotel'" : "";
+// Fetch hotels for super admin
+$hotels = [];
+if ($id_hotel == "") {
+	$hotel_query = mysql_query("SELECT id_hotel, nama FROM data_hotel ORDER BY id_hotel");
+	while ($row = mysql_fetch_assoc($hotel_query)) {
+		$hotels[] = $row;
+	}
+}
+
+// Build dynamic filter
+$filter_hotel = ($id_hotel != "") ? "AND id_hotel = '$id_hotel'" : (isset($_POST['hotel']) && $_POST['hotel'] != 'all' ? "AND id_hotel = '" . mysql_real_escape_string($_POST['hotel']) . "'" : "");
 
 // Fetch distinct years and months from data_transaksi for combobox
 $year_month_query = mysql_query("
@@ -21,9 +30,11 @@ while ($row = mysql_fetch_assoc($year_month_query)) {
 // Default to current year and month if not set
 $selected_year = isset($_POST['year']) ? mysql_real_escape_string($_POST['year']) : date('Y');
 $selected_month = isset($_POST['month']) ? mysql_real_escape_string($_POST['month']) : date('m');
+$selected_hotel = isset($_POST['hotel']) ? mysql_real_escape_string($_POST['hotel']) : ($id_hotel != "" ? $id_hotel : 'all');
 
 // Get number of days in the selected month
-$days_in_month = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
+$days_in_month = date('t', strtotime($selected_year . '-' . $selected_month . '-01'));
+
 
 // Fetch transaction counts per day for the selected month and year
 $trans_query = mysql_query("
@@ -45,7 +56,6 @@ $labels = range(1, $days_in_month);
 $counts = array_values($daily_counts);
 ?>
 
-
 <!DOCTYPE html>
 <html>
 
@@ -57,8 +67,6 @@ $counts = array_values($daily_counts);
 			width: 100% !important;
 			max-width: 100% !important;
 		}
-
-
 
 		table {
 			border-collapse: collapse;
@@ -81,13 +89,33 @@ $counts = array_values($daily_counts);
 		th {
 			background-color: #f4f4f4;
 		}
+
+		.filter-form {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+
+		.filter-form select {
+			margin: 0 10px;
+		}
 	</style>
 </head>
 
 <body>
 	<h3>Jumlah Transaksi Harian (<?php echo date('F Y', mktime(0, 0, 0, $selected_month, 1, $selected_year)); ?>)</h3>
 
-	<form method="post" style="margin-bottom: 20px;">
+	<form method="post" class="filter-form">
+		<?php if ($id_hotel == ""): ?>
+			<label for="hotel">Hotel: </label>
+			<select name="hotel" id="hotel" onchange="this.form.submit()">
+				<option value="all" <?php echo $selected_hotel == 'all' ? 'selected' : ''; ?>>All Hotels</option>
+				<?php foreach ($hotels as $hotel): ?>
+					<option value="<?php echo htmlspecialchars($hotel['id_hotel']); ?>" <?php echo $selected_hotel == $hotel['id_hotel'] ? 'selected' : ''; ?>>
+						<?php echo htmlspecialchars($hotel['nama']); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		<?php endif; ?>
 		<label for="year">Tahun: </label>
 		<select name="year" id="year" onchange="this.form.submit()">
 			<?php foreach ($years as $year): ?>
@@ -108,7 +136,6 @@ $counts = array_values($daily_counts);
 
 	<canvas id="transactionChart" style="max-width: 100%; max-height: 400px; margin: auto; display: block; box-sizing: border-box; height: 400px; width: 300px;"></canvas>
 
-	<!-- Tambahan tabel -->
 	<table>
 		<thead>
 			<tr>

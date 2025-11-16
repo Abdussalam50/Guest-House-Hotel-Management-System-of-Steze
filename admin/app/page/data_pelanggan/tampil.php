@@ -1,3 +1,13 @@
+<?php
+if(isset($_COOKIE['operasional'])){
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+}
+?>
 <div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
     <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold">
         <i class='fas fa-add text-black'></i> Input Pelanggan
@@ -31,6 +41,22 @@
                         <th align="left" class="th_border cell">Jenis kelamin</th>
                         <th align="left" class="th_border cell">Lokasi Transaksi</th>
                         <th align="left" class="th_border cell">No hp</th>
+                        <?php
+                            if(isset($_COOKIE['id_hotel'])){
+                                $idhotel=decrypt($_COOKIE['id_hotel']);
+                                $hotel=baca_database("","nama","select * from data_hotel where id_hotel='$idhotel'");
+                            
+                        ?>
+                        <th align="left" class="th_border cell">Total Transaksi (<?= ucwords($hotel)?>)</th>
+                        <th align="left" class="th_border cell">Total Transaksi </th>
+                        
+                        <?php
+                            }else{
+                        ?>
+                        <th align="left" class="th_border cell">Total Transaksi </th>
+                        <?php
+                            }
+                        ?>
 
 
                     </tr>
@@ -91,7 +117,28 @@
                                 <td align="left"><?php echo $data["jenis_kelamin"]; ?></td>
                                 <td align="left"><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'")  ?></td>
                                 <td align="left"><?php echo $data["no_hp"]; ?></td>
+                        <?php
+                        
+                                $query_total=mysql_query("SELECT COUNT(*) AS total FROM  data_transaksi WHERE id_pelanggan='$data[id_pelanggan]'");
+                                $data_total=mysql_fetch_array($query_total);
+                                $total=$data_total['total'];
+                            if(isset($_COOKIE['id_hotel'])){
+                                $query_total_sini=mysql_query("SELECT COUNT(*) AS total_sini FROM data_transaksi WHERE id_pelanggan='$data[id_pelanggan]' AND id_hotel='$idhotel'");
+                                $data_sini=mysql_fetch_array($query_total_sini);
+                                $total_sini=$data_sini['total_sini'];
 
+                        ?>
+                       <td align="left"><?php echo $total_sini; ?> Transaksi</td>
+                       <td align="left"><?php echo $total; ?> Transaksi</td>
+                       
+                        
+                        <?php
+                            }else{
+                        ?>
+                        <th align="left" class="th_border cell"><?= $total?> Transaksi</th>
+                        <?php
+                            }
+                        ?>                                
 
 
                             </tr>

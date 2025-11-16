@@ -256,8 +256,14 @@ $color_type = "danger";
 
                                     </span>
                                     <?php
-                                    $queryPelanggan = mysql_query("SELECT * FROM data_pelanggan WHERE id_hotel='$id_hotel'");
-                                    $jumlahPelanggan = mysql_num_rows($queryPelanggan);
+                                    if ($id_hotel == "") {
+                                        $queryPelanggan = mysql_query("SELECT * FROM data_pelanggan ");
+                                        $jumlahPelanggan = mysql_num_rows($queryPelanggan);
+                                    } else {
+                                        $queryPelanggan = mysql_query("SELECT * FROM data_pelanggan WHERE id_hotel='$id_hotel'");
+                                        $jumlahPelanggan = mysql_num_rows($queryPelanggan);
+                                    }
+
                                     ?>
                                     <!--end::Date-->
 
@@ -274,8 +280,15 @@ $color_type = "danger";
                                     <span class="fs-6 text-gray-500 fw-bold">Transaksi</span>
                                     <!--end::Date-->
                                     <?php
-                                    $queryTransaksi = mysql_query("SELECT * FROM data_transaksi JOIN data_pelanggan ON data_transaksi.id_pelanggan=data_pelanggan.id_pelanggan WHERE data_transaksi.id_hotel='$id_hotel'");
-                                    $jumlahTransaksi = mysql_num_rows($queryTransaksi);
+
+                                    if ($id_hotel == "") {
+                                        $queryTransaksi = mysql_query("SELECT * FROM data_transaksi JOIN data_pelanggan ON data_transaksi.id_pelanggan=data_pelanggan.id_pelanggan ");
+                                        $jumlahTransaksi = mysql_num_rows($queryTransaksi);
+                                    } else {
+                                        $queryTransaksi = mysql_query("SELECT * FROM data_transaksi JOIN data_pelanggan ON data_transaksi.id_pelanggan=data_pelanggan.id_pelanggan WHERE data_transaksi.id_hotel='$id_hotel'");
+                                        $jumlahTransaksi = mysql_num_rows($queryTransaksi);
+                                    }
+
                                     ?>
                                     <!--begin::Label-->
                                     <div id="tersedia" class="fs-5 fw-bold text-black"> <?php echo $jumlahTransaksi ?>
@@ -850,45 +863,65 @@ $color_type = "danger";
                                             <!--begin::Row-->
                                             <div class="row g-2">
 
-                                                <div class="col-4">
-                                                    <a href="../data_pengaturan_printer/index.php?input=detail"
-                                                        class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
-                                                        <img src="https://stock.ridikcindustries.com/admin/upload/1737378453-35735-credit-card.png"
-                                                            class="w-25px h-25px mb-2" alt="" />
-                                                        <span class="fw-semibold">Printer</span>
-                                                    </a>
-                                                </div>
 
-                                                <div class="col-4">
-                                                    <a href="../data_pengaturan_aplikasi/index.php"
-                                                        class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
-                                                        <img src="https://stock.ridikcindustries.com/admin/upload/1737378453-35735-credit-card.png"
-                                                            class="w-25px h-25px mb-2" alt="" />
-                                                        <span class="fw-semibold">Aplikasi</span>
-                                                    </a>
-                                                </div>
+                                                <?php if ($_COOKIE['id_hotel'] == "") {
+                                                ?>
+                                                    <div class="col-4">
+                                                        <a href="../data_pengaturan_aplikasi/index.php"
+                                                            class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
+                                                            <img src="../../../../admin/data/image/logo/vektors.png"
+                                                                class="w-25px h-25px mb-2" alt="" />
+                                                            <span class="fw-semibold">Aplikasi</span>
+                                                        </a>
+                                                    </div>
 
-                                                <div class="col-4">
-                                                    <a href="../backuprestore/index.php?input=backup"
-                                                        class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
-                                                        <img src="https://stock.ridikcindustries.com/admin/upload/1737378453-35735-credit-card.png"
-                                                            class="w-25px h-25px mb-2" alt="" />
-                                                        <span class="fw-semibold">Backup</span>
-                                                    </a>
-                                                </div>
+                                                    <div class="col-4">
+                                                        <a href="../backuprestore/index.php?input=backup"
+                                                            class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
+                                                            <img src="../../../../admin/data/image/logo/vektors.png"
+                                                                class="w-25px h-25px mb-2" alt="" />
+                                                            <span class="fw-semibold">Backup</span>
+                                                        </a>
+                                                    </div>
 
-                                                <div class="col-4">
-                                                    <a href="../backuprestore/index.php?input=restore"
-                                                        class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
-                                                        <img src="https://stock.ridikcindustries.com/admin/upload/1737378453-35735-credit-card.png"
-                                                            class="w-25px h-25px mb-2" alt="" />
-                                                        <span class="fw-semibold">Restore</span>
-                                                    </a>
-                                                </div>
+                                                    <div class="col-4">
+                                                        <a href="../backuprestore/index.php?input=restore"
+                                                            class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
+                                                            <img src="../../../../admin/data/image/logo/vektors.png"
+                                                                class="w-25px h-25px mb-2" alt="" />
+                                                            <span class="fw-semibold">Restore</span>
+                                                        </a>
+                                                    </div>
+
+                                                    <div class="col-4">
+                                                        <a href="../data_pengelola/index.php?input=restore"
+                                                            class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
+                                                            <img src="../../../../admin/data/image/logo/vektors.png"
+                                                                class="w-25px h-25px mb-2" alt="" />
+                                                            <span class="fw-semibold">Pengelola</span>
+                                                        </a>
+                                                    </div>
+                                                <?php
+                                                } else {
+                                                ?>
+                                                    <div class="col-4">
+                                                        <a href="../data_pengaturan_printer/index.php?input=detail"
+                                                            class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
+                                                            <img src="../../../../admin/data/image/logo/vektors.png"
+                                                                class="w-25px h-25px mb-2" alt="" />
+                                                            <span class="fw-semibold">Printer</span>
+                                                        </a>
+                                                    </div>
+                                                <?php
+                                                }
+                                                ?>
+
+
+
                                                 <div class="col-4">
                                                     <a href="<?php logout(); ?>"
                                                         class="d-flex flex-column flex-center text-center text-gray-800 text-hover-<?php echo $color_type; ?> bg-hover-light rounded py-4 px-3 mb-3">
-                                                        <img src="https://stock.ridikcindustries.com/admin/upload/1737378453-35735-credit-card.png"
+                                                        <img src="../../../../admin/data/image/logo/vektors.png"
                                                             class="w-25px h-25px mb-2" alt="" />
                                                         <span class="fw-semibold">Logout</span>
                                                     </a>
@@ -926,6 +959,8 @@ $color_type = "danger";
 
 
                     if (lastpath("data_transaksi") && isset($_GET['input']) && $_GET['input'] == "tambah") {
+                        include 'halaman.php';
+                    } else if (lastpath("checkout") && isset($_GET['input']) && $_GET['input'] == "tampil") {
                         include 'halaman.php';
                     } else {
                 ?>

@@ -1,9 +1,26 @@
 <div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
-
+    <?php
+        if(!isset($_COOKIE['id_hotel'])){
+    ?>
     <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold">
         <i class='fas fa-add text-black'></i> Tambah Bank
     </a>
+    <?php
+    }
+    
+    
+    if(isset($_COOKIE['operasional'])){
+        $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='akses_kamar_operasional'");
+        if($akses==0){
+        ?>
+        <script>
+         alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu bank\n');
 
+            window.location.href='../index.php';
+        </script>
+    <?php
+        }
+    }?>
 
     <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
         <i class='fas fa-search text-white'></i> Pencarian
@@ -34,15 +51,26 @@
                         $no = 0;
                         $startRow = ($page - 1) * $dataPerPage;
                         $no = $startRow;
-
-                        if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
-                            $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
-                            $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_bank where $berdasarkan like '%$isi%' AND id_hotel = '$id_hotel' LIMIT $startRow ,$dataPerPage";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_bank where $berdasarkan like '%$isi%' AND id_hotel = '$id_hotel'";
+                        if ($_COOKIE['id_hotel'] == "") {
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_bank where $berdasarkan like '%$isi%'  ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_bank where $berdasarkan like '%$isi%' ";
+                            } else {
+                                $querytabel = "SELECT * FROM data_bank ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_bank ";
+                            }
                         } else {
-                            $querytabel = "SELECT * FROM data_bank WHERE id_hotel = '$id_hotel' LIMIT $startRow ,$dataPerPage";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_bank WHERE id_hotel = '$id_hotel'";
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_bank where $berdasarkan like '%$isi%' AND id_hotel = '$id_hotel' ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_bank where $berdasarkan like '%$isi%' AND id_hotel = '$id_hotel'";
+                            } else {
+                                $querytabel = "SELECT * FROM data_bank WHERE id_hotel = '$id_hotel' ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_bank WHERE id_hotel = '$id_hotel'";
+                            }
                         }
                         $proses = mysql_query($querytabel);
                         while ($data = mysql_fetch_array($proses)) {
@@ -73,7 +101,7 @@
 
                                 <td align="center" width="50"><?php $no = (($no + 1));
                                                                 echo $no; ?></td>
-                                <td align="left"><a href="<?php index(); ?>?input=edit&proses=<?php echo encrypt($data['id_bank']); ?>"> <?php echo $data['id_bank'] ?></a></td>
+                                <td align="left"><a href="<?php index(); ?>?input=<?= isset($_COOKIE['id_hotel'])?'#':'edit'?>&proses=<?php echo encrypt($data['id_bank']); ?>"> <?php echo $data['id_bank'] ?></a></td>
                                 <td align="left"><?php echo ucwords($data['nama_bank']); ?></td>
 
                                 <td align="left"><?php echo $data['rekening']; ?></td>

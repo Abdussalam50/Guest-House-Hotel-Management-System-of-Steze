@@ -1,4 +1,14 @@
 <body>
+	<?php
+if(isset($_COOKIE['operasional'])){
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pengaturan printer\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+}
+?>
 	<a href="<?php index(); ?>?input=tambah">
 		<?php btn_tambah('Tambah'); ?>
 	</a>

@@ -1,8 +1,24 @@
 <div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
+    <?php
+        if(!isset($_COOKIE['id_hotel'])){
+    ?>
     <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold">
         <i class='fas fa-add text-black'></i> Input Admin
     </a>
-
+    <?php
+    }
+    
+    if(isset($_COOKIE['operasional'])){
+         $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='akses_admin'");
+         if($admin==0){ 
+    ?>  
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu admin\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+    }
+}?>
     <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
         <i class='fas fa-search text-white'></i> Pencarian
     </a>
@@ -30,20 +46,44 @@
                     </tr>
 
                     <tbody>
+
                         <?php
-                        $no = 0;
-                        $startRow = ($page - 1) * $dataPerPage;
-                        $no = $startRow;
-                        $id_hotel = decrypt($_COOKIE['id_hotel']);
-                        if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
-                            $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
-                            $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_admin where $berdasarkan like '%$isi% AND id_hotel='$id_hotel'  LIMIT $startRow ,$dataPerPage";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_admin where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+                        if ($_COOKIE['id_hotel'] == "") {
+
+                            $no = 0;
+                            $startRow = ($page - 1) * $dataPerPage;
+                            $no = $startRow;
+
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_admin where $berdasarkan like '%$isi%  LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_admin where $berdasarkan like '%$isi%' ";
+                            } else {
+                                $querytabel = "SELECT * FROM data_admin  ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_admin";
+                            }
                         } else {
-                            $querytabel = "SELECT * FROM data_admin WHERE id_hotel='$id_hotel' ";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_admin";
+
+                            $no = 0;
+                            $startRow = ($page - 1) * $dataPerPage;
+                            $no = $startRow;
+                            $id_hotel = decrypt($_COOKIE['id_hotel']);
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_admin where $berdasarkan like '%$isi% AND id_hotel='$id_hotel'  LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_admin where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+                            } else {
+                                $querytabel = "SELECT * FROM data_admin WHERE id_hotel='$id_hotel' ";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_admin";
+                            }
                         }
+                        ?>
+
+
+
+                        <?php
                         $proses = mysql_query($querytabel);
                         while ($data = mysql_fetch_array($proses)) {
                         ?>
@@ -76,7 +116,7 @@
                                 <!--h <td align="left"><?php echo $data['id_admin']; ?></td> h-->
                                 <td align="left">
 
-                                    <a href="<?php index(); ?>?input=edit&proses=<?= encrypt($data['id_admin']); ?>" class='mx-2'>
+                                    <a href="<?php index(); ?>?input=<?= isset($_COOKIE['id_hotel'])?'detail':'edit'?>&proses=<?= encrypt($data['id_admin']); ?>" class='mx-2'>
 
 
                                         <?php echo $data['nama']; ?>

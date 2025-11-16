@@ -6,6 +6,9 @@ setcookie('token', '', 0, '/');
 setcookie('jenenge', '', 0, '/');
 setcookie('kodene', '', 0, '/');
 setcookie('hak_akses','',0,'/');
+if(isset($_COOKIE['operasional'])){
+    setcookie('operasional','',0,'/');
+}
 unlink($_SERVER['DOCUMENT_ROOT']."/../tmp/sess_login");
 ?>
 <script>location.href = "index.php";</script>

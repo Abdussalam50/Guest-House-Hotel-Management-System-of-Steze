@@ -11,6 +11,15 @@ if (!isset($_GET['proses']))
 	die();
 } 
 $proses =  (mysql_real_escape_string($_GET['proses']));
+if(isset($_COOKIE['id_hotel'])){
+	$id_hotel=decrypt($_COOKIE['id_hotel']);
+	$id_handler=baca_database("","id_admin","select * from data_admin where id_hotel='$id_hotel'");
+}else{
+	$username=decrypt($_COOKIE['jenenge']);
+	$id_handler=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
+}
+$sql="delete from data_pelanggan where id_pelanggan='$proses'";
+simpan_riwayat("data_pelanggan","id_pelanggan",$proses,$sql,$id_handler);
 $query=mysql_query("delete from data_pelanggan where id_pelanggan='$proses'");
 
 if($query){

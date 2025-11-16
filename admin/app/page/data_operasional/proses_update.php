@@ -21,6 +21,18 @@ $biaya = xss($_POST['biaya']);
 $id_admin = xss($_POST['id_admin']);
 $keperluan = xss($_POST['keperluan']);
 
+$sql="update data_operasional set 
+id_hotel='$id_hotel',
+tanggal='$tanggal',
+operasional='$operasional',
+jumlah='$jumlah',
+keperluan='$keperluan',
+biaya='$biaya',
+id_admin='$id_admin'
+
+where id_operasional='$id_operasional'";
+simpan_riwayat("data_operasional","id_operasional",$id_operasional,$sql,$id_admin);
+
 $query = mysql_query("update data_operasional set 
 id_hotel='$id_hotel',
 tanggal='$tanggal',
@@ -31,7 +43,6 @@ biaya='$biaya',
 id_admin='$id_admin'
 
 where id_operasional='$id_operasional' ") or die(mysql_error());
-
 if ($query) {
 ?>
     <script>

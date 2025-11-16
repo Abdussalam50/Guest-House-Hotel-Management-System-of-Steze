@@ -112,7 +112,9 @@ if (isset($_GET['input'])) {
                 $querytabel = "SELECT * FROM data_operasional WHERE id_hotel='$id_hotel'";
             }
             $proses = mysql_query($querytabel);
+            $Total_biaya=[];
             while ($data = mysql_fetch_array($proses)) {
+                $Total_biaya[]=$data['biaya'];
             ?>
                 <tr class="event2">
                     <td align="center" width="50"><?php $no = $no + 1;
@@ -131,6 +133,11 @@ if (isset($_GET['input'])) {
 
                 </tr>
             <?php } ?>
+            <tr style='font-weight:700'>
+                <td colspan='6' style='text-align:center;'>Total Operasional Hotel</td>
+                <td colspan="2"><?php echo rupiah(array_sum($Total_biaya))?></td>
+
+            </tr>
         </tbody>
     </table>
     <!-- BODY -->

@@ -1,5 +1,6 @@
 <?php
 include '../../../include/all_include.php';
+
 date_default_timezone_set("Asia/Jakarta");
 
 if (!isset($_POST['id_transaksi'])) {
@@ -98,8 +99,9 @@ if (pengaturan_aplikasi('transaksi_bulanan') == "aktif" && isset($_POST['jumlah_
 }
 
 // Metode pembayaran
-$metode_transaksi = xss($_POST['id_metode_pembayaran']);
-$id_bank = baca_database("", "id_bank", "select * from data_metode_pembayaran where id_metode_pembayaran='$metode_transaksi'");
+$id_metode_pembayaran = xss($_POST['id_metode_pembayaran']);
+$metode_pembayaran = xss($_POST['metode_pembayaran']);
+$id_bank = baca_database("", "id_bank", "select * from data_metode_pembayaran where id_metode_pembayaran='$id_metode_pembayaran'");
 $nama_bank = baca_database("", "nama_bank", "select * from data_bank where id_bank='$id_bank'");
 
 // Biaya tambahan & catatan
@@ -144,7 +146,16 @@ $pajak = ($subtotal * $persentase_pajak) / 100;
 $harga_sebelum_pajak = $subtotal;
 $total_bayar = $subtotal + $pajak;
 
-
+//deposit
+$id_metode_deposit=xss($_POST['id_metode_pembayaran_deposit'])==null?'-':xss($_POST['id_metode_pembayaran_deposit']);
+$no_rek_deposit=xss($_POST['no_rekening_deposit'])==null?'-':xss($_POST['no_rekening_deposit']);
+$metode_deposit=xss($_POST['metode_pembayaran_deposit'])==null?'-':xss($_POST['metode_pembayaran_deposit']);
+$nominal_deposit=xss($_POST['nominal_deposit'])==0?0:xss($_POST['nominal_deposit']);
+if($nominal_deposit!==0 && $nominal_deposit!==null){
+$id_deposit=id_otomatis("data_deposit","id_deposit",10);
+}else{
+  $id_deposit='-';
+}
 if ($nominal_bayar == 0) {
   $nominal_bayar = $total_bayar;
 }
@@ -155,16 +166,44 @@ if ($nominal_bayar == 0) {
 mysql_query("START TRANSACTION");
 
 // INSERT DATA TRANSAKSI
+
 $query_transaksi = mysql_query("INSERT INTO data_transaksi VALUES (
 '$id_transaksi','$id_pelanggan','$id_kamar','$waktu_checkin','$waktu_check_out',
-'$no_rekening','$harga_kamar_total','$metode_transaksi','$jumlah_dewasa','$jumlah_anak_anak',
+'$no_rekening','$harga_kamar_total','$id_metode_pembayaran','$metode_pembayaran','$jumlah_dewasa','$jumlah_anak_anak',
 '$discount','$status_transaksi','$nama_pelanggan','$no_hp_pelanggan','$nomor_kamar','$tipe_kamar',
 '$jam_checkin','$jam_checkout','$jumlah_hari','$jenis_transaksi','$id_admin','$nama_admin','$id_hotel','$nama_hotel',
 '$waktu','$id_bank','$nama_bank','$biaya_tambahan_checkin','$deskripsi_biaya_checkin','$biaya_tambahan_checkout','$deskripsi_biaya_checkout',
 '$catatan','$harga_kamar_harian','$harga_kamar_bulanan','$potongan_harga','$persentase_pajak','$pajak','$harga_sebelum_pajak','$total_bayar','$nominal_bayar','$kembalian','$sisa_bayar'
-,'$id_channel','$channel'
-)");
+,'$id_channel'
+,'$channel'
+,'$identitas'
+,'$no_identitas'
+,'$alamat'
+,'$jenis_kelamin'
+,'$id_deposit'
+,'$id_metode_deposit'
+,'$no_rek_deposit'
+,'$metode_deposit'
+,'$nominal_deposit')");
 
+$sql_transaksi="INSERT INTO data_transaksi VALUES (
+'$id_transaksi','$id_pelanggan','$id_kamar','$waktu_checkin','$waktu_check_out',
+'$no_rekening','$harga_kamar_total','$id_metode_pembayaran','$metode_pembayaran','$jumlah_dewasa','$jumlah_anak_anak',
+'$discount','$status_transaksi','$nama_pelanggan','$no_hp_pelanggan','$nomor_kamar','$tipe_kamar',
+'$jam_checkin','$jam_checkout','$jumlah_hari','$jenis_transaksi','$id_admin','$nama_admin','$id_hotel','$nama_hotel',
+'$waktu','$id_bank','$nama_bank','$biaya_tambahan_checkin','$deskripsi_biaya_checkin','$biaya_tambahan_checkout','$deskripsi_biaya_checkout',
+'$catatan','$harga_kamar_harian','$harga_kamar_bulanan','$potongan_harga','$persentase_pajak','$pajak','$harga_sebelum_pajak','$total_bayar','$nominal_bayar','$kembalian','$sisa_bayar'
+,'$id_channel'
+,'$channel'
+,'$identitas'
+,'$no_identitas'
+,'$alamat'
+,'$jenis_kelamin'
+,'$id_deposit'
+,'$id_metode_deposit'
+,'$no_rek_deposit'
+,'$metode_deposit'
+,'$nominal_deposit')";
 // INSERT DATA PAJAK
 
 if ($persentase_pajak > 0) {
@@ -174,24 +213,51 @@ if ($persentase_pajak > 0) {
   $query_pajak = mysql_query("INSERT INTO data_pajak VALUES (
         '$id_pajak','$waktu','$id_transaksi','$type_pajak','$persentase_pajak','$pajak','$id_hotel'
     )");
+  $sql_pajak="INSERT INTO data_pajak VALUES (
+        '$id_pajak','$waktu','$id_transaksi','$type_pajak','$persentase_pajak','$pajak','$id_hotel'
+    )";
 } else {
   $query_pajak = true;
 }
+
+
 
 // INSERT DATA PEMASUKAN
 $id_pemasukan = id_otomatis("data_pemasukan", "id_pemasukan", "10");
 $keterangan = 'Pembayaran Checkin A.n ' . $nama_pelanggan . ', Kamar Nomor ' . $nomor_kamar . ' (' . ($tipe_kamar) . ")";
 $query_pemasukan = mysql_query("INSERT INTO data_pemasukan VALUES (
-    '$id_pemasukan','$waktu','$id_transaksi','$total_bayar','$metode_transaksi','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
+    '$id_pemasukan','$waktu','$id_transaksi','$total_bayar','$id_metode_pembayaran','$metode_pembayaran','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
 )");
-
+$sql_pemasukan="INSERT INTO data_pemasukan VALUES (
+    '$id_pemasukan','$waktu','$id_transaksi','$total_bayar','$id_metode_pembayaran','$metode_pembayaran','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
+)";
+//INSERT DATA DEPOSIT
+if($nominal_deposit!==0){
+$query_deposit=mysql_query("INSERT INTO data_deposit VALUES('$id_deposit','$id_pelanggan','$id_transaksi',NOW(),'$nominal_deposit','$id_admin','$nama_admin','$id_metode_deposit','$no_rek_deposit','$metode_deposit','$id_hotel')");
+$sql_deposit="INSERT INTO data_deposit VALUES('$id_deposit','$id_pelanggan','$id_transaksi',NOW(),'$nominal_deposit','$id_admin','$nama_admin','$id_metode_deposit','$no_rek_deposit','$metode_deposit','$id_hotel')";
+}else{
+  $query_deposit=true;
+}
 // UPDATE STATUS KAMAR
 $query_status = mysql_query("UPDATE data_kamar SET status_kamar='Terisi' WHERE id_kamar='$id_kamar'");
 
 // CEK SEMUA QUERY
-if ($query_transaksi && $query_pajak && $query_pemasukan && $query_status) {
+
+if ($query_transaksi && $query_pajak && $query_pemasukan && $query_deposit&&$query_status) {
   mysql_query("COMMIT");
 
+//SIMPAN 
+if($id_admin==null){
+  $username_pengelola=decrypt($_COOKIE['jenenge']);
+  $id_admin=baca_database("","","select * from data_pengelola where username='$username'");
+}
+simpan_riwayat("data_transaksi","id_transaksi",$id_transaksi,$sql_transaksi,$id_admin);
+simpan_riwayat("data_pemasukan","id_pemasukan",$id_pemasukan,$sql_pemasukan,$id_admin);
+if($nominal_deposit>0 ){
+  simpan_riwayat("data_deposit","id_deposit",$id_deposit,$sql_deposit,$id_admin);
+}elseif($pajak>0){
+  simpan_riwayat("data_pajak","id_pajak",$id_pajak,$sql_pajak,$id_admin);
+}
 
   if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
   ?>

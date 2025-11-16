@@ -32,7 +32,19 @@ id_tipe_kamar='$id_tipe_kamar',
 status_kamar='$status_kamar'
 
 where id_kamar='$id_kamar' ") or die(mysql_error());
+$sql="update data_kamar set 
+id_hotel='$id_hotel',
+kapasitas='$kapasitas',
+harga_harian='$harga_harian',
+harga_bulanan='$harga_bulanan',
+no_kamar='$no_kamar',
+id_tipe_kamar='$id_tipe_kamar',
+status_kamar='$status_kamar'
 
+where id_kamar='$id_kamar'";
+$username=decrypt($_COOKIE['jenenge']);
+$id_super_admin=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
+simpan_riwayat("data_kamar","id_kamar",$id_kamar,$sql,$id_super_admin);
 if ($query) {
     ?>
     <script>location.href = "<?php index(); ?>?input=popup_edit";</script>

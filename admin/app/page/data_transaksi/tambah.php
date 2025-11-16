@@ -40,7 +40,7 @@
                     }
 
                     .room-badge {
-                        background-color: #bf2b27;
+                        background-color: #75cc68;
                         color: white;
                         font-size: 2rem;
                         font-weight: bold;
@@ -98,7 +98,11 @@
                     <form action="proses_simpan.php" enctype="multipart/form-data" method="post" id='formini'>
 
                         <?php
+                        if(isset($_COOKIE['id_hotel'])){
                         $idHotel = decrypt($_COOKIE["id_hotel"]);
+                        }else{
+                            $idHotel=$_GET['id_hotel'];
+                        }
                         $namaHotel = baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'");
 
                         if (isset($_GET['id'])) {
@@ -108,9 +112,7 @@
                             $idKamar = '';
                             $noKamar = '';
                         }
-                        ?>
 
-                        <?php
                         $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$_GET[id]'");
                         $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$_GET[id]'");
                         $kapasitas = baca_database("", "kapasitas", "select * from data_kamar where id_kamar='$_GET[id]'");
@@ -127,6 +129,11 @@
                         <input type="hidden" name="id_admin" value='<?php
                                                                     $username = decrypt($_COOKIE['jenenge']);
                                                                     $id_admin = baca_database("", "id_admin", "select * from data_admin where username='$username'");
+                                                                    if($id_admin==null){
+                                                                        $username=decrypt($_COOKIE['jenenge']);
+                                                                        $id_admin=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
+
+                                                                    }
                                                                     echo $id_admin;
                                                                     ?>'>
                         <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
@@ -170,13 +177,13 @@
 
 
                                                 <label class="form-label">Tanggal Cek In</label>
-                                                <input class="form-control mb-2" value="<?php echo date("Y-m-d") ?>" type="date" min='<?php echo date("Y-m-d") ?>' name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
+                                                <input class="form-control mb-2" value="<?php echo date("Y-m-d") ?>" type="date" name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
 
                                                 <label class="form-label">Tanggal Cek Out</label>
 
                                                 <input class="form-control mb-2"
                                                     type="date"
-                                                    min="<?php echo date("Y-m-d"); ?>"
+                                                    
                                                     value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>"
                                                     name="waktu_check_out"
                                                     id="waktu_check_out"
@@ -222,15 +229,15 @@
                                                 </div>
 
 
-                                                <div class="row g-2 mb-2">
+                                                <div class="row g-2 mb-1">
                                                     <div class="col-4">
                                                         <label class="form-label">Identitas</label>
-                                                        <input required class="form-control mb-2" name="identitas" id="identitas" placeholder="Identitas">
+                                                        <input required class="form-control " name="identitas" id="identitas" placeholder="Identitas">
 
                                                     </div>
                                                     <div class="col-8">
                                                         <label class="form-label">No. Identitas</label>
-                                                        <div class="input-group mb-2">
+                                                        <div class="input-group ">
                                                             <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" placeholder="No Identitas">
 
                                                         </div>
@@ -238,7 +245,7 @@
                                                 </div>
 
                                                 <label class="form-label">Alamat</label>
-                                                <input required type="text" class="form-control mb-2" name="alamat" id="alamat" placeholder="Alamat">
+                                                <input required type="text" class="form-control mb-1" name="alamat" id="alamat" placeholder="Alamat">
 
                                                 <label class="form-label">No. Telp</label>
                                                 <input required type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp">
@@ -286,7 +293,7 @@
                                                     <input type="text" readonly class="form-control" id="total_harga_kamar">
                                                 </div>
 
-                                                <div class="row g-2 mb-2">
+                                                <div class="row g-2 mb-1">
                                                     <div class="col-6">
                                                         <label class="form-label">Diskon</label>
                                                         <div class="input-group">
@@ -327,7 +334,7 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="noteModalLabel">Catatan Tambahan Biaya</h5>
+                                                                <h5 class="modal-title" id="noteModalLabel">Catatan Tambahan Biaya Check-in</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
@@ -389,7 +396,7 @@
 
                                                 <div class="mt-auto d-flex justify-content-end">
                                                     <button class="btn btn-secondary me-2" type="reset">Batal</button>
-                                                    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalPembayaran">Check-in</button>
+                                                    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalPembayaran"><i class="fa fa-save"></i> Check-in</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -412,31 +419,74 @@
                                     </div>
                                     <div class="modal-body">
 
-                                        <label class="form-label">Grand Total</label>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">Rp</span>
 
-                                            <input type="text" readonly class="form-control" id="grand_total" name="grand_total">
+
+                                        <label class="form-label">Informasi  Deposit  <label class="form-label" onclick="Swal.fire({
+                                                                                title: 'Informasi Deposit',
+                                                                                text: 'Catatan : Jumlah nominal deposit tidak dihitung dalam total transaksi yang dilakukan oleh pelanggan, melainkan hanya dicatat sebagai informasi tambahan.',
+                                                                                confirmButtonText: 'Mengerti'
+                                                                        })">
+                                                     <i style="color:#bf2b2763" class="fa fa-info-circle"></i> 
+
+                                                </label></label>
+
+                                        <div class="d-flex justify-content-evenly align-items-center">
+                                            <input type="hidden" name="id_metode_pembayaran_deposit" id="id_metode_pembayaran_deposit">
+                                            <input type="hidden" name="no_rekening_deposit" id="no_rekening_deposit" value='-'>
+                                            <div class="input-group mb-2 me-3">
+
+                                                
+                                                <button type="button" onclick='pilih_metode_deposit()' class="btn btn-secondary">
+                                                    Metode
+                                                </button>
+                                                <input type="text" onclick='pilih_metode_deposit()' class="form-control" name="metode_pembayaran_deposit" id="metode_pembayaran_deposit" value=''   readonly>
+                                            </div>
+                                            
+                                            
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="hidden" class="form-control" id="nominal_deposit" name="nominal_deposit">
+                                                <input class="form-control" type="text" name="deposit" id="deposit" value="0">
+                                            </div>
                                         </div>
+                                        <div class="d-flex">
+                                            <div class='me-3'>
+                                            <label class="form-label">Grand Total</label>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">Rp</span>
 
-
-                                        <label class="form-label">Metode Pembayaran</label>
-
-
+                                                <input type="text" readonly class="form-control" id="grand_total" name="grand_total">
+                                            </div>
+                                            </div>
+                                            <div>
+                                            <label class="form-label">Grand Total + Deposit</label>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="hidden" name="" id='grandtotal_ndepo_hidden'>
+                                                <input type="text" readonly class="form-control" id="grand_total_plus_depo" name="grand_total_plus_depo">
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <label class="form-label">Metode Pembayaran </label>
                                         <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran">
                                         <input type="hidden" name="no_rekening" id="no_rekening" value='-'>
                                         <div class="input-group mb-2">
 
-                                            <input type="text" onclick='pilih_metode_transaksi()' class="form-control" name="metode_transaksi" id="metode_transaksi" value='' required readonly>
-
-                                            <button type="button" onclick='pilih_metode_transaksi()' class="btn btn-secondary">
-                                                Pilih
+                                            
+                                            <button type="button" onclick='pilih_metode_pembayaran()' class="btn btn-secondary">
+                                                Metode
                                             </button>
+                                            <input type="text" onclick='pilih_metode_pembayaran()' class="form-control" name="metode_pembayaran" id="metode_pembayaran" value='' required readonly>
                                         </div>
 
 
-
-                                        <label class="form-label">Nominal Bayar</label>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label class="form-label">Nominal Pembayaran</label>
+                                            <div class='d-flex align-items-center'>
+                                                <input type="checkbox" class="form-check-input me-2" id='totalplusdepo'>
+                                                <label for="" class="form-check-label text-dark" >Nominal + Deposit</label>
+                                            </div>
+                                        </div>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
                                             <input type="hidden" class="form-control" id="nominal" name="nominal">
@@ -445,7 +495,7 @@
 
 
                                         <div class="mb-2">
-                                            <small class="text-muted" style="font-size:0.7rem;">Estimasi Nominal Pembayaran:</small>
+                                            <small class="text-muted" style="font-size:0.7rem;">Estimasi Nominal Transaksi:</small>
 
                                             <!-- Tombol Prediksi Bayar Kecil -->
                                             <div class="mb-2" id="prediksi_buttons" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
@@ -528,6 +578,8 @@
                                             <th>No&nbsp;Tlp</th>
                                             <th>Jenis Kelamin</th>
                                             <th>Alamat</th>
+                                            <th>Jml Transaksi (<?= $namaHotel?>)</th>
+                                            <th>Total Transaksi</th>
 
                                             <th>Pilih</th>
                                         </tr>
@@ -545,25 +597,25 @@
                                 <table class="table table-sm mb-2">
                                     <tr>
                                         <td>Nama</td>
-                                        <td><input type="text" id="nama_baru" name="nama_baru" class="form-control form-control-sm"></td>
+                                        <td><input type="text" id="nama_baru" name="nama_baru" required class="form-control form-control-sm"></td>
                                     </tr>
                                     <tr>
                                         <td>Identitas</td>
-                                        <td><input type="text" id="identitas_baru" name="identitas_baru" class="form-control form-control-sm"></td>
+                                        <td><input type="text" id="identitas_baru" name="identitas_baru" required class="form-control form-control-sm"></td>
                                     </tr>
                                     <tr>
                                         <td>No Identitas</td>
-                                        <td><input type="text" id="no_identitas_baru" name="no_identitas_baru" class="form-control form-control-sm"></td>
+                                        <td><input type="text" id="no_identitas_baru" name="no_identitas_baru" required class="form-control form-control-sm"></td>
                                     </tr>
                                     <tr>
                                         <td>Alamat</td>
-                                        <td><input type="text" id="alamat_baru" name="alamat_baru" class="form-control form-control-sm"></td>
+                                        <td><input type="text" id="alamat_baru" name="alamat_baru" required class="form-control form-control-sm"></td>
                                     </tr>
                                     <tr>
                                         <td>Jenis Kelamin</td>
                                         <td>
-                                            <select name="jenis_kelamin_baru" id="jenis_kelamin_baru" class="form-control form-control-sm">
-                                                <option value="laki-Laki">laki-Laki</option>
+                                            <select name="jenis_kelamin_baru" id="jenis_kelamin_baru" required class="form-control form-control-sm">
+                                                <option value="laki-laki">laki-laki</option>
                                                 <option value="perempuan">perempuan</option>
                                             </select>
                                         </td>
@@ -572,10 +624,12 @@
                                         <td>No HP</td>
                                         <td><input type="text" id="hp_baru" name="hp_baru" class="form-control form-control-sm"></td>
                                     </tr>
-
                                     <tr>
                                         <td></td>
                                         <td>
+                                            <input type="hidden" name="id_admin" value='<?php 
+                                            $username=decrypt($_COOKIE['jenenge']);
+                                            echo baca_database("","id_admin","select * from data_admin where username='$username'")?>'>
                                             <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
                                             <button type="button" id="btn_simpan" class="btn btn-danger btn-sm">
                                                 <i class="fa fa-save"></i> Simpan Pelanggan
@@ -621,6 +675,8 @@
             taxPercent: document.getElementById('persentase_pajak'),
             payment: document.getElementById('nominal_bayar'),
             paymentDisplay: document.getElementById('nominal'),
+            paymentDeposit:document.getElementById('nominal_deposit'),
+            displayDeposit:document.getElementById('deposit'),
             change: document.getElementById('kembalian'),
             changeDisplay: document.getElementById('kembalian_value'),
             remaining: document.getElementById('sisa'),
@@ -628,7 +684,10 @@
             harga_kamar: document.getElementById('harga_kamar'),
             priceCut: document.getElementById('potongan_harga'),
             form: document.getElementById('formini'),
-            saveButton: document.getElementById('simpan_data')
+            saveButton: document.getElementById('simpan_data'),
+            grandplusdepo:document.getElementById('grand_total_plus_depo'),
+            totalplusdepo:document.getElementById('totalplusdepo'),
+            grandplusdepohidden:document.getElementById('grandtotal_ndepo_hidden')
         };
 
 
@@ -646,7 +705,7 @@
 
         // Calculate base price based on days or months
         const calculateBasePrice = (days) => {
-            days = parseInt(days) || 0;
+            days = parseInt(days) || 1;
             return days < 30 || days % 30 !== 0 ?
                 days * DAILY_RATE :
                 Math.floor(days / 30) * MONTHLY_RATE;
@@ -659,7 +718,7 @@
             const discountPercent = Number(elements.discount.value) || 0;
             const priceCut = Number(elements.priceCut.value) || 0;
             const taxPercent = Number(elements.taxPercent.value) || 0;
-
+       
             // Apply discount only to room price (basePrice)
             const discountedRoomPrice = basePrice * (1 - discountPercent / 100);
 
@@ -667,7 +726,7 @@
             const subtotal = discountedRoomPrice + additional - priceCut;
 
             // Apply tax to the subtotal
-            const finalPrice = subtotal * (1 + taxPercent / 100);
+            const finalPrice = subtotal * (1 + taxPercent / 100)
 
             // Update displays
             elements.roomPrice.value = formatRupiah(basePrice);
@@ -685,6 +744,21 @@
 
         };
 
+
+        const total_plus_depo=(e)=>{
+            const grandtotal=elements.priceInput.value;
+            const total_semua=elements.grandplusdepohidden.value;
+            const payment=elements.payment;
+            if(e.target.checked){
+            payment.value=total_semua;
+            createPrediksiButtons(total_semua);
+            }else{
+            elements.payment.value=grandtotal;
+            createPrediksiButtons(grandtotal);
+            }
+            elements.change.value=0;
+            elements.changeDisplay.value=formatRupiah(0);
+        }
 
 
         function createPrediksiButtons(total) {
@@ -726,23 +800,57 @@
 
             const payment = Number(elements.payment.value) || 0;
             const total = Number(elements.priceInput.value) || 0;
-
+            const grandplusdeposit=Number(elements.grandplusdepohidden.value)|| 0;
+            const deposit=Number(elements.paymentDeposit.value)|| 0;
+    
             elements.paymentDisplay.value = formatRupiah(payment);
-
+     
             if (payment >= total) {
-                const change = payment - total;
+                let change=0;
+                if(deposit>0){
+                 change=payment-(grandplusdeposit);
+                }else{
+                 change = payment - (total);
+                }
+
+                if(change<0){
+                elements.change.value = 0;
+                elements.changeDisplay.value = formatRupiah(0);                    
+                }else{
                 elements.change.value = change;
                 elements.changeDisplay.value = formatRupiah(change);
+                }
                 elements.remaining.value = 0;
                 elements.remainingDisplay.value = '0';
             } else {
-                const remaining = total - payment;
+                let remaining=0;
+                if(deposit>0){
+                    remaining=(grandplusdeposit)-payment;
+                }else{
+                    remaining=(total) - payment;
+                }
+
                 elements.change.value = 0;
                 elements.changeDisplay.value = '0';
                 elements.remaining.value = remaining;
                 elements.remainingDisplay.value = formatRupiah(remaining);
             }
+       
         };
+        const updateGrandTotal = () => {
+
+            const grand_total = Number(elements.priceInput.value) || 0;
+            const nominal_deposit=Number(elements.displayDeposit.value)|| 0;
+            elements.grandplusdepo.value = formatRupiah(Number(grand_total+nominal_deposit));
+            elements.grandplusdepohidden.value=grand_total+nominal_deposit;
+            elements.paymentDeposit.value=nominal_deposit;
+            elements.change.value=0;
+            elements.changeDisplay.value=formatRupiah(0);
+            createPrediksiButtons(Math.floor(grand_total+nominal_deposit));
+       
+        };
+
+
 
         // Update checkout date based on checkin and days
         const updateCheckoutDate = () => {
@@ -760,7 +868,7 @@
             const checkin = new Date(elements.checkin.value);
             const checkout = new Date(elements.checkout.value);
             const days = Math.floor((checkout - checkin) / MS_PER_DAY);
-            elements.days.value = days;
+            days==0?elements.days.value =1: elements.days.value = days;
 
             elements.harga_kamar.value = calculateBasePrice(days);
             updateFinalPrice();
@@ -782,9 +890,12 @@
         [elements.additionalFee, elements.discount, elements.priceCut, elements.taxPercent]
         .forEach(el => el.addEventListener('input', updateFinalPrice));
         elements.payment.addEventListener('input', updatePaymentCalculations);
+        elements.displayDeposit.addEventListener('input', updateGrandTotal);
         elements.additionalFee.addEventListener('input', () => {
             elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
+            
         });
+        elements.totalplusdepo.addEventListener('click',total_plus_depo);
 
 
         const checkbox = document.getElementById("pajakCheck");
@@ -832,19 +943,31 @@
         // Form submission
         elements.saveButton.addEventListener('click', () => {
             if (elements.form.checkValidity()) {
-                elements.form.submit();
+                if(elements.grandplusdepohidden.value>elements.payment.value){
+                    Swal.fire({
+                        title:'Peringatan!',
+                        icon:'info',
+                        text:'Nominal Bayar yang digunakan tidak cukup, silahkan input ulang',
+                        
+                    });
+                }else{
+                    elements.form.submit();
+
+                }
             } else {
                 elements.form.reportValidity();
             }
         });
 
         // Payment method selection
-        window.pilih_metode_transaksi = () => {
-            Swal.fire({
+        window.pilih_metode_pembayaran = () => {
+            
+            Swal.fire(
+                {
                 title: 'Pilih Metode Transaksi',
-                icon: 'info',
-                cancelButton: false,
-                submitButton: false,
+
+                showConfirmButton: false,
+                showCancelButton: false,
                 width: '850px',
                 html: `
         <div class="container-fluid">
@@ -875,7 +998,35 @@
                                 <td><?php echo $data['rekening']; ?></td>
                                 <td><?php echo ucwords($data['atas_nama']); ?></td>
                               
-                                <td><button style='background-color:#8b1815;border-radius:10px;color:#fff;width:120px;height:30px;border:none;' class='pil_metode' data-id='<?php echo $data['id_metode_pembayaran']; ?>' data-name='<?php echo ucwords($data['metode_pembayaran']); ?>' data-rekening='<?php echo $data['rekening'] ?>'>Pilih</button></td>
+    <?php
+            if(strpos(strtolower($data['metode_pembayaran']),'qris')!==false ||strpos(strtolower($data['metode_pembayaran']),'transfer')!==false){
+    ?>
+                         <td>
+                            <button style="background-color:#bf2b27;border-radius:10px;color:#fff;width:120px;height:30px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;" 
+                                class="pil_metode" 
+                                data-id="<?php echo $data['id_metode_pembayaran']; ?>" 
+                                data-name="<?php echo ucwords($data['metode_pembayaran']); ?>" 
+                                data-rekening="<?php echo $data['rekening'] ?>"
+                                data-nominal="${ elements.grandplusdepohidden.value}">
+                                <i style="color:white" class="fa fa-credit-card"></i> Pilih
+                            </button>
+                        </td>
+    <?php
+            }else{
+    ?>
+                         <td>
+                            <button style="background-color:#bf2b27;border-radius:10px;color:#fff;width:120px;height:30px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;" 
+                                class="pil_metode" 
+                                data-id="<?php echo $data['id_metode_pembayaran']; ?>" 
+                                data-name="<?php echo ucwords($data['metode_pembayaran']); ?>" 
+                                data-rekening="<?php echo $data['rekening'] ?>"
+                                data-nominal="0">
+                                <i style="color:white" class="fa fa-credit-card"></i> Pilih
+                            </button>
+                        </td>
+<?php
+                }?>
+
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -883,19 +1034,107 @@
             </div>
         </div>`,
                 didOpen: () => {
+                 
                     document.querySelectorAll('.pil_metode').forEach(button => {
                         button.addEventListener('click', () => {
+                        
                             document.getElementById('id_metode_pembayaran').value = button.dataset.id;
-                            document.getElementById('metode_transaksi').value = button.dataset.name;
+                            document.getElementById('metode_pembayaran').value = button.dataset.name;
                             document.getElementById('no_rekening').value = button.dataset.rekening;
+                            document.getElementById('nominal').value=button.dataset.nominal;
+                      
+
+                                document.getElementById('nominal_bayar').value=button.dataset.nominal;
+                                document.getElementById('nominal').value=button.dataset.nominal;
+                            
+                          
                             Swal.close();
                         });
                     });
+                
                 }
             });
-        };
+        
+    };
     });
+    window.pilih_metode_deposit= () => {
+        const grand_total=document.getElementById('grand_total');
+                    Swal.fire(
+                {
+                title: 'Pilih Metode Deposit',
 
+                showConfirmButton: false,
+                showCancelButton: false,
+                width: '850px',
+                html: `
+        <div class="container-fluid">
+            <div class="table-responsive">
+               <table class="table text-start">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Metode Deposit</th>
+                            <th>Bank</th>
+                            <th>Rekening</th>
+                            <th>Atas Nama</th>
+                           
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $query_metode_bayar = mysql_query("SELECT mp.*, b.* 
+FROM data_metode_pembayaran mp
+LEFT JOIN data_bank b ON mp.id_bank = b.id_bank
+WHERE b.id_hotel = '$idHotel'
+  AND (
+      LOWER(mp.metode_pembayaran) LIKE '%tunai%' 
+      OR LOWER(mp.metode_pembayaran) LIKE '%transfer%'
+  )") or die(mysql_error());
+                        $no = 0;
+                        while ($data = mysql_fetch_array($query_metode_bayar)) {
+                            $no++;
+                        ?>
+                            <tr>
+                                <td><?php echo $no; ?></td>
+                                <td><?php echo ucwords($data['metode_pembayaran']); ?></td>
+                                <td><?php echo ucwords($data['nama_bank']); ?></td>
+                                <td><?php echo $data['rekening']; ?></td>
+                                <td><?php echo ucwords($data['atas_nama']); ?></td>
+                              
+                                <td>
+    <button style="background-color:#bf2b27;border-radius:10px;color:#fff;width:120px;height:30px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;" 
+        class="pil_metode" 
+        data-id="<?php echo $data['id_metode_pembayaran']; ?>" 
+        data-name="<?php echo ucwords($data['metode_pembayaran']); ?>" 
+        data-rekening="<?php echo $data['rekening'] ?>"
+        >
+        <i style="color:white" class="fa fa-credit-card"></i> Pilih
+    </button>
+</td>
+
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>`,
+                didOpen: () => {
+                 
+                    document.querySelectorAll('.pil_metode').forEach(button => {
+                        button.addEventListener('click', () => {
+
+                            document.getElementById('id_metode_pembayaran_deposit').value = button.dataset.id;
+                            document.getElementById('metode_pembayaran_deposit').value = button.dataset.name;
+                            document.getElementById('no_rekening_deposit').value = button.dataset.rekening;                                
+                            
+                            Swal.close();
+                        });
+                    });
+                
+                }
+            });
+    }
 
     document.getElementById('simpan_data').addEventListener('click', function() {
         var form = document.getElementById('formini');
@@ -918,7 +1157,52 @@
         if (invalidFields.length > 0) {
             alert("Kolom berikut harus diisi:\n- " + invalidFields.join("\n- "));
         } else {
-            form.submit();
+                if(elements.grandplusdepohidden.value>elements.payment.value){
+                    Swal.fire({
+                        title:'Peringatan!',
+                        icon:'info',
+                        text:'Nominal Bayar yang digunakan tidak cukup, silahkan input ulang',
+                        
+                    });
+                }else{
+                    elements.form.submit();
+
+                }
+        }
+    });
+
+    document.getElementById('simpan_data').addEventListener('click', function() {
+        var form = document.getElementById('formini');
+        var inputs = form.querySelectorAll('[required]');
+        var invalidFields = [];
+
+        inputs.forEach(function(input) {
+            if (!input.value.trim()) {
+                var fieldName = input.name || input.id;
+
+                // jika ada prefix "id_", hapus
+                if (fieldName.startsWith("id_")) {
+                    fieldName = fieldName.replace("id_", "");
+                }
+
+                invalidFields.push(fieldName);
+            }
+        });
+
+        if (invalidFields.length > 0) {
+            alert("Kolom berikut harus diisi:\n- " + invalidFields.join("\n- "));
+        } else {
+            if(elements.grandplusdepohidden.value>elements.payment.value){
+                    Swal.fire({
+                        title:'Peringatan!',
+                        icon:'info',
+                        text:'Nominal Bayar yang digunakan tidak cukup, silahkan input ulang'
+                       
+                    });
+                }else{
+                    elements.form.submit();
+
+                }
         }
     });
 
@@ -956,7 +1240,9 @@
                         no_hp: element.no_hp,
                         jenis_kelamin: element.jenis_kelamin,
                         jumlah_dewasa: element.jumlah_dewasa,
-                        jumlah_anak_anak: element.jumlah_anak_anak
+                        jumlah_anak_anak: element.jumlah_anak_anak,
+                        frekuensi_member:element.member_cabang_ini,
+                        frekuensi_lain:element.member_lain
                     });
 
                     results.innerHTML += `
@@ -966,7 +1252,9 @@
         <td>${element.no_identitas}</td>
         <td>${element.no_hp}</td>
         <td>${element.jenis_kelamin}</td>
-        <td>${element.no_hp}</td>
+        <td>${element.alamat}</td>
+        <td>${element.member_cabang_ini} Transaksi</td>
+        <td>${element.member_lain} Transaksi</td>
         <td>
           <button class="btn btn-sm btn-danger pil_pelanggan" 
                   data-json='${jsonData}'>
@@ -1027,43 +1315,69 @@
 
         // simpan pelanggan baru
         btn_simpan.addEventListener("click", function() {
-            const dataform = new FormData(simpan_baru);
-            fetch("simpan_pelanggan_v2.php", {
-                    method: "POST",
-                    body: dataform
-                })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data !== "false") {
-                        // set value select dan input lain
-                        document.getElementById("id_pelanggan").value = data.id || '';
-                        document.getElementById("nama").value = data.nama || '';
-                        document.getElementById("identitas").value = data.identitas || '';
-                        document.getElementById("no_identitas").value = data.no_identitas || '';
-                        document.getElementById("alamat").value = data.alamat || '';
-                        document.getElementById("no_telp").value = data.no_hp || '';
-                        document.getElementById("jumlah_dewasa").value = data.jumlah_dewasa || 1;
-                        document.getElementById("jumlah_anak_anak").value = data.jumlah_anak_anak || 0;
-                        document.getElementById("jenis_kelamin").value = data.jenis_kelamin || 'laki-laki';
 
-                        // reset form input tambah baru
-                        simpan_baru.reset();
+            var form = document.getElementById('simpan_baru');
+            var inputs = form.querySelectorAll('[required]');
+            var invalidFields = [];
 
-                        // tutup modal
-                        modal.hide();
+            inputs.forEach(function(input) {
+                if (!input.value.trim()) {
+                    var fieldName = input.name || input.id;
 
-                        // SweetAlert notifikasi sukses
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: 'Pelanggan baru berhasil ditambahkan',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                    // jika ada prefix "id_", hapus
+                    if (fieldName.startsWith("id_")) {
+                        fieldName = fieldName.replace("id_", "");
                     }
-                })
-                .catch((err) => console.error(err));
+
+                    invalidFields.push(fieldName);
+                }
+            });
+
+            if (invalidFields.length > 0) {
+                alert("Kolom berikut harus diisi:\n- " + invalidFields.join("\n- "));
+            } else {
+
+
+
+                const dataform = new FormData(simpan_baru);
+                fetch("simpan_pelanggan_v2.php", {
+                        method: "POST",
+                        body: dataform
+                    })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (data !== "false") {
+                            // set value select dan input lain
+                            document.getElementById("id_pelanggan").value = data.id || '';
+                            document.getElementById("nama").value = data.nama || '';
+                            document.getElementById("identitas").value = data.identitas || '';
+                            document.getElementById("no_identitas").value = data.no_identitas || '';
+                            document.getElementById("alamat").value = data.alamat || '';
+                            document.getElementById("no_telp").value = data.no_hp || '';
+                            document.getElementById("jumlah_dewasa").value = data.jumlah_dewasa || 1;
+                            document.getElementById("jumlah_anak_anak").value = data.jumlah_anak_anak || 0;
+                            document.getElementById("jenis_kelamin").value = data.jenis_kelamin || 'laki-laki';
+
+                            // reset form input tambah baru
+                            simpan_baru.reset();
+
+                            // tutup modal
+                            modal.hide();
+
+                            // SweetAlert notifikasi sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Pelanggan baru berhasil ditambahkan',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    })
+                    .catch((err) => console.error(err));
+            }
         });
+
 
     }
 </script>

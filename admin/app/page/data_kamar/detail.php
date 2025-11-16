@@ -46,13 +46,13 @@
             <tr>
                 <td class="clleft" width="25%">Harga Harian </td>
                 <td class="clleft" width="2%">:</td>
-                <td class="clleft"><?php echo $data['harga_harian']; ?></td>
+                <td class="clleft"><?php echo rupiah($data['harga_harian']); ?></td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td class="clleft" width="25%">Harga Bulanan </td>
                 <td class="clleft" width="2%">:</td>
                 <td class="clleft"><?php echo $data['harga_bulanan']; ?></td>
-            </tr>
+            </tr> -->
             <tr>
                 <td class="clleft" width="25%">No Kamar </td>
                 <td class="clleft" width="2%">:</td>

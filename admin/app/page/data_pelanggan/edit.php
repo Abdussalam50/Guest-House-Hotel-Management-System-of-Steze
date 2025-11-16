@@ -105,6 +105,9 @@
                             </td>
                             <td width="2%">:</td>
                             <td>
+
+
+
                                 <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
                                     <option value="<?php echo ($data['id_hotel']); ?>">- <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'"); ?> -</option><?php combo_database_v2('data_hotel', 'id_hotel', 'nama', ''); ?>
                                 </select>

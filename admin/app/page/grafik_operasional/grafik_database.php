@@ -1,13 +1,24 @@
 <?php
-$id_hotel = decrypt($_COOKIE['id_hotel']); // ambil id hotel dari cookie
 
-// === buat kondisi filter hotel ===
+// Decrypt and validate id_hotel from cookie
+$id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+
+// === Build hotel filter condition ===
 $filter_hotel = "";
-if (!empty($id_hotel)) {
-    $filter_hotel = "AND id_hotel = '$id_hotel'";
+$selected_hotel = isset($_POST['id_hotel']) ? mysql_real_escape_string($_POST['id_hotel']) : $id_hotel;
+
+if (!empty($selected_hotel) && $selected_hotel !== 'all') {
+    $filter_hotel = "AND id_hotel = '$selected_hotel'";
 }
 
-// Fetch distinct years and months dari data_operasional untuk combobox
+// Fetch hotel data for dropdown
+$hotels_query = mysql_query("SELECT id_hotel, nama FROM data_hotel ORDER BY id_hotel");
+$hotels = [];
+while ($row = mysql_fetch_assoc($hotels_query)) {
+    $hotels[$row['id_hotel']] = $row['nama'];
+}
+
+// Fetch distinct years and months from data_operasional for combobox
 $year_month_query = mysql_query("
     SELECT DISTINCT YEAR(tanggal) AS year, MONTH(tanggal) AS month 
     FROM data_operasional 
@@ -19,14 +30,15 @@ while ($row = mysql_fetch_assoc($year_month_query)) {
     $years[$row['year']] = $row['year'];
 }
 
-// Default ke tahun & bulan saat ini
+// Default to current year & month
 $selected_year = isset($_POST['year']) ? mysql_real_escape_string($_POST['year']) : date('Y');
 $selected_month = isset($_POST['month']) ? mysql_real_escape_string($_POST['month']) : date('m');
 
-// Hitung jumlah hari di bulan yang dipilih
-$days_in_month = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
+// Calculate number of days in selected month
+$days_in_month = date('t', strtotime($selected_year . '-' . $selected_month . '-01'));
 
-// Ambil biaya operasional per hari sesuai hotel + bulan + tahun
+
+// Fetch daily operational expenses
 $expense_query = mysql_query("
     SELECT DAY(tanggal) AS day,
            SUM(biaya) AS expense
@@ -45,23 +57,24 @@ while ($row = mysql_fetch_assoc($expense_query)) {
     $total_expense += (float)$row['expense'];
 }
 
-// Labels & data chart
+// Labels & data for chart
 $labels = range(1, $days_in_month);
 $expenses = array_values($daily_expenses);
 
-// Jika kosong biar chart tidak error
+// Prevent chart error if data is empty
 if (empty($expenses) || array_sum($expenses) == 0) {
     $labels = [1];
     $expenses = [0];
 }
-?>
 
+
+?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Daily Operational Expense Chart</title>
+    <title>Grafik Operasional Harian</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         .chart-container {
@@ -97,13 +110,38 @@ if (empty($expenses) || array_sum($expenses) == 0) {
             font-weight: bold;
             background: #f1f1f1;
         }
+
+        .filter-form {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .filter-form select {
+            margin-right: 10px;
+        }
     </style>
 </head>
 
 <body>
-    <h3 style="text-align: left;">Daily Operational Expenses for <?php echo date('F Y', mktime(0, 0, 0, $selected_month, 1, $selected_year)); ?></h3>
-    <form method="post" style="text-align: left; margin-bottom: 20px;">
-        <label for="year">Year: </label>
+    <h3 style="text-align: left;">
+        Grafik Operasional Harian 
+        <?php echo date('F Y', mktime(0, 0, 0, $selected_month, 1, $selected_year)); ?>
+        <?php if ($selected_hotel === 'all') echo ' (All Hotels)';
+        elseif (!empty($selected_hotel)) echo ' (' . htmlspecialchars($hotels[$selected_hotel]) . ')'; ?>
+    </h3>
+    <form method="post" class="filter-form">
+        <?php if (empty($id_hotel)): ?>
+            <label for="id_hotel">Hotel: </label>
+            <select name="id_hotel" id="id_hotel" onchange="this.form.submit()">
+                <option value="all" <?php echo $selected_hotel === 'all' ? 'selected' : ''; ?>>All Hotels</option>
+                <?php foreach ($hotels as $id => $nama): ?>
+                    <option value="<?php echo htmlspecialchars($id); ?>" <?php echo $id == $selected_hotel ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($nama); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+        <label for="year">Tahun: </label>
         <select name="year" id="year" onchange="this.form.submit()">
             <?php foreach ($years as $year): ?>
                 <option value="<?php echo htmlspecialchars($year); ?>" <?php echo $year == $selected_year ? 'selected' : ''; ?>>
@@ -111,7 +149,7 @@ if (empty($expenses) || array_sum($expenses) == 0) {
                 </option>
             <?php endforeach; ?>
         </select>
-        <label for="month">Month: </label>
+        <label for="month">Bulan: </label>
         <select name="month" id="month" onchange="this.form.submit()">
             <?php for ($m = 1; $m <= 12; $m++): ?>
                 <option value="<?php echo sprintf('%02d', $m); ?>" <?php echo $m == $selected_month ? 'selected' : ''; ?>>
@@ -124,15 +162,15 @@ if (empty($expenses) || array_sum($expenses) == 0) {
         <canvas id="expenseChart" style="max-height: 400px;"></canvas>
     </div>
     <div class="total-expense">
-        Total Operational Expenses: <?php echo rupiah($total_expense); ?>
+        Total Biaya Operasional: <?php echo rupiah($total_expense); ?>
     </div>
 
-    <!-- Tabel detail -->
+    <!-- Detail table -->
     <table>
         <thead>
             <tr>
-                <th>Day</th>
-                <th>Expense</th>
+                <th>Hari</th>
+                <th>Pengeluaran</th>
             </tr>
         </thead>
         <tbody>
@@ -160,7 +198,7 @@ if (empty($expenses) || array_sum($expenses) == 0) {
                 datasets: [{
                     label: 'Operational Expenses per Day',
                     data: <?php echo json_encode($expenses); ?>,
-                    backgroundColor: '#dc3545', // Modern red for expenses
+                    backgroundColor: '#dc3545',
                     borderColor: '#dc3545',
                     borderWidth: 1
                 }]
@@ -173,13 +211,13 @@ if (empty($expenses) || array_sum($expenses) == 0) {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Expenses'
+                            text: 'Pengeluaran'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Day of Month'
+                            text: 'Tanggal'
                         }
                     }
                 },

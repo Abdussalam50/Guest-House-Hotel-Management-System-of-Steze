@@ -12,17 +12,23 @@ if (!isset($_POST['id_metode_pembayaran'])) {
     die();
 }
 
-$id_hotel = xss($_POST['id_hotel']);
-$nama = xss($_POST['nama']);
-$alamat = xss($_POST['alamat']);
+$metode_pembayaran = xss($_POST['metode_pembayaran']);
+$nama = xss($_POST['nama_hotel']);
+$bank = xss($_POST['bank']);
 
 
-$query = mysql_query("update data_hotel set 
+$query = mysql_query("update metode_pembayaran set 
 nama='$nama',
-alamat='$alamat'
+bank='$bank'
 
-where id_hotel='$id_hotel' ") or die(mysql_error());
+where metode_pembayaran='$metode_pembayaran' ") or die(mysql_error());
 
+$sql="update metode_pembayaran set 
+nama='$nama',
+bank='$bank'
+
+where metode_pembayaran='$metode_pembayaran'";
+simpan_riwayat("data_metode_pembayaran","id_metode_pembayaran",$id_metode_pembayaran,$sql);
 if ($query) {
     ?>
     <script>location.href = "<?php index(); ?>?input=popup_edit";</script>

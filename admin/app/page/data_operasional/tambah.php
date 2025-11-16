@@ -38,9 +38,21 @@
                             </td>
                             <td width="2%">:</td>
                             <td>
-                                <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
-                                    <option value='<?php echo $id_hotel ?>'><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$id_hotel'") ?></option>
-                                </select>
+                                <?php
+                                if ($_COOKIE['id_hotel'] == "") {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
+                                        <?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel"); ?>
+                                    </select>
+                                <?php
+                                } else {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel ">
+                                        <option value='<?php echo $id_hotel ?>'><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$id_hotel'") ?></option>
+                                    </select>
+                                <?php
+                                }
+                                ?>
                             </td>
                         </tr>
                         <tr>
@@ -82,6 +94,9 @@
                             <?php
                             $admin = decrypt($_COOKIE['jenenge']);
                             $id_admin = baca_database("", "id_admin", "select * from data_admin where username='$admin'");
+                            if($id_admin==null){
+                                $id_admin=baca_database("", "id_pengelola", "select * from data_pengelola where username='$admin'");
+                            }
                             ?>
                             <input type="hidden" name="id_admin" value="<?php echo $id_admin ?>">
                         </tr>

@@ -95,6 +95,7 @@
                 <div class="content-box-content">
                     <center>
                         <?php btn_update(' PROSES UPDATE DATA'); ?>
+                        <a href="index.php?input=hapus&proses=<?= encrypt($proses)?>" class="btn btn-danger"><i class="fas fa-remove"></i> Hapus Data</a>
                     </center>
                 </div>		
             </div>

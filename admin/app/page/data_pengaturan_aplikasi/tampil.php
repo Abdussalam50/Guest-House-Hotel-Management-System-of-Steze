@@ -1,6 +1,19 @@
 <body>
-
+<?php
+if(isset($_COOKIE['operasional'])){
+    $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='pengaturan_oleh_operasional'");
+    if($akses==0){
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+    }
+}
+?>
     <div style="overflow-x:auto;">
+        <a href="<?php index()?>?input=tambah" class="btn btn-sm btn-danger mb-3" style='float:right'><i class="fas fa-plus"></i> Input Pengaturan</a>
         <table <?php tabel(100, "%", 1, "left"); ?>>
             <tr>
 

@@ -41,7 +41,20 @@ $query = mysql_query("insert into data_kamar values (
  ,'$status_kamar'
 
 )");
+$sql="insert into data_kamar values (
+'$id_kamar'
+ ,'$id_hotel'
+ ,'$kapasitas'
+ ,'$harga_harian'
+ ,'$harga_bulanan'
+ ,'$no_kamar'
+ ,'$id_tipe_kamar'
+ ,'$status_kamar'
 
+)";
+$username=decrypt($_COOKIE['jenenge']);
+$id_super_admin=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
+simpan_riwayat("data_kamar","id_kamar",$id_kamar,$sql,$id_super_admin);
 if ($query) {
 ?>
     <script>

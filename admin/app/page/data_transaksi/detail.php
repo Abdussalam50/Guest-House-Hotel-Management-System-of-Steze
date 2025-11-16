@@ -1,4 +1,4 @@
-<a href="<?php index(); ?>">
+<a onclick="history.back()">
     <?php btn_kembali(' KEMBALI'); ?>
 </a>
 
@@ -15,6 +15,7 @@
         <?php
         // Panggil fungsi detail_transaksi
         if (isset($_GET['proses'])) {
+            
             detail_transaksi(decrypt($_GET['proses']));
         } else {
             echo "<p>Transaksi tidak ditemukan.</p>";
@@ -27,6 +28,6 @@
 
 
 
-        <a href="<?php index() ?>?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?php echo $_COOKIE['jenenge'] ?>" class='btn btn-sm btn-secondary fw-semibold'><i class="fa fa-remove"></i> Hapus Transaksi</a>
+        <!-- <a href="<?php index() ?>?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?php echo $_COOKIE['jenenge'] ?>" class='btn btn-sm btn-secondary fw-semibold'><i class="fa fa-remove"></i> Hapus Transaksi</a> -->
     </div>
 </div>

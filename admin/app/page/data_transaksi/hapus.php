@@ -7,7 +7,7 @@
 <?php btn_tidak('NO'); ?>
 </a>
 <?php
-$admin=decrypt(mysql_real_escape_string($_GET['admin']));
+$admin=mysql_real_escape_string($_GET['admin']);
 ?>
 <a href="proses_hapus.php?proses=<?php echo decrypt(mysql_real_escape_string($_GET['proses']));?>&admin=<?php echo $admin; ?>">
 <?php btn_ya('YES'); ?>

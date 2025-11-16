@@ -1,8 +1,49 @@
+
+
+<?php
+
+if (isset($_GET['id_hotel'])) {
+    $id_hotel = decrypt($_GET['id_hotel']);
+}elseif(isset($_COOKIE['operasional'])){
+     $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='akses_kamar_operasional'");
+     if($akses==0){
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu kamar\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+     }
+} else {
+    $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+}
+
+if ($id_hotel == "") {
+    include 'tampil_admin.php';
+    die();
+}
+?>
+
 <div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
+
+ <?php if ($_COOKIE['id_hotel'] == "") {
+    ?>
+
+        <a href="index.php" class=" btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-backward text-black'></i> Kembali
+        </a>
+       
+    <?php
+    } 
+    
+    if(!isset($_COOKIE['id_hotel'])){
+    ?>
+
     <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold">
         <i class='fas fa-add text-black'></i> Input Kamar Baru
     </a>
-
+    <?php
+    }?>
     <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
         <i class='fas fa-search text-white'></i> Pencarian
     </a>
@@ -18,7 +59,7 @@
 
             <div style="overflow-x:auto;">
                 <table <?php
-                        $id_hotel = decrypt($_COOKIE['id_hotel']);
+             \
                         tabel(100, '%', 1, 'left'); ?>>
                     <tr style="background-color: #f9f9f9;">
 
@@ -46,10 +87,20 @@
                         if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
                             $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
                             $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel' ORDER BY  CASE
+    WHEN no_kamar LIKE 'KOST%' THEN 1   -- kelompok KOST dulu
+    WHEN no_kamar LIKE '%GH' THEN 2     -- kelompok GH sesudahnya
+    ELSE 3                              -- sisanya paling belakang
+  END,
+  CAST(REGEXP_SUBSTR(no_kamar, '[0-9]+') AS UNSIGNED) ASC;";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
                         } else {
-                            $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' ";
+                            $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' ORDER BY  CASE
+    WHEN no_kamar LIKE 'KOST%' THEN 1   -- kelompok KOST dulu
+    WHEN no_kamar LIKE '%GH' THEN 2     -- kelompok GH sesudahnya
+    ELSE 3                              -- sisanya paling belakang
+  END,
+  CAST(REGEXP_SUBSTR(no_kamar, '[0-9]+') AS UNSIGNED) ASC;";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar WHERE id_hotel='id_hotel'";
                         }
                         $proses = mysql_query($querytabel);
@@ -83,7 +134,7 @@
                                                                 echo $no; ?></td>
                                 <!--h <td align="left"><?php echo $data['id_kamar']; ?></td> h-->
                                 <td align="left">
-                                    <a href="<?php index(); ?>?input=edit&proses=<?= encrypt($data['id_kamar']); ?>" class='mx-2'>
+                                    <a href="<?php index(); ?>?input=<?= isset($_COOKIE['id_hotel'])?'detail':'edit'?>&proses=<?= encrypt($data['id_kamar']); ?>" class='mx-2'>
                                         Kamar <?php echo $data['no_kamar']; ?>
                                     </a>
                                 </td>
@@ -180,10 +231,23 @@
                     return false;
                 }
 
-                window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}`;
+            
+                <?php
+                if (isset($_GET['id_hotel'])) {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}&id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>`;
+                <?php
+                } else {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}`;
+                <?php
+                }
+                ?>
+
+
             },
             preDeny: () => {
-                window.location.href = 'index.php';
+                window.location.href = 'index.php?id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>';
             }
         });
 

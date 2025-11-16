@@ -426,7 +426,7 @@ if (php_sapi_name() != "cli") {
 
 ?>
 <br>
-<a href="file/database.sql" class="btn btn-primary">Download Database </a>
+<a href="download.php" class="btn btn-primary">Download Database </a>
 <br>
 <br>
 <?php //die();

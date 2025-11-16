@@ -25,9 +25,10 @@ if (isset($_GET['input'])) {
     <!-- HEADER -->
     <table border="0" style="width: 100%">
         <?php
+        $idHotel = decrypt($_COOKIE['id_hotel']);
         if (isset($_GET['export'])) {
         } else {
-            $idHotel = decrypt($_COOKIE['id_hotel']);
+            
         ?>
             <tr>
                 <td class="auto-style1" rowspan="3" width="101">

@@ -74,7 +74,7 @@ if (isset($_GET['input'])) {
     <!-- HEADER -->
 
     <!-- BODY -->
-    <table width="100%" class="tblcms2">
+    <table width="100%" class="" style='font-family:arial;font-size:11pt'>
         <tr>
             <th class="th_border cell">No</th>
             <!--h <th>Id pajak</th> -->
@@ -119,13 +119,19 @@ if (isset($_GET['input'])) {
                 }
             }
             $proses = mysql_query($querytabel);
+            $total_pajak=[];
             while ($data = mysql_fetch_array($proses)) {
+                $total_pajak[]=$data['pajak'];
             ?>
                 <tr class="event2">
                     <td align="center" width="50"><?php $no = $no + 1;
                                                     echo $no; ?></td>
                     <!--h <td align="center"><?php echo $data["id_pajak"]; ?></td> h-->
-                    <td align="center"><?php echo $data["waktu"]; ?></td>
+                    <td align="center"><?php 
+                    $waktu=explode(" ",$data['waktu']);
+                    $tanggal=format_indo($waktu[0]);
+                    $jam=$waktu[1];
+                    echo $tanggal." ".$jam; ?></td>
                     <td align="center"><?php echo baca_database("", "id_transaksi", "select * from data_transaksi where id_transaksi='$data[id_transaksi]'")  ?></td>
                     <td align="center"><?php echo $data["jenis_pajak"]; ?></td>
                     <td align="center"><?php echo $data["persentase_pajak"]; ?>%</td>
@@ -134,6 +140,10 @@ if (isset($_GET['input'])) {
                     <td align="center"><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'")  ?></td>
                 </tr>
             <?php } ?>
+            <tr style='font-weight:700'>
+                <td colspan='5' style='text-align:center'>Total Pajak</td>
+                <td colspan="2"><?php echo rupiah(array_sum($total_pajak))?></td>
+            </tr>
         </tbody>
     </table>
     <!-- BODY -->

@@ -3,20 +3,21 @@ if (isset($_GET['input'])) {
     echo "<h3> Cetak Laporan ";
     tabelnomin();
     echo "</h3>";
-    ?>
+?>
     <link rel="stylesheet" type="text/css" href="../../../data/cssjs/cetak/style_new.css">
     <link rel="stylesheet" type="text/css" href="../../../data/cssjs/cetak/style_new2.css">
-    <?php
+<?php
     action_cetak("data_pelanggan");
 } else {
 
-    function location() {
+    function location()
+    {
         return "cetak";
     }
 
     include '../../../include/all_include.php';
     proses_action_cetak("data_pelanggan");
-    ?>
+?>
     <link rel="stylesheet" type="text/css" href="../../../data/cssjs/cetak/style_new.css">
     <link rel="stylesheet" type="text/css" href="../../../data/cssjs/cetak/style_new2.css">
 
@@ -24,49 +25,49 @@ if (isset($_GET['input'])) {
     <!-- HEADER -->
     <table border="0" style="width: 100%">
         <?php
-        if (isset($_GET['export'])) {
-            
+        $idHotel = decrypt($_COOKIE['id_hotel']);
+        if (isset($_GET['export'])){
         } else {
-        $idHotel=decrypt($_COOKIE['id_hotel']);
-            ?>
+            
+        ?>
             <tr>
                 <td class="auto-style1" rowspan="3" width="101">
-                    <img alt="" height="100" src="<?php echo $logo_laporan1; ?>" width="100"></td>
+                    <img alt="" height="100" src="<?php echo $logo_laporan1; ?>" width="100">
+                </td>
 
                 <td class="auto-style1">
-            <center>
-                <h2 class="auto-style1" style='color:#D92C09'><?php echo $judul." Cabang ".baca_database("","nama","select * from data_hotel where id_hotel='$idHotel'")?></h2>
-            </center>
-        </td>
+                    <center>
+                        <h2 class="auto-style1" style='color:#D92C09'><?php echo $judul . "  " . baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?></h2>
+                    </center>
+                </td>
 
-        <td class="auto-style1" rowspan="3" width="101">
-            <img alt="" height="100" src="<?php echo $logo_laporan2; ?>" width="100"></td>
+                <td class="auto-style1" rowspan="3" width="101">
+                    <img alt="" height="100" src="<?php echo $logo_laporan2; ?>" width="100">
+                </td>
+            </tr>
+        <?php } ?>
+
+        <tr>
+            <td class="auto-style2">
+                <center>
+                    <strong>LAPORAN
+
+                        <?php
+                        $tabelnya = "data_pelanggan";
+                        $tabelnya = str_replace("_", " ", $tabelnya);
+                        $tabelnya = str_replace("data", "", $tabelnya);
+                        $tabelnya = strtoupper($tabelnya);
+                        echo $tabelnya;
+                        ?>
+
+                    </strong>
+                </center>
+            </td>
         </tr>
-    <?php } ?>
 
-    <tr>
-        <td class="auto-style2">
-    <center>
-        <strong>LAPORAN
-
-            <?php
-            $tabelnya = "data_pelanggan";
-            $tabelnya = str_replace("_", " ", $tabelnya);
-            $tabelnya = str_replace("data", "", $tabelnya);
-            $tabelnya = strtoupper($tabelnya);
-            echo $tabelnya;
-            ?>
-
-        </strong>
-    </center>
-    </td>
-    </tr>
-
-    <tr>
-        <td class="auto-style2"><?php
-        
-        echo baca_database("","alamat","select * from data_hotel where id_hotel='$idHotel'"); ?></td>
-    </tr>
+        <tr>
+            <td class="auto-style2"><?php echo baca_database("", "alamat", "select * from data_hotel where id_hotel='$idHotel'"); ?></td>
+        </tr>
     </table>
     <!-- HEADER -->
 
@@ -74,12 +75,12 @@ if (isset($_GET['input'])) {
     <table width="100%" class='' style='font-family:arial;font-size:11pt'>
         <tr>
             <th class="th_border cell">No</th>
-           <!--h <th class="th_border cell">Id Pelanggan </th> h-->
-                <th align="center" class="th_border cell"  >Nama </th>
-                <th align="center" class="th_border cell"  >Jenis Kelamin </th>
-                <th align="center" class="th_border cell"  >Nama Hotel</th>
-                <th align="center" class="th_border cell"  >No Hp </th>
-                
+            <!--h <th class="th_border cell">Id Pelanggan </th> h-->
+            <th align="center" class="th_border cell">Nama </th>
+            <th align="center" class="th_border cell">Jenis Kelamin </th>
+            <th align="center" class="th_border cell">Nama Hotel</th>
+            <th align="center" class="th_border cell">No Hp </th>
+
 
 
         </tr>
@@ -108,20 +109,21 @@ if (isset($_GET['input'])) {
             }
             $proses = mysql_query($querytabel);
             while ($data = mysql_fetch_array($proses)) {
-                ?>
+            ?>
                 <tr class="event2">
-                    <td align="center" width="50"><?php $no = $no + 1; echo $no; ?></td>
+                    <td align="center" width="50"><?php $no = $no + 1;
+                                                    echo $no; ?></td>
                     <!--h <td align="center"><?php echo $data['id_pelanggan']; ?></td> h-->
-                        <td align="center"><?php echo ucwords($data['nama']); ?></td>
-                        <td align="center"><?php echo ucwords($data['jenis_kelamin']); ?></td>
-                        <td align="center"><?php echo ucwords(baca_database("","nama","select * from data_hotel where id_hotel='$data[id_hotel]'"))  ?></td>
-                        <td align="center"><?php echo $data['no_hp']; ?></td>
+                    <td align="center"><?php echo ucwords($data['nama']); ?></td>
+                    <td align="center"><?php echo ucwords($data['jenis_kelamin']); ?></td>
+                    <td align="center"><?php echo ucwords(baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'"))  ?></td>
+                    <td align="center"><?php echo $data['no_hp']; ?></td>
 
 
 
 
                 </tr>
-    <?php } ?>
+            <?php } ?>
         </tbody>
     </table>
     <!-- BODY -->

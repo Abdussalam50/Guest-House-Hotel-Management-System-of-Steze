@@ -1,21 +1,52 @@
 <?php
-// Assume decrypt function is defined elsewhere
-$id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+
+if (isset($_GET['id_hotel'])) {
+    $id_hotel = decrypt($_GET['id_hotel']);
+} else {
+    $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+}
+
+if ($id_hotel == "") {
+    include 'tampil_admin.php';
+    die();
+}elseif(isset($_COOKIE['operasional'])){
+    // $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='pengaturan_oleh_operasional'")
+    ?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
+        window.location.href='../../index.php'
+    </script>
+<?php
+}
 ?>
 
 <div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
-    <a href="../data_transaksi/index.php?input=cetak" class="btn btn-sm btn-secondary fw-semibold">
-        <i class='fas fa-print text-black'></i> Report Transaksi
-    </a>
-    <a href="../data_transaksi/index.php?input=cetak_cashflow&id_hotel=<?php echo $id_hotel ?>" class=" btn btn-sm btn-secondary fw-semibold">
-        <i class='fas fa-file-text text-black'></i> Cashflow
-    </a>
-    <a href="../grafik_rekapitulasi/index.php" class=" btn btn-sm btn-secondary fw-semibold">
-        <i class='fas fa-chart-pie text-black'></i> Grafik
-    </a>
-    <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
-        <i class='fas fa-search text-white'></i> Pencarian
-    </a>
+
+    <?php if ($_COOKIE['id_hotel'] == "") {
+    ?>
+
+        <a href="index.php" class=" btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-backward text-black'></i> Kembali
+        </a>
+        <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
+            <i class='fas fa-search text-white'></i> Pencarian
+        </a>
+    <?php
+    } else { ?>
+        <a href="../data_transaksi/index.php?input=cetak" class="btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-print text-black'></i> Report Transaksi
+        </a>
+        <a href="../data_transaksi/index.php?input=cetak_cashflow&id_hotel=<?php echo $id_hotel ?>" class=" btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-file-text text-black'></i> Cashflow
+        </a>
+        <a href="../grafik_rekapitulasi/index.php" class=" btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-chart-pie text-black'></i> Grafik
+        </a>
+        <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
+            <i class='fas fa-search text-white'></i> Pencarian
+        </a>
+
+    <?php } ?>
 </div>
 <br>
 
@@ -50,30 +81,33 @@ $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
                     <tbody>
                         <?php
                         $no = ($page - 1) * $dataPerPage;
-
+                        $basepagination = "SELECT COUNT(*) AS total FROM data_transaksi WHERE id_hotel='$id_hotel'";
                         // Query dengan filter jika ada
                         $where_clauses = [];
                         if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
                             $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
                             $isi = mysql_real_escape_string($_GET['isi']);
                             $where_clauses[] = "$berdasarkan LIKE '%$isi%'";
+                            $querypagination = $basepagination . " AND $berdasarkan LIKE '%$isi%'";
                         }
 
                         // Add id_hotel filter only if it exists and is not empty
                         if (!empty($id_hotel)) {
                             $where_clauses[] = "dt.id_hotel='$id_hotel'";
+                            $querypagination = $basepagination;
                         }
 
                         // Build the WHERE clause
                         $where_clause = !empty($where_clauses) ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
-                        $querytabel = "SELECT dt.*, dp.nama, dk.no_kamar 
+                        $querytabel = "SELECT dt.*,dp.nama, dk.no_kamar 
                                        FROM data_transaksi dt
                                        JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
                                        JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
                                        $where_clause
                                        ORDER BY dt.id_transaksi DESC 
                                        LIMIT " . (($page - 1) * $dataPerPage) . ", $dataPerPage";
+
 
                         $proses = mysql_query($querytabel);
                         while ($data = mysql_fetch_array($proses)) {
@@ -170,7 +204,16 @@ $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
                 </table>
             </div>
 
-            <?php Pagination($page, $dataPerPage, $querypagination); ?>
+
+            <?php
+            //perlu perbaikan handle paginationnya
+            if ($_COOKIE['id_hotel'] == "") {
+            } else {
+                Pagination($page, $dataPerPage, $querypagination);
+            }
+            ?>
+
+
         </div>
     </div>
 </div>
@@ -231,10 +274,23 @@ $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
                     return false;
                 }
 
-                window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}`;
+
+                <?php
+                if (isset($_GET['id_hotel'])) {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}&id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>`;
+                <?php
+                } else {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}`;
+                <?php
+                }
+                ?>
+
+
             },
             preDeny: () => {
-                window.location.href = 'index.php';
+                window.location.href = 'index.php?id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>';
             }
         });
     }

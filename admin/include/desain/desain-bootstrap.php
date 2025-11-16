@@ -19,7 +19,7 @@ function btn_export_laporan($namatombol)
 
 function btn_cetak_laporan($namatombol)
 {
-    echo "<button class='btn btn-sm btn-secondary fw-semibold' name='cetak'><i class='fa fa-print'></i> " . $namatombol . "</button>";
+    // echo "<button class='btn btn-sm btn-secondary fw-semibold' name='cetak'><i class='fa fa-print'></i> " . $namatombol . "</button>";
 };
 
 function btn_export($namatombol)

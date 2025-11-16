@@ -84,22 +84,22 @@ function Pagination($pagedefault, $limit, $querypagination)
 //POTONG KALIMAT
 function cutText($text, $length, $mode = 2)
 {
-	if ($mode != 1) {
-		$char = $text{
-			$length - 1};
-		switch ($mode) {
-			case 2:
-				while ($char != ' ') {
-					$char = $text{
-						--$length};
-				}
-			case 3:
-				while ($char != ' ') {
-					$char = $text{
-						++$num_char};
-				}
-		}
-	}
+	// if ($mode != 1) {
+	// 	$char = $text{
+	// 		$length - 1};
+	// 	switch ($mode) {
+	// 		case 2:
+	// 			while ($char != ' ') {
+	// 				$char = $text{
+	// 					--$length};
+	// 			}
+	// 		case 3:
+	// 			while ($char != ' ') {
+	// 				$char = $text{
+	// 					++$num_char};
+	// 			}
+	// 	}
+	// }
 	return substr($text, 0, $length);
 }
 
@@ -885,8 +885,11 @@ function temp()
 
 						<td>
 							<?php btn_preview_laporan('Print Preview'); ?>
-							<?php btn_cetak_laporan('Print'); ?>
-							<?php btn_export_laporan('Export Excel'); ?>
+
+							<?php
+							if ($tabel == 'data_pelanggan') {
+								btn_export_laporan('Export Excel');
+							} ?>
 						</td>
 					</tr>
 				</tbody>
@@ -934,8 +937,11 @@ function temp()
 
 						<td>
 							<?php btn_preview_laporan('Print Preview'); ?>
-							<?php btn_cetak_laporan('Print'); ?>
-							<?php btn_export_laporan('Export Excel'); ?>
+							<!-- <?php btn_cetak_laporan('Print'); ?> -->
+							<?php
+							if ($tabel == 'data_pelanggan') {
+								btn_export_laporan('Export Excel');
+							} ?>
 						</td>
 					</tr>
 				</tbody>
@@ -1011,8 +1017,11 @@ function temp()
 
 							<td>
 								<?php btn_preview_laporan('Print Preview'); ?>
-								<?php btn_cetak_laporan('Print'); ?>
-								<?php btn_export_laporan('Export Excel'); ?>
+								<!-- <?php btn_cetak_laporan('Print'); ?> -->
+								<?php
+								if ($tabel == 'data_pelanggan') {
+									btn_export_laporan('Export Excel');
+								} ?>
 							</td>
 						</tr>
 					</tbody>
@@ -1027,6 +1036,7 @@ function temp()
 		//PROSES ACTION CETAK
 		function proses_action_cetak($tabel)
 		{
+
 			$status = "";
 			if (isset($_GET['preview'])) {
 				$status = "preview";
@@ -1038,6 +1048,8 @@ function temp()
 		</script>
 	<?php
 			} else if (isset($_GET['export'])) {
+
+
 				$status = "export";
 				header("Content-Type: application/force-download");
 				header("Cache-Control: no-cache, must-revalidate");
@@ -1304,7 +1316,7 @@ function detail_transaksi($id_transaksi)
 
 	$id_transaksi = (mysql_real_escape_string($id_transaksi));
 
-	$sql = mysql_query("SELECT dt.*, dp.nama, dk.no_kamar 
+	$sql = mysql_query("SELECT dt.*,dp.nama, dk.no_kamar 
                         FROM data_transaksi dt
                         JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
                         JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
@@ -1331,12 +1343,28 @@ function detail_transaksi($id_transaksi)
 	$tambahan_in = $data['biaya_tambahan_checkin'];
 	$tambahan_out = $data['biaya_tambahan_checkout'];
 	$potongan_harga = $data['potongan_harga'];
+	$metode_pembayaran = $data['metode_pembayaran'];
+	$no_rekening = $data['no_rekening'];
 
 	// Subtotal, pajak, total
 	$sub_total = $harga_setelah_disc + $tambahan_in + $tambahan_out - $potongan_harga;
 	$pajak = ($sub_total * $data['persentase_pajak']) / 100;
 	$total_bayar = $sub_total + $pajak;
 	$id_hotel  = $data['id_hotel'];
+
+	//durasi counter hanya untuk memunculkan tombol hanya 5 jam saja dari waktu checkin
+	$waktu_checkin = strtotime($data['waktu_checkin'] . ' ' . $data['jam_checkin']);
+	$now = strtotime(date('Y-m-d H:i:s'));
+	$selisih = $now - $waktu_checkin;
+	//deposit
+	$nominal_deposit = $data['nominal_deposit'];
+	if ($nominal_deposit !== null && $nominal_deposit > 0) {
+		$status_deposit = "Iya";
+	} else {
+		$status_deposit = "Tidak";
+	}
+	// konversi ke jam (dibulatkan ke bawah)
+	$jam = floor($selisih / 3600);
 
 ?>
 	<div class="card shadow-sm mb-3" style="max-width:900px;margin:auto;">
@@ -1399,7 +1427,15 @@ function detail_transaksi($id_transaksi)
 			</div>
 
 			<hr>
-
+			<div class="row mb-2">
+				<div class="col-md-4 font-weight-bold">Pakai Deposit</div>
+				<div class="col-md-8"><strong class="<?= $status_deposit == "Iya" ? "text-success" : "text-danger" ?>"><?= $status_deposit; ?></strong></div>
+			</div>
+			<div class="row mb-2">
+				<div class="col-md-4 font-weight-bold">Nominal Deposit</div>
+				<div class="col-md-8"><strong class="text-dark"><?= rupiah($nominal_deposit); ?></strong></div>
+			</div>
+			<hr>
 			<div class="row mb-2">
 				<div class="col-md-4 font-weight-bold">Harga Kamar/Hari</div>
 				<div class="col-md-8"><?= rupiah($harga_per_hari); ?></div>
@@ -1468,9 +1504,20 @@ function detail_transaksi($id_transaksi)
 				<div class="col-md-8"><?= rupiah($pajak); ?></div>
 			</div>
 
+
 			<div class="row mb-2">
 				<div class="col-md-4 font-weight-bold">Total Bayar</div>
 				<div class="col-md-8"><strong class="text-danger"><?= rupiah($total_bayar); ?></strong></div>
+			</div>
+
+			<div class="row mb-2">
+				<div class="col-md-4 font-weight-bold">Metode Pembayaran</div>
+				<div class="col-md-8"><strong><?= ($metode_pembayaran); ?></strong></div>
+			</div>
+
+			<div class="row mb-2">
+				<div class="col-md-4 font-weight-bold">Nomor Rekeing</div>
+				<div class="col-md-8"><strong> <?= ($no_rekening); ?></strong></div>
 			</div>
 
 			<div class="row mb-2">
@@ -1481,13 +1528,21 @@ function detail_transaksi($id_transaksi)
 					</span>
 				</div>
 			</div>
-
+			<?php
+			$jam_default = baca_database("", "value", "select * from data_pengaturan_aplikasi where nama_pengaturan='jam_batal_transaksi'");
+			if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
+			?>
+				<p class="text-start text-danger">
+					<span style='font-weight:700'>Information!:</span> Fitur hapus transaksi hanya dapat digunakan <?= $jam_default ?> jam dari waktu checkin.
+				</p>
+			<?php
+			} ?>
 
 
 		</div>
 	</div>
 
-	<?php if ($id_hotel == decrypt($_COOKIE['id_hotel'])) { ?>
+	<?php if (isset($_COOKIE['id_hotel']) && $id_hotel == decrypt($_COOKIE['id_hotel'])) { ?>
 		<?php if ($data['status_transaksi'] == "Selesai") {
 		} else {
 
@@ -1500,18 +1555,124 @@ function detail_transaksi($id_transaksi)
 				<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi; ?>'">Cetak Ulang Nota</button>
 			<?php
 			}
+
+
+
 			?>
 
 
 
 			<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $data['id_kamar'] ?>&trx=<?php echo encrypt($data['id_transaksi']) ?>'">Check Out</button>
-		<?php
 
+
+
+			<?php
 		}
-		?>
+	} elseif (isset($_COOKIE['operasional'])) {
+		echo "";
+	} else {
+		if ($data['status_transaksi'] == "Selesai") {
+		} else {
 
-	<?php } ?>
+			if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
+			?>
+				<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/notaA4.php?id_trx=<?php echo $id_transaksi; ?>&status=checkin'">Cetak Ulang Nota</button>
+			<?php
+			} else {
+			?>
+				<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/cetak_nota.php?id_trx=<?php echo $id_transaksi; ?>'">Cetak Ulang Nota</button>
+			<?php
+			}
+
+
+
+			?>
+
+
+
+			<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $data['id_kamar'] ?>&trx=<?php echo encrypt($data['id_transaksi']) ?>'">Check Out</button>
+
+
+
+	<?php
+		}
+	} ?>
+
+	<?php
+
+	if ($jam <= $jam_default && $data['status_transaksi'] == 'Lunas') {
+		$jenenge = decrypt($_COOKIE['jenenge']);
+
+		$id_admin = baca_database("", "id_admin", "select * from data_admin where username='$jenenge'");
+		if ($id_admin == null) {
+			$id_admin = baca_database("", "id_pengelola", "select * from data_pengelola where username='$jenenge'");
+		}
+	?>
+		<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../data_transaksi/index.php?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?= $id_admin ?>'"> Hapus Transaksi</button>
+<?php
+	}
+}
+?>
+
 
 <?php
+
+function simpan_riwayat($nama_tabel, $nama_kolom, $id_kolom, $proses_query, $admin)
+{
+	// Buat ID unik dan waktu sekarang
+	$id_riwayat = uniqid('riwayat_');
+	$waktu = date('Y-m-d H:i:s');
+	$data_json = 'NULL';
+
+	// Ambil ID admin dari cookie
+	$id_admin = isset($_COOKIE['id_admin']) ? mysql_real_escape_string($_COOKIE['id_admin']) : $admin;
+	$id_hotel = isset($_COOKIE['id_hotel']) ? baca_database("", "id_hotel", "select * from data_admin where id_admin='$id_admin'") : '-';
+
+	// Escape proses_query
+	$proses_query = mysql_real_escape_string($proses_query);
+
+	// Deteksi action dari query
+	$action = 'UNKNOWN';
+	$query_lower = strtolower(trim($proses_query));
+
+	if (strpos($query_lower, 'insert') === 0) {
+		$action = 'INSERT';
+	} elseif (strpos($query_lower, 'update') === 0) {
+		$action = 'UPDATE';
+	} elseif (strpos($query_lower, 'delete') === 0) {
+		$action = 'DELETE';
+	}
+
+	// Ambil data sebelum perubahan untuk UPDATE atau DELETE
+	$sql_data = "SELECT * FROM `$nama_tabel` WHERE `$nama_kolom` = '$id_kolom'";
+	$result = mysql_query($sql_data);
+
+	if ($result && mysql_num_rows($result) > 0) {
+		$data = mysql_fetch_assoc($result);
+		$json_data = json_encode($data);
+		if ($json_data !== false) {
+			$data_json = "'" . mysql_real_escape_string($json_data) . "'";
+		} else {
+			// Log JSON encoding error
+			error_log("JSON encoding failed for table $nama_tabel, column $nama_kolom, id $id_kolom");
+			$data_json = 'NULL';
+		}
+	}
+
+	// Simpan ke tabel data_riwayat_admin
+	if (isset($_COOKIE['id_hotel'])) {
+		$sql_insert = "INSERT INTO data_riwayat_admin 
+        (id_riwayat_admin, waktu, action, nama_tabel, id_hotel, nama_kolom, id_kolom, data_json, proses_query, id_admin)
+        VALUES 
+        ('$id_riwayat', '$waktu', '$action', '$nama_tabel', '$id_hotel', '$nama_kolom', '$id_kolom', $data_json, '$proses_query', '$id_admin')";
+	} else {
+		$sql_insert = "INSERT INTO data_riwayat_superadmin 
+        (id_riwayat_admin, waktu, action, nama_tabel, id_hotel, nama_kolom, id_kolom, data_json, proses_query, id_admin)
+        VALUES 
+        ('$id_riwayat', '$waktu', '$action', '$nama_tabel', '$id_hotel', '$nama_kolom', '$id_kolom', $data_json, '$proses_query', '$id_admin')";
+	}
+	mysql_query($sql_insert) or die("Gagal simpan riwayat: " . mysql_error());
 }
+
+
 ?>

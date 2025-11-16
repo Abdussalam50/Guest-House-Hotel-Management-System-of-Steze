@@ -62,7 +62,7 @@
             <tr>
                 <td class="clleft" width="25%">Biaya </td>
                 <td class="clleft" width="2%">:</td>
-                <td class="clleft"><?php echo $data['biaya']; ?></td>
+                <td class="clleft"><?php echo rupiah($data['biaya']); ?></td>
             </tr>
 
 

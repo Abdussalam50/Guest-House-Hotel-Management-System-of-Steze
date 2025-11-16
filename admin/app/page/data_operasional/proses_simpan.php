@@ -34,7 +34,16 @@ $query = mysql_query("insert into data_operasional values (
  ,'$id_admin'
 
 )");
-
+$sql="insert into data_operasional values (
+        '$id_operasional',
+        '$id_hotel',
+        '$tanggal',
+        '$operasional',
+        '$jumlah',
+        '$keperluan',
+        '$biaya',
+        '$id_admin')";
+simpan_riwayat("data_operasional","id_operasional",$id_operasional,$sql,$id_admin);
 if ($query) {
     ?>
     <script>location.href = "<?php index(); ?>?input=popup_tambah";</script>

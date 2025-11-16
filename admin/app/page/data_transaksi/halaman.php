@@ -74,6 +74,8 @@
 					include 'pendapatan.php';
 				}elseif($input=='cetak_cashflow'){
 					include 'laporan cash flow.php';
+				}elseif($input=='cetak_deposit'){
+					include 'laporan deposit.php';
 				}
 				else
 				{

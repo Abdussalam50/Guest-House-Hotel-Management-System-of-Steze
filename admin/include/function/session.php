@@ -8,13 +8,15 @@ if ($_COOKIE['token'] == $token)
 {
 	
 }
-else
-{
-	?>
-	<script>location.href = "../../../login/<?php index();?>";</script> 
+// else
+// {
+// 	?>
+	<script>
+// 	   // location.href = "../../../login/<?php index();?>";
+// 	    </script> 
 	<?php
-	die();
-}
+// 	die();
+// }
 
 
 if (empty($_COOKIE['jenenge']))

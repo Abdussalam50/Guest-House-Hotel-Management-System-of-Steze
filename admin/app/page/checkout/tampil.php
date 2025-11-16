@@ -1,551 +1,765 @@
-<div class="container-md">
-    <div class="table">
-        <table class="table table-striped">
-            <tr>
-                <td colspan="3">
-                    <center>
-                        <img src="../../../data/image/logo/steze-2.png" alt="" width='100'>
-                        <br><br>
-                        <h2 style="color: #c12c27;"><i class='fas fa-sign-in-alt text-danger'></i> Check-out</h2>
-                        <?php echo $alamat; ?>
-                    </center>
-                    <br>
-                </td>
-            </tr>
-
-            <?php
-            require_once '../../../include/all_include.php';
-
-            $id_kamar = decrypt($_GET['id']);
-            $id_trx = decrypt($_GET['trx']);
-            $id_hotel = decrypt($_COOKIE['id_hotel']);
-            $username = decrypt($_COOKIE['jenenge']);
-
-            // Fetch transaction details
-            $query = mysql_query("SELECT dt.*, dp.nama 
-                                 FROM data_transaksi dt
-                                 LEFT JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
-                                 WHERE dt.id_transaksi='$id_trx' AND dt.status_transaksi != 'Selesai'");
-            if (!$query) {
-                echo "<script>alert('Error: " . mysql_error() . "');history.back();</script>";
-                die();
-            }
-            $data = mysql_fetch_array($query);
-
-            if (!$data) {
-                echo "<script>alert('Data transaksi tidak ditemukan atau sudah selesai');history.back();</script>";
-                die();
-            }
-
-            // Calculate pricing based on transaction type
-            $harga_per_hari = $data['harga_kamar_harian'];
-            $harga_per_bulan = $data['harga_kamar_bulanan'];
-            $jumlah_hari = $data['jumlah_hari'];
-            $harga_kamar_total = ($data['jenis_transaksi'] == 'bulanan')
-                ? $harga_per_bulan * ($jumlah_hari / 30)
-                : $harga_per_hari * $jumlah_hari;
-
-            // Discount
-            $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
-            $harga_setelah_disc = $harga_kamar_total - $disc_nominal;
-
-            // Additional costs and deductions
-            $tambahan_in = $data['biaya_tambahan_checkin'];
-            $tambahan_out = $data['biaya_tambahan_checkout'];
-            $potongan_harga = $data['potongan_harga'];
-
-            // Subtotal (including biaya_tambahan_checkout)
-            $sub_total = $harga_setelah_disc + $tambahan_in + $tambahan_out - $potongan_harga;
-            $pajak = ($sub_total * $data['persentase_pajak']) / 100;
-            $total_bayar = $sub_total + $pajak;
-
-            ?>
-            <tr>
-                <th>Nama Pelanggan</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php echo ucwords($data['nama']); ?>
-                    <span class="<?php echo $data['status_transaksi'] == 'Belum Lunas' ? 'text-danger' : 'text-success'; ?>">
-                        (<?php echo $data['status_transaksi']; ?>)
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <th>Kamar</th>
-                <td width='1%'>:</td>
-                <td>Kamar <?php echo $data['no_kamar']; ?> (<?php echo $data['tipe_kamar']; ?>)</td>
-            </tr>
-            <tr>
-                <th>Waktu Checkin</th>
-                <td width='1%'>:</td>
-                <td><?php echo format_indo($data['waktu_checkin']) . " " . $data['jam_checkin']; ?></td>
-            </tr>
-            <tr>
-                <th>Waktu Checkout</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php
-                    $today = strtotime(date('Y-m-d'));
-                    $checkout = strtotime($data['waktu_checkout']);
-                    $hari_tersisa = ($checkout - $today) / (60 * 60 * 24);
-
-                    if ($hari_tersisa > 0) {
-                        $hari_tersisa = ceil($hari_tersisa);
-                        echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']) . " " . $data['jam_checkout'])
-                            . "<b style='color:red'>&nbsp;{$hari_tersisa}&nbsp;hari&nbsp;lagi</b>";
-                    } elseif ($hari_tersisa == 0) {
-                        echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']) . " " . $data['jam_checkout'])
-                            . "<b style='color:green'>&nbsp;Hari ini</b>";
-                    } else {
-                        echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']) . " " . $data['jam_checkout']);
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="card">
+                <style>
+                    /* ===== Custom Checkin Card Style (tidak ganggu bootstrap) ===== */
+                    .cardcheckin {
+                        background: #fff;
+                        border-radius: 12px;
+                        border: 1px solid #e0e0e0;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                        transition: all 0.2s ease-in-out;
                     }
-                    ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Jumlah Hari</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php
-                    if ($data['jenis_transaksi'] == 'bulanan') {
-                        $j_hari = ($data['jumlah_hari'] / 30);
-                        echo $j_hari . ' Bulan';
-                    } else {
-                        $j_hari = $data['jumlah_hari'];
-                        echo $j_hari . ' Hari';
+
+                    .cardcheckin:hover {
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
                     }
-                    ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Harga Kamar</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php
-                    if ($data['jenis_transaksi'] == 'bulanan') {
-                        echo rupiah($harga_per_bulan) . '/Bulan';
-                    } else {
-                        echo rupiah($harga_per_hari) . '/Hari';
+
+                    .cardcheckin-body {
+                        padding: 18px;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
                     }
+
+                    .cardcheckin .card-group-title {
+                        font-weight: bold;
+                        background: #f8f9fa;
+                        padding: 6px 10px;
+                        border-radius: 6px;
+                        margin-bottom: 12px;
+                        border: 1px solid #dee2e6;
+                    }
+
+                    .room-badge {
+                        background-color: #bf2b27;
+                        color: white;
+                        font-size: 2rem;
+                        font-weight: bold;
+                        width: 70px;
+                        height: 70px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 8px;
+                        margin-right: 12px;
+                    }
+
+                    .cardcheckin .form-control,
+                    .cardcheckin .form-select {
+                        border-radius: 8px;
+                        border: 1px solid #ced4da;
+                        padding: 8px 12px;
+                    }
+
+                    .cardcheckin .form-control:focus,
+                    .cardcheckin .form-select:focus {
+                        border-color: #0d6efd;
+                        box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+                    }
+
+                    .input-group .btn,
+                    .input-group .input-group-text {
+                        border-radius: 8px;
+                        border: 1px solid #ced4da;
+                        padding: 8px 12px;
+                    }
+
+                    .btn-minus {
+                        background: #bf2b27;
+                        color: white;
+                        border: none;
+                    }
+
+                    .btn-plus {
+                        background: #28a745;
+                        color: white;
+                        border: none;
+                    }
+
+                    .btn-minus:hover {
+                        background: #c82333;
+                    }
+
+                    .btn-plus:hover {
+                        background: #218838;
+                    }
+                </style>
+
+                <body class="bg-light p-4">
+
+                    <?php
+                    require_once '../../../include/all_include.php';
+
+                    $id_kamar = decrypt($_GET['id']);
+                    $id_trx = decrypt($_GET['trx']);
+                    $id_hotel = decrypt($_COOKIE['id_hotel']);
+                    $username = decrypt($_COOKIE['jenenge']);
+                    $nama_hotel = baca_database("", "nama", "SELECT * FROM data_hotel WHERE id_hotel='$id_hotel'");
+                    $alamat = baca_database("", "alamat", "SELECT * FROM data_hotel WHERE id_hotel='$id_hotel'");
+
+
+
+                    // Fetch transaction details
+                    $query = mysql_query("SELECT dt.*, dp.nama 
+                                             FROM data_transaksi dt
+                                             LEFT JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
+                                             WHERE dt.id_transaksi='$id_trx' AND dt.status_transaksi != 'Selesai'");
+                    if (!$query) {
+                        echo "<script>alert('Error: " . mysql_error() . "');history.back();</script>";
+                        die();
+                    }
+                    $data = mysql_fetch_array($query);
+
+                    if (!$data) {
+                        echo "<script>alert('Data transaksi tidak ditemukan atau sudah selesai');history.back();</script>";
+                        die();
+                    }
+
+                    // Calculate pricing based on transaction type
+                    $harga_per_hari = $data['harga_kamar_harian'];
+                    $harga_per_bulan = $data['harga_kamar_bulanan'];
+                    $jumlah_hari = $data['jumlah_hari'];
+                    $harga_kamar_total = ($data['jenis_transaksi'] == 'bulanan')
+                        ? $harga_per_bulan * ($jumlah_hari / 30)
+                        : $harga_per_hari * $jumlah_hari;
+
+                    // Discount
+                    $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
+                    $harga_setelah_disc = $harga_kamar_total - $disc_nominal;
+
+                    // Additional costs and deductions
+                    $biaya_tambahan_checkin = $data['biaya_tambahan_checkin'];
+                    $deskripsi_biaya_checkin = $data['deskripsi_biaya_checkin'];
+                    if ($deskripsi_biaya_checkin == "") {
+                        $deskripsi_biaya_checkin = "tidak ada catatan tambahan biaya check-in";
+                    }
+                    $tambahan_out = $data['biaya_tambahan_checkout'];
+                    $potongan_harga = $data['potongan_harga'];
+                    $pajak = $data['pajak'];
+                    $persentase_pajak = $data['persentase_pajak'];
+                    $total_bayar = $data['total_bayar'];
+
+                    $id_pelanggan = $data['id_pelanggan'];
+                    $sqlpelanggan = mysql_query("SELECT * FROM data_pelanggan where id_pelanggan = '$id_pelanggan'");
+                    $data_pelanggan = mysql_fetch_array($sqlpelanggan);
+
                     ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Harga Kamar Total</th>
-                <td width='1%'>:</td>
-                <td><?php echo rupiah($harga_kamar_total); ?></td>
-            </tr>
-            <tr>
-                <th>Diskon (<?php echo $data['discount']; ?>%)</th>
-                <td width='1%'>:</td>
-                <td><?php echo rupiah($disc_nominal); ?> → <span class="text-success"><?php echo rupiah($harga_setelah_disc); ?></span></td>
-            </tr>
-            <tr>
-                <th>Jumlah Dewasa</th>
-                <td width='1%'>:</td>
-                <td><?php echo $data['jumlah_dewasa']; ?></td>
-            </tr>
-            <tr>
-                <th>Jumlah Anak-anak</th>
-                <td width='1%'>:</td>
-                <td><?php echo $data['jumlah_anak_anak']; ?></td>
-            </tr>
-            <tr>
-                <th>Metode Transaksi</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php if ($data['status_transaksi'] == 'Belum Lunas') { ?>
-                        <div class="input-group" style='width:60%'>
-                            <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value='<?php echo $data['metode_transaksi']; ?>'>
-                            <input type="text" name="metode_bayar" id="metode_bayar" placeholder='Pilih Metode Bayar' class='form-control'
-                                value="<?php echo baca_database("", "metode_pembayaran", "SELECT * FROM data_metode_pembayaran WHERE id_metode_pembayaran='{$data['metode_transaksi']}'") ?: '-'; ?>">
-                            <button type="button" id='metode' class='btn btn-secondary'><i class="fa fa-dollar"></i> Pilih Metode Pembayaran</button>
+
+
+
+                    <div class="mb-4">
+                        <div class="cardcheckin-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="room-badge"><?php echo $data['no_kamar']; ?></div>
+                                <h4 class="mb-0"><i class="fas fa-sign-out-alt text-danger"></i> Check-out <?php echo $nama_hotel; ?></h4>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Informasi Kamar -->
+                                <div class="col-md-4">
+                                    <div class="cardcheckin h-100">
+                                        <div class="cardcheckin-body">
+                                            <div class="card-group-title">Informasi Kamar</div>
+                                            <label class="form-label">Tanggal</label>
+                                            <input type="text" class="form-control mb-2" readonly value="20/05/2013">
+
+                                            <label class="form-label">Channel</label>
+                                            <input type="text" class="form-control mb-2" readonly value="Walk-In Guest">
+
+                                            <label class="form-label">Tipe Kamar</label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo $data['tipe_kamar']; ?>">
+
+                                            <label class="form-label">Tanggal Cek In</label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo format_indo($data['waktu_checkin']); ?>">
+
+                                            <label class="form-label">Tanggal Cek Out <b><?php
+                                                                                            $today = strtotime(date('Y-m-d'));
+                                                                                            $checkout = strtotime($data['waktu_checkout']);
+                                                                                            $hari_tersisa = ($checkout - $today) / (60 * 60 * 24);
+                                                                                            if ($hari_tersisa > 0) {
+                                                                                                $hari_tersisa = ceil($hari_tersisa);
+                                                                                                echo "<span class='text-danger'>{$hari_tersisa}&nbsp;hari&nbsp;lagi</span>";
+                                                                                            } elseif ($hari_tersisa == 0) {
+                                                                                                echo "<span class='text-success'>Hari ini</span>";
+                                                                                            } else {
+                                                                                            }
+                                                                                            ?></b></label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo str_replace(' ', '&nbsp;', format_indo($data['waktu_checkout'])) ?>">
+
+                                            <label class="form-label">Jumlah Hari</label>
+                                            <div class="input-group mb-2">
+
+                                                <input type="text" class="form-control" readonly value="<?php echo $j_hari = $data['jumlah_hari']; ?>">
+
+                                                <span class="input-group-text">Hari</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informasi Pelanggan -->
+                                <div class="col-md-4">
+                                    <div class="cardcheckin h-100">
+                                        <div class="cardcheckin-body">
+                                            <div class="card-group-title">Informasi Pelanggan</div>
+                                            <label class="form-label">Nama</label>
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control" readonly value="<?php echo ucwords($data_pelanggan['nama']); ?>">
+
+                                            </div>
+
+
+                                            <div class="row g-2 ">
+                                                <div class="col-4">
+                                                    <label class="form-label">Identitas</label>
+                                                    <input required class="form-control mb-2" name="identitas" id="identitas" value="<?php echo $data_pelanggan['identitas']; ?>" placeholder="Identitas">
+
+                                                </div>
+                                                <div class="col-8">
+                                                    <label class="form-label">No. Identitas</label>
+                                                    <div class="input-group mb-2">
+                                                        <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" value="<?php echo $data_pelanggan['no_identitas']; ?>" id="no_identitas" placeholder="No Identitas">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <label class="form-label">Alamat</label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo $data_pelanggan['alamat']; ?>">
+                                            <label class="form-label">No. Telp</label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo $data_pelanggan['no_hp']; ?>">
+                                            <label class="form-label">Jenis Kelamin</label>
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo ucfirst($data_pelanggan['jenis_kelamin']); ?>">
+                                            <label class="form-label">Jumlah Tamu</label>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Dewasa</span>
+                                                <input type="number" class="form-control" readonly value="<?php echo $data['jumlah_dewasa']; ?>">
+                                                <span class="input-group-text">Anak</span>
+                                                <input type="number" class="form-control" readonly value="<?php echo $data['jumlah_anak_anak']; ?>">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informasi Transaksi -->
+                                <div class="col-md-4">
+                                    <div class="cardcheckin h-100">
+                                        <div class="cardcheckin-body">
+                                            <div class="card-group-title">Informasi Transaksi</div>
+
+
+
+
+                                            <label class="form-label">Harga Sewa / Hari</label>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_per_hari) ?>">
+                                            </div>
+
+                                            <label class="form-label">Total Harga Sewa</label>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_kamar_total); ?>">
+                                            </div>
+
+
+
+
+                                            <div class="row g-2 mb-2">
+                                                <div class="col-6">
+                                                    <label class="form-label">Diskon</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">%</span>
+                                                        <input type="text" class="form-control" readonly value="<?php echo $data['discount']; ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label">Potongan</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">Rp</span>
+                                                        <input type="text" class="form-control" readonly value="<?php echo rupiah_format($potongan_harga); ?>">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <p class="form-label mb-1">Grandtotal ( <label class="form-label" onclick="Swal.fire({
+                                                                                title: 'Tambahan Biaya Check-in',
+                                                                                text: 'Catatan : <?php echo addslashes($deskripsi_biaya_checkin); ?>',
+                                                                                confirmButtonText: 'Tutup'
+                                                                        })">
+                                                    Tambahan <i style="color:#bf2b2763" class="fa fa-info-circle"></i> : <?php echo rupiah_format($biaya_tambahan_checkin); ?>
+
+                                                </label>)</p>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control" readonly id="total_bayar" value="<?php echo rupiah_format($total_bayar); ?>">
+                                                <span class="input-group-text">Status : Lunas</span>
+                                            </div>
+
+                                            <div class="form-check mt-2 mb-0">
+                                                <?php if ($data['persentase_pajak'] > 0) { ?>
+                                                    <input class="form-check-input me-2" type="checkbox" id="pajakCheck" disabled checked>
+                                                    <label class="form-label" for="pajakCheck">Pajak (<?php echo $data['persentase_pajak']; ?>%)</label>
+                                                <?php } else { ?>
+                                                    <input class="form-check-input me-2" type="checkbox" id="pajakCheck" disabled>
+                                                    <label class="form-label" for="pajakCheck">Pajak (<?php echo $data['persentase_pajak']; ?>%)</label>
+                                                <?php } ?>
+                                            </div>
+
+
+
+
+
+
+                                            <hr class="mb-6">
+                                            <label class="form-label">Tambahan Biaya Checkout</label>
+                                            <div class="input-group mb-4">
+                                                <span class="input-group-text">Rp</span>
+
+                                                <input type="number" name="tambahan" id="tambahan" class="form-control" placeholder="Biaya Tambahan" value="" required>
+                                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#noteModal">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+
+                                            </div>
+
+
+
+
+
+
+
+
+                                            <input type="hidden" class="form-control <?php echo $data['status_transaksi'] == 'Lunas' ? 'text-success' : 'text-danger'; ?>" readonly value="<?php echo $data['status_transaksi']; ?>">
+
+
+
+                                            <div class="mt-auto d-flex justify-content-end">
+                                                <button type="button" class="btn btn-secondary me-2" onclick="window.history.back()">Batal</button>
+                                                <?php if ($data['status_transaksi'] != 'Selesai') { ?>
+                                                    <button type="button" class="btn btn-danger" id="open_checkout"><i class="fa fa-save"></i> Checkout</button>
+                                                <?php } ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    <?php } else {
-                        echo baca_database("", "metode_pembayaran", "SELECT * FROM data_metode_pembayaran WHERE id_metode_pembayaran='{$data['metode_transaksi']}'") ?: '-';
-                    } ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Biaya Tambahan Checkin</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php echo rupiah($tambahan_in); ?>
-                    <?php if (!empty($data['deskripsi_biaya_checkin']) && $tambahan_in > 0) { ?>
-                        <span class='text-danger'>(<?php echo $data['deskripsi_biaya_checkin']; ?>)</span>
-                    <?php } ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Biaya Tambahan Checkout</th>
-                <td width='1%'>:</td>
-                <td>
-                    <?php if ($tambahan_out > 0) { ?>
-                        <?php echo rupiah($tambahan_out); ?>
-                        <?php if (!empty($data['deskripsi_biaya_checkout'])) { ?>
-                            <span class='text-danger'>(<?php echo $data['deskripsi_biaya_checkout']; ?>)</span>
-                        <?php } ?>
-                    <?php } else { ?>
-                        <div style='width:60%'>
-                            <input type="number" name="tambahan" id="tambahan" class='form-control mb-1' placeholder="Jumlah Biaya Tambahan" value='0' min='0' required='required'>
-                            <textarea class='form-control' name='tambahan_desc' id='desc_tambahan' placeholder="Deskripsi Biaya Tambahan" required="required">-</textarea>
+                    </div>
+
+
+
+                    <form action="proses_simpan_checkout.php" method="get" id='formini' enctype="multipart/form-data">
+                        <input type="hidden" name="id_hotel" id="id_hotel" value="<?php echo $id_hotel; ?>">
+                        <input type="hidden" name="id_transaksi" id="id_transaksi" value="<?php echo $data['id_transaksi']; ?>">
+                        <input type="hidden" name="total_bayar_hidden" id="total_bayar_hidden" value="<?php echo $total_bayar; ?>">
+                        <input type="hidden" name="persentase_pajak" id="persentase_pajak" value="<?php echo $persentase_pajak; ?>">
+                        <input type="hidden" name="total_bayar" id="total_bayar" value="<?php echo $total_bayar; ?>">">
+
+                        <div class="modal fade" id="modalPembayaran" tabindex="-1" aria-labelledby="modalPembayaranLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalPembayaranLabel">Proses Pembayaran</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        
+                                        <label class="form-label">Informasi Deposit</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <input type="hidden" name="id_metode_deposit" id="id_metode_deposit">
+                                            <div class="input-group mb-2">
+                                                <span class='input-group-text'>Metode</span>
+                                                <input type="text"  class="form-control" readonly id="metode_deposit" value='<?=$data['metode_deposit']?>' readonly>
+    
+                                            </div>
+
+                                            
+                                            <div class="input-group mb-2 ms-2">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="hidden"  id="nominal_deposit">
+                                                <input type="number" class="form-control" id="nominal_deposit" value="<?= $data['nominal_deposit']?>" min="0" readonly>
+                                            </div>
+                                        </div>
+                                        
+                                                                                <label id="labelTambahan" class="form-label">
+                                                                                    Tambahan Biaya Checkout
+                                                                                    <span id="infoPajak" style="cursor:pointer; display:none; color:#0d6efd; margin-left:5px;"
+                                                                                        onclick="showInfoPajak()">
+                                                                                        <i style="color:#bf2b27" class="fa fa-info-circle"></i>
+                                                                                    </span>
+                                                                                </label>
+                                        
+                                        
+                                                                                <div class="input-group mb-3">
+                                                                                    <span class="input-group-text">Rp</span>
+                                                                                    <input type="hidden" readonly class="form-control" id="total_tambahan_non_pajak" name="total_tambahan_non_pajak">
+                                                                                    <input type="hidden" readonly class="form-control" id="total_tambahan" name="total_tambahan">
+                                                                                    <input type="text" readonly class="form-control" id="total_tambahan_display">
+                                                                                </div>
+                                        <label class="form-label">Metode Pembayaran</label>
+                                        <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran_modal">
+                                        <div class="input-group mb-2">
+
+                                            <button type="button" class="btn btn-secondary" onclick="pilih_metode_pembayaran()"> Metode</button>
+                                            <input type="text" onclick="pilih_metode_pembayaran()" class="form-control" readonly id="metode_pembayaran" name="metode_pembayaran">
+                                        </div>
+
+                                        <label class="form-label">Nominal Bayar</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="hidden" name="nominal" id="nominal">
+                                            <input type="number" class="form-control" id="nominal_bayar_modal" value="0" min="0">
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted" style="font-size:0.7rem;">Estimasi Nominal Pembayaran:</small>
+                                            <div class="mb-2" id="prediksi_buttons_modal" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
+                                        </div>
+                                        <label class="form-label">Kembalian</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="hidden" name="kembalian" id="kembalian" value="0">
+                                            <input type="text" class="form-control" readonly id="kembalian_value_modal" value="0">
+                                        </div>
+                                        <input type="hidden" name="sisa" id="sisa" value="0">
+                                        <input type="hidden" id="sisa_value_modal" value="0">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                        <button type="button" class="btn btn-danger" id="simpan_data" >Proses Checkout</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    <?php } ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Subtotal</th>
-                <td width='1%'>:</td>
-                <td id='sub_total'><?php echo rupiah($sub_total); ?></td>
-            </tr>
-            <tr>
-                <th>Pajak (<?php echo $data['persentase_pajak']; ?>%)</th>
-                <td width='1%'>:</td>
-                <td id='pajak'><?php echo rupiah($pajak); ?></td>
-            </tr>
-            <tr>
-                <th>Total Bayar</th>
-                <td width='1%'>:</td>
-                <td id='total_bayar'><?php echo rupiah($total_bayar); ?></td>
-            </tr>
-            <tr>
-                <th>Status Pembayaran</th>
-                <td width='1%'>:</td>
-                <td class='<?php echo $data['status_transaksi'] == 'Lunas' ? 'text-success' : 'text-danger'; ?>'>
-                    <?php echo $data['status_transaksi']; ?>
-                </td>
-            </tr>
-            <?php if ($data['status_transaksi'] == 'Belum Lunas') { ?>
-                <tr>
-                    <th>Sisa Pembayaran</th>
-                    <td width='1%'>:</td>
-                    <td id='sisa'><?php echo rupiah($data['sisa_pembayaran']); ?></td>
-                </tr>
-                <tr>
-                    <th>Jumlah Uang</th>
-                    <td width='1%'>:</td>
-                    <td>
-                        <div class='input-group' style='width:60%'>
-                            <input type="number" name="total" id="total" class='form-control' value='0' placeholder="Jumlah Uang" min='0' required='required'>
+
+
+                        <div class="modal fade" id="modalKonfirmasiCheckout" tabindex="-1" aria-labelledby="modalKonfirmasiCheckoutLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalKonfirmasiCheckoutLabel">Konfirmasi Checkout</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Checkout Tanpa Biaya Tambahan,
+                                        Tekan tombol <b>Proses Checkout</b> untuk melanjutkan proses checkout. Pastikan tidak ada biaya tambahan atau deposit yang belum tercatat.
+                                        </p>
+                                        <?php
+                                        if($data['nominal_deposit']>0){
+                                            ?>
+                                        <p class="text-start fw-bold">Informasi Deposit</p>
+                                        <div class="d-flex p-2 justify-between align-items-center">
+                                            <div class="input-group me-3">
+                                               
+                                               <span class="input-group-text">Metode</span> 
+                                               <input type="text" class="form-control" value="<?= $data['metode_deposit']?>" readonly>
+                                            </div>
+                                            <div class="input-group">
+                                               
+                                               <span class="input-group-text">Rp</span> 
+                                               <input type="text" class="form-control" value="<?= rupiah($data['nominal_deposit'])?>" readonly>
+                                            </div>
+                                            
+
+                                        </div>
+                                        <?php
+                                        }
+                                        ?>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-danger" >Proses Checkout</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p id='total_display' style='font-size:18px'></p>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Kembalian</th>
-                    <td width='1%'>:</td>
-                    <td id='kembalian'>
-                        <input type="hidden" name="kembalian" id='kembalian2' value='0'>
-                        Rp 0
-                    </td>
-                </tr>
-            <?php } ?>
-        </table>
+
+
+
+                        <!-- Modal untuk Note -->
+                        <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="noteModalLabel">Catatan Biaya Tambahan Check-out</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <textarea class="form-control" name="tambahan_desc" id="desc_tambahan" rows="4" placeholder="Tulis catatan di sini..."></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </body>
+            </div>
+        </div>
     </div>
-
-    <input type="hidden" name="nama_hotel" id='nama_hotel' value="<?php echo !empty($id_hotel) ? baca_database("", "nama", "SELECT * FROM data_hotel WHERE id_hotel='$id_hotel'") : 'Semua Cabang'; ?>">
-    <input type="hidden" name="id_transaksi" id='id_transaksi' value="<?php echo $data['id_transaksi']; ?>">
-    <input type="hidden" name="total_bayar_hidden" id='total_bayar_hidden' value='<?php echo $total_bayar; ?>'>
-    <?php if ($data['status_transaksi'] != 'Selesai') { ?>
-        <button class='btn btn-danger' id='cetak'><i class="fa fa-print"></i> Proses Checkout</button>
-    <?php } ?>
 </div>
 
 <script src="../../../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script>
-    <?php if ($data['status_transaksi'] == 'Belum Lunas') { ?>
-        const metode = document.getElementById('metode');
-        metode.addEventListener('click', function() {
-            Swal.fire({
-                title: 'Pilih Metode Pembayaran',
-                icon: 'info',
-                width: '700px',
-                html: `
-                <div class="container-xl">
+    window.pilih_metode_pembayaran = () => {
+        Swal.fire({
+            title: 'Pilih Metode Transaksi',
+            showConfirmButton: false,
+            showCancelButton: true,
+            width: '850px',
+            html: `
+                <div class="container-fluid">
                     <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table text-start">
                             <thead>
-                                <th>No</th>
-                                <th>Metode Pembayaran</th>
-                                <th>Bank</th>
-                                <th>Nomor Rekening</th>
-                                <th>Atas Nama</th>
-                                <th>Aksi</th>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Metode Transaksi</th>
+                                    <th>Bank</th>
+                                    <th>Rekening</th>
+                                    <th>Atas Nama</th>
+                                    <th>Action</th>
+                                </tr>
                             </thead>
-                            <tbody id='row_metode'>
+                            <tbody>
                                 <?php
-                                $query_met_bayar = mysql_query("SELECT * FROM data_metode_pembayaran LEFT JOIN data_bank ON data_metode_pembayaran.id_bank=data_bank.id_bank WHERE data_metode_pembayaran.id_hotel='$id_hotel'");
-                                $no = 1;
-                                if (mysql_num_rows($query_met_bayar) > 0) {
-                                    while ($data_met_bayar = mysql_fetch_array($query_met_bayar)) {
+                                $query_metode_bayar = mysql_query("SELECT * FROM data_metode_pembayaran LEFT JOIN data_bank ON data_metode_pembayaran.id_bank = data_bank.id_bank WHERE data_bank.id_hotel = '$id_hotel'") or die(mysql_error());
+                                $no = 0;
+                                while ($data_metode = mysql_fetch_array($query_metode_bayar)) {
+                                    $no++;
                                 ?>
-                                        <tr>
-                                            <td><?php echo $no++; ?></td>
-                                            <td><?php echo $data_met_bayar['metode_pembayaran']; ?></td>
-                                            <td><?php echo $data_met_bayar['nama_bank']; ?></td>
-                                            <td><?php echo $data_met_bayar['rekening']; ?></td>
-                                            <td><?php echo $data_met_bayar['atas_nama']; ?></td>
-                                            <td>
-                                                <button style='width:120px; height:22px; color:#fff; background-color: #c92d22ff; border: none; border-radius: 4px;' id='pilih' data-id='<?php echo $data_met_bayar['id_metode_pembayaran']; ?>' data-name='<?php echo $data_met_bayar['metode_pembayaran']; ?>'>Pilih</button>
-                                            </td>
-                                        </tr>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                    <tr>
+                                        <td><?php echo $no; ?></td>
+                                        <td><?php echo ucwords($data_metode['metode_pembayaran']); ?></td>
+                                        <td><?php echo ucwords($data_metode['nama_bank']); ?></td>
+                                        <td><?php echo $data_metode['rekening']; ?></td>
+                                        <td><?php echo ucwords($data_metode['atas_nama']); ?></td>
+                                        <td>
+                                            <button style="background-color:#bf2b27;border-radius:10px;color:#fff;width:120px;height:30px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;" 
+                                                    class="pil_metode" 
+                                                    data-id="<?php echo $data_metode['id_metode_pembayaran']; ?>" 
+                                                    data-name="<?php echo ucwords($data_metode['metode_pembayaran']); ?>">
+                                                <i style="color:white" class="fa fa-credit-card"></i> Pilih
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            `,
-                showCancelButton: true,
-                didOpen: () => {
-                    const pilih = document.getElementById('row_metode');
-                    pilih.addEventListener('click', function(e) {
-                        const id_transaksi = document.getElementById('id_transaksi').value;
-                        const target = e.target;
-                        if (target.id == 'pilih') {
-                            const id_metode = target.getAttribute('data-id');
-                            const nama_metode = target.getAttribute('data-name');
-                            document.getElementById('metode_pembayaran').value = id_metode;
-                            document.getElementById('metode_bayar').value = nama_metode;
-                            fetch('update_metode_pembayaran.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        id_metode: id_metode,
-                                        id_transaksi: id_transaksi
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.response == 'success') {
-                                        Swal.close();
-                                        Swal.fire({
-                                            title: 'Berhasil',
-                                            text: 'Metode pembayaran berhasil diupdate',
-                                            icon: 'success',
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Gagal',
-                                            text: 'Gagal mengupdate metode pembayaran: ' + (data.message || 'Unknown error'),
-                                            icon: 'error'
-                                        });
-                                    }
-                                })
-                                .catch(error => {
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: 'Terjadi kesalahan saat mengupdate metode pembayaran',
-                                        icon: 'error'
-                                    });
-                                    console.error('Error:', error);
-                                });
-                        }
+                </div>`,
+            didOpen: () => {
+                document.querySelectorAll('.pil_metode').forEach(button => {
+                    button.addEventListener('click', () => {
+                        document.getElementById('id_metode_pembayaran_modal').value = button.dataset.id;
+                        document.getElementById('metode_pembayaran').value = button.dataset.name;
+                        Swal.close();
                     });
-                }
-            });
+                });
+            }
         });
-    <?php } ?>
+    };
 
-    const total = document.getElementById('total');
-    const total_display = document.getElementById('total_display');
-    const kembalian = document.getElementById('kembalian');
-    const kembalian2 = document.getElementById('kembalian2');
-    const cetak = document.getElementById('cetak');
+
+    const persentase_pajak = <?= (int)$persentase_pajak ?>; // ambil dari PHP
+
+    function showInfoPajak() {
+        Swal.fire({
+            title: 'Informasi Pajak',
+            html: `Tambahan biaya checkout dikenakan PPN sebesar <b>${persentase_pajak}%</b>, 
+               sesuai dengan ketentuan yang berlaku karena transaksi check-in telah dikenakan pajak.`,
+            icon: 'info',
+            confirmButtonText: 'Mengerti'
+        });
+    }
+
+
     const id_transaksi = document.getElementById('id_transaksi');
-    const nama_hotel = document.getElementById('nama_hotel');
-    const tambahan_biaya = document.getElementById('tambahan');
-    const deskripsi = document.getElementById('desc_tambahan');
-    const sub_total_elem = document.getElementById('sub_total');
-    const pajak_elem = document.getElementById('pajak');
-    const total_bayar_elem = document.getElementById('total_bayar');
-    const sisa = document.getElementById('sisa');
-    const total_bayar_hidden = document.getElementById('total_bayar_hidden');
+    const tambahan = document.getElementById('tambahan');
+    const total_tambahan = document.getElementById('total_tambahan');
+    const total_tambahan_non_pajak = document.getElementById('total_tambahan_non_pajak');
+    const total_tambahan_display = document.getElementById('total_tambahan_display');
+    const payment_nominal=document.getElementById('nominal');
+    const payment_nominal_modal=document.getElementById('nominal_bayar_modal');
+    const open_checkout = document.getElementById('open_checkout');
+    if (open_checkout) {
+        open_checkout.addEventListener('click', () => {
+            const tambahan_value = Number(tambahan.value) || 0;
 
-    function rupiahFormat(value) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
+
+
+
+
+
+            if (tambahan_value > 0) {
+                const modal = new bootstrap.Modal(document.getElementById('modalPembayaran'));
+
+                let tambahan_final = Number(tambahan_value);
+                let pajak_tambahan = 0;
+
+                // kalau ada pajak
+                if (persentase_pajak > 0) {
+                    pajak_tambahan = Math.round(tambahan_value * persentase_pajak / 100);
+                    tambahan_final = tambahan_value + pajak_tambahan;
+
+
+                    document.querySelector('#labelTambahan').innerHTML =
+                        `Tambahan Biaya Checkout + PPN(${persentase_pajak}%) 
+             <span id="infoPajak" style="cursor:pointer; color:#0d6efd; margin-left:5px;"
+                   onclick="showInfoPajak()">
+                <i style="color:#bf2b2763" class="fa fa-info-circle"></i>
+             </span>`;
+                } else {
+                    document.querySelector('#labelTambahan').innerHTML =
+                        'Tambahan Biaya Checkout';
+                }
+
+                total_tambahan_non_pajak.value = tambahan_value;
+                total_tambahan.value = tambahan_final;
+                total_tambahan_display.value = formatRupiah(tambahan_final);
+                payment_nominal.value=tambahan_final;
+                payment_nominal_modal.value=tambahan_final;
+                createPrediksiButtons(tambahan_final, 'prediksi_buttons_modal');
+                modal.show();
+
+            } else {
+                const modal = new bootstrap.Modal(document.getElementById('modalKonfirmasiCheckout'));
+                modal.show();
+            }
+
+
+
+
+
+        });
+    }
+
+
+
+    const elements = {
+
+
+        payment: document.getElementById('nominal_bayar'),
+        paymentModal: document.getElementById('nominal_bayar_modal'),
+        paymentDisplay: document.getElementById('nominal'),
+        paymentDisplayModal: document.getElementById('nominal'),
+        change: document.getElementById('kembalian'),
+        changeModal: document.getElementById('kembalian'),
+        changeDisplay: document.getElementById('kembalian_value'),
+        changeDisplayModal: document.getElementById('kembalian_value_modal'),
+        remaining: document.getElementById('sisa'),
+        remainingModal: document.getElementById('sisa'),
+        remainingDisplay: document.getElementById('sisa_value'),
+        remainingDisplayModal: document.getElementById('sisa_value_modal'),
+        form: document.getElementById('formini'),
+        proses_checkout:document.getElementById('simpan_data')
+        
+        
+    };
+
+    const formatRupiah = (value) =>
+        new Intl.NumberFormat('id-ID', {
             minimumFractionDigits: 0
         }).format(value);
-    }
 
-    if (total) {
-        total.addEventListener('input', function() {
-            const nom_bayar = Number(this.value);
-            const total_harga = Number(total_bayar_hidden.value);
-            let kembalian_val = nom_bayar - total_harga;
-            total_display.innerHTML = rupiahFormat(nom_bayar);
-            kembalian2.value = kembalian_val;
-            if (kembalian_val >= 0) {
-                kembalian.innerHTML = rupiahFormat(kembalian_val);
-                if (sisa) sisa.innerHTML = rupiahFormat(0);
-            } else {
-                kembalian.innerHTML = rupiahFormat(0);
-                if (sisa) sisa.innerHTML = rupiahFormat(-kembalian_val);
-            }
+
+
+
+
+    function createPrediksiButtons(total, containerId = 'prediksi_buttons') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const nearest5k = Math.ceil(total / 5000) * 5000;
+        const round200k = Math.ceil(total / 200000) * 200000;
+
+        const prediksiArr = [total];
+        if (nearest5k !== total) prediksiArr.push(nearest5k);
+        if (round200k !== total && round200k !== nearest5k) prediksiArr.push(round200k);
+
+        prediksiArr.forEach(val => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-light btn-sm';
+            btn.style.padding = '4px 12px';
+            btn.style.fontSize = '0.75rem';
+            btn.style.opacity = '0.8';
+            btn.style.borderColor = '#ccc';
+            btn.innerText = val.toLocaleString('id-ID');
+            btn.addEventListener('click', () => {
+                if (containerId === 'prediksi_buttons') {
+                    elements.payment.value = val;
+                    elements.paymentDisplay.value = val;
+                } else {
+                    elements.paymentModal.value = val;
+                    elements.paymentDisplayModal.value = val;
+                }
+                updatePaymentCalculations(containerId);
+            });
+            container.appendChild(btn);
         });
     }
+    const updatePaymentCalculations = (containerId = 'prediksi_buttons') => {
+        const total = Number(total_tambahan.value) || 0; // ambil dari hidden total_tambahan
 
-    if (tambahan_biaya) {
-        tambahan_biaya.addEventListener('input', () => {
-            const biaya_tambahan = Number(tambahan_biaya.value);
-            const biaya_checkin = <?php echo intval($tambahan_in); ?>;
-            const harga_kamar = <?php echo intval($harga_setelah_disc); ?>;
-            const potongan = <?php echo intval($potongan_harga); ?>;
-            const persentase_pajak = <?php echo intval($data['persentase_pajak']); ?>;
+        let payment = 0;
+        if (containerId === 'prediksi_buttons') {
+            payment = Number(elements.payment.value) || 0;
+            elements.paymentDisplay.value = formatRupiah(payment);
+        } else {
+            payment = Number(elements.paymentModal.value) || 0;
+            elements.paymentDisplayModal.value = formatRupiah(payment);
 
-            const sub_total = harga_kamar + biaya_checkin + biaya_tambahan - potongan;
-            const pajak = (sub_total * persentase_pajak) / 100;
-            const total_bayar = sub_total + pajak;
+            // sinkronkan ke nominal hidden
+            elements.paymentDisplay.value = payment;
+            // elements.tambahan.value=formatRupiah(payment);
+        }
 
-            sub_total_elem.innerHTML = rupiahFormat(sub_total);
-            pajak_elem.innerHTML = rupiahFormat(pajak);
-            total_bayar_elem.innerHTML = rupiahFormat(total_bayar);
-            total_bayar_hidden.value = total_bayar;
-            if (sisa) sisa.innerHTML = rupiahFormat(total_bayar - <?php echo intval($data['nominal_bayar']); ?>);
-        });
+        if (payment >= total) {
+            const change = payment - total;
+            elements.changeModal.value = change; // angka asli
+            elements.changeDisplayModal.value = formatRupiah(change); // rupiah
+            elements.remainingModal.value = 0;
+            elements.remainingDisplayModal.value = '0';
+        } else {
+            const remaining = total - payment;
+            elements.changeModal.value = 0;
+            elements.changeDisplayModal.value = '0';
+            elements.remainingModal.value = remaining; // angka asli
+            elements.remainingDisplayModal.value = formatRupiah(remaining); // rupiah
+        }
+    };
+
+    const validation_payment=()=>{
+        const payment_value=document.getElementById('nominal').value;
+        if(Number(payment_value)-Number(total_tambahan.value)<0){
+            alert('Maaf Nominal Pembayaran yang Diberikan Tidak Mencukupi, Silahkan Input Ulang Nominal yang Sesuai');
+        }else{
+            elements.form.submit();
+            
+        }
     }
 
-    if (cetak) {
-        cetak.addEventListener('click', function() {
-            // Validate inputs
-            const nom_bayar = total ? Number(total.value) : 0;
-            const total_harga = Number(total_bayar_hidden.value);
-            const metode_pembayaran = document.getElementById('metode_pembayaran') ? document.getElementById('metode_pembayaran').value : '';
-            const biaya_tambahan = tambahan_biaya ? Number(tambahan_biaya.value) : 0;
-            const deskripsi_tambahan = deskripsi ? deskripsi.value : '';
 
-            if (nom_bayar <= 0 && <?php echo $data['status_transaksi'] == 'Belum Lunas' ? 'true' : 'false'; ?>) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Masukkan jumlah uang yang valid',
-                    icon: 'error'
-                });
-                return;
-            }
-
-            if (!metode_pembayaran && <?php echo $data['status_transaksi'] == 'Belum Lunas' ? 'true' : 'false'; ?>) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Pilih metode pembayaran terlebih dahulu',
-                    icon: 'error'
-                });
-                return;
-            }
-
-            const status_transaksi = nom_bayar >= total_harga ? 'Lunas' : 'Belum Lunas';
-            const kembalian_val = nom_bayar >= total_harga ? nom_bayar - total_harga : 0;
-
-            // Function to process checkout
-            const processCheckout = () => {
-                fetch('update_bayar.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            nom_bayar: nom_bayar,
-                            id_transaksi: id_transaksi.value,
-                            status: status_transaksi,
-                            kembalian: kembalian_val
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.response == 'yes') {
-                            return fetch('proses_checkout.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    total: nom_bayar,
-                                    kembalian1: kembalian_val,
-                                    id_trx: id_transaksi.value,
-                                    nama_hotel: nama_hotel.value,
-                                    username: "<?php echo $username; ?>",
-                                    status: 'checkout'
-                                })
-                            });
-                        } else {
-                            throw new Error(data.message || 'Pembayaran gagal');
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data == 'true') {
-                            Swal.fire({
-                                title: 'Proses Selesai',
-                                icon: 'success',
-                                text: 'Checkout Berhasil',
-                                timer: 1500
-                            }).then(() => {
-                                window.location.href = '../index.php';
-                            });
-                        } else {
-                            throw new Error(data.message || 'Proses gagal');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            title: 'Proses Gagal',
-                            icon: 'error',
-                            text: error.message || 'Terjadi Kesalahan'
-                        });
-                        console.error('Checkout Error:', error);
-                    });
-            };
-
-            // If additional cost exists, update it first
-            if (biaya_tambahan > 0) {
-                fetch('update_biaya_tambah.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            tambahan: biaya_tambahan,
-                            deskripsi: deskripsi_tambahan,
-                            id_trx: id_transaksi.value
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.response == 'yes') {
-                            processCheckout();
-                        } else {
-                            Swal.fire({
-                                title: 'Proses Gagal',
-                                icon: 'error',
-                                text: data.message || 'Gagal menambahkan biaya tambahan'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            title: 'Error',
-                            icon: 'error',
-                            text: 'Terjadi kesalahan saat menambahkan biaya tambahan',
-                            timer: 1500
-                        });
-                        console.error('Error:', error);
-                    });
-            } else {
-                processCheckout();
-            }
-        });
-    } else {
-        console.error('Cetak button not found in DOM');
+    if (elements.additionalFee) {
+        elements.additionalFee.addEventListener('input', updateFinalPrice);
     }
+    if (elements.payment) {
+        elements.payment.addEventListener('input', () => updatePaymentCalculations('prediksi_buttons'));
+    }
+    if (elements.paymentModal) {
+        elements.paymentModal.addEventListener('input', () => updatePaymentCalculations('prediksi_buttons_modal'));
+    }
+    elements.proses_checkout.addEventListener('click', validation_payment)
+
+ 
 </script>

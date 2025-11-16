@@ -14,14 +14,14 @@ try {
 
     // Ambil data transaksi sekaligus
     $datas = mysql_fetch_array(mysql_query("SELECT * FROM data_transaksi WHERE id_transaksi='$id_transaksi'"));
-
+     $deposit=rupiah_format($datas['nominal_deposit']==null?0:$datas['nominal_deposit']);
     // Ambil data hotel
     $id_hotel = baca_database("", "id_hotel", "SELECT * FROM data_transaksi WHERE id_transaksi='$id_transaksi'");
     $hotel = mysql_fetch_array(mysql_query("SELECT * FROM data_hotel WHERE id_hotel='$id_hotel'"));
     $alamat = $hotel['alamat'];
     $cabang = $hotel['nama'];
-    $no_telepon = $hotel['no_telepon'];
-
+    $no_telepon_arr = explode(",",$hotel['no_telepon']);
+    $no_telepon=$no_telepon_arr[0];
     // Ambil data pelanggan
     $nama = ucwords(baca_database("", "nama", "SELECT * FROM data_pelanggan WHERE id_pelanggan='{$datas['id_pelanggan']}'"));
 
@@ -41,7 +41,7 @@ try {
         : $datas['nama_admin'];
 
     // Pembayaran & tambahan
-    $metode_transaksi = $datas['metode_transaksi'];
+    $metode_pembayaran = $datas['metode_pembayaran'];
     $jumlah_dewasa = $datas['jumlah_dewasa'];
     $jumlah_anak_anak = $datas['jumlah_anak_anak'];
 
@@ -53,8 +53,19 @@ try {
     $potongan_harga = $datas['potongan_harga'];
     $persentase_pajak = $datas['persentase_pajak'];
     $pajak = $datas['pajak'];
-    $biaya_tambahan_checkin = $datas['biaya_tambahan_checkin'] ?? 0;
-    $biaya_tambahan_checkout = $datas['biaya_tambahan_checkout'] ?? 0;
+
+    if (empty($datas['biaya_tambahan_checkin'])) {
+        $biaya_tambahan_checkin = 0;
+    } else {
+        $biaya_tambahan_checkin = $datas['biaya_tambahan_checkin'];
+    }
+
+    if (empty($datas['biaya_tambahan_checkout'])) {
+        $biaya_tambahan_checkout = 0;
+    } else {
+        $biaya_tambahan_checkout = $datas['biaya_tambahan_checkout'];
+    }
+
 
     $discount = $datas['discount'];
     $disc_nominal = ($total_harga_kamar * $discount) / 100;
@@ -62,19 +73,21 @@ try {
     $grand_total = $datas['total_bayar'];
 
 
-    $nominal_bayar = isset($_GET['total']) ? number_format(str_replace(" ", "", $_GET['total'])) : number_format($datas['nominal_bayar']);
+    $nominal_bayar = ($datas['nominal_bayar']);
     if ($nominal_bayar == 0) {
         $nominal_bayar = $grand_total;
     }
-    $kembalian = isset($_GET['kembalian1'])
-        ? number_format($_GET['kembalian1'])
-        : number_format($datas['kembalian_checkout'] ?? $datas['jumlah_kembalian']);
-    $sisa_pembayaran = number_format($datas['sisa_pembayaran'] ?? 0);
+    $kembalian = $datas['jumlah_kembalian'];
+    $sisa_pembayaran = number_format($datas['sisa_pembayaran']==null ?0:$datas['sisa_pembayaran']);
 
     $catatan_kaki = pengaturan_aplikasi("catatan_kaki_nota");
     $tampilkan_catatan_kaki_nota = pengaturan_aplikasi("tampilkan_catatan_kaki_nota");
     $catatan_kaki = str_replace("{nama_hotel}",  $judul . " " . ucwords($cabang), $catatan_kaki);
-    $catatan_kaki = str_replace("{telepon_hotel}",  $no_telepon, $catatan_kaki);
+    $catatan_kaki = str_replace("{telepon_hotel}",  $telepon, $catatan_kaki);
+    $catatan_kaki = str_replace("{cs}",  $no_telepon, $catatan_kaki);
+    
+    //informasi deposit
+
 
 
 ?>
@@ -344,14 +357,14 @@ try {
                     <td style="text-align:right; padding:2px;">Rp<?php echo rupiah_format($total_harga_kamar); ?></td>
                 </tr>
                 <tr>
-                    <td style="text-align:left; padding:2px; font-weight:bold;">Diskon <?php echo $disc_nominal; ?>%</td>
+                    <td style="text-align:left; padding:2px; font-weight:bold;">Diskon <?php echo $discount; ?>%</td>
                     <td style='font-weight:700'>:</td>
                     <td style="text-align:right; padding:2px;"> Rp<?php echo rupiah_format($disc_nominal); ?></td>
                 </tr>
                 <tr>
                     <td style="text-align:left; padding:2px; font-weight:bold;">Potongan Harga</td>
                     <td style='font-weight:700'>:</td>
-                    <td style="text-align:right; padding:2px;"> <?php echo 'Rp' . rupiah_format($$potongan_harga) ?></td>
+                    <td style="text-align:right; padding:2px;"> <?php echo 'Rp' . rupiah_format($potongan_harga) ?></td>
                 </tr>
                 <?php if ($biaya_tambahan_checkin > 0) { ?>
                     <tr>
@@ -390,7 +403,11 @@ try {
                     <td style='font-weight:700; border-top:2px solid #000; border-bottom:2px solid #000'>:</td>
                     <td style="text-align:right; padding:2px; font-weight:bold; border-top:2px solid #000; border-bottom:2px solid #000;"><?php echo 'Rp' . rupiah_format($grand_total) ?></td>
                 </tr>
-
+                <tr>
+                    <td style="text-align:left; padding:2px; font-weight:bold;color:#c02b27" >Deposit</td>
+                    <td style='font-weight:700;color:#c02b27'>:</td>
+                    <td style="text-align:right; padding:2px;color:#c02b27"><?php echo "Rp ".$deposit ?></td>
+                </tr>
                 <tr>
                     <td style="text-align:left; padding:2px; font-weight:bold;">Bayar</td>
                     <td style='font-weight:700'>:</td>
@@ -403,7 +420,11 @@ try {
                     <td style="text-align:right; padding:2px;"><?php echo 'Rp' . rupiah_format($kembalian) ?></td>
                 </tr>
 
+
             </table>
+
+
+
 
 
 

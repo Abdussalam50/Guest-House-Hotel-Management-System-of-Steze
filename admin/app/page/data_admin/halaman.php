@@ -31,6 +31,14 @@
 				{
 					//HAPUS
 					include 'hapus.php'; 
+				}elseif($input=='cetak_riwayat'){
+
+					include 'cetak_riwayat.php';
+					
+				}elseif($input=='cetak_riw_superadmin'){
+
+					include 'cetak_riwayat_superadmin.php';
+
 				}
 				elseif ($input=='proses_tambah')
 				{

@@ -1,5 +1,5 @@
-<a href="<?php index(); ?>">
-    <?php btn_kembali(' KEMBALI KEHALAMAN SEBELUMNYA'); ?>
+<a onclick="history.back()">
+    <?php btn_kembali('Kembali'); ?>
 </a>
 
 
@@ -41,10 +41,22 @@
                             </td>
                             <td width="2%">:</td>
                             <td>
-                                <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
-                                    <option value="">-- --</option>
-                                    <option value='<?php echo $id_hotel ?>'><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$id_hotel'") ?></option>
-                                </select>
+                                <?php
+                                if ($_COOKIE['id_hotel'] == "") {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
+                                        <option></option><?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel"); ?>
+                                    </select>
+                                <?php
+                                } else {
+                                ?>
+                                    <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
+                                        <option></option><?php combo_database_v2('', 'id_hotel', 'nama', "select * from data_hotel where id_hotel='$id_hotel'"); ?>
+                                    </select>
+                                <?php
+
+                                }
+                                ?>
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +107,13 @@
                             <td width="2%">:</td>
                             <td>
                                 <select class="form-control" style="width:50%" type="text" name="id_tipe_kamar" id="id_tipe_kamar" placeholder="Id Tipe Kamar " required="required">
-                                    <option></option><?php combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar where id_hotel = '$id_hotel'"); ?>
+                                    <option></option><?php
+                                    if(isset($_COOKIE['id_hotel'])){
+                                        combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar where id_hotel = '$id_hotel' ");
+                                    }else{
+
+                                        combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar group by tipe_kamar"); 
+                                    }?>
                                 </select>
                             </td>
                         </tr>

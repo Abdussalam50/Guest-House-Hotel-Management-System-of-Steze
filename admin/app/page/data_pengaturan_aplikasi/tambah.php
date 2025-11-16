@@ -44,8 +44,9 @@
                 </table>
                </div>
 			</div>
-		</form>  
- <a href="<?php index(); ?>"> <?php btn_kembali(' Kembali'); ?></a>
+             <a href="<?php index(); ?>"> <?php btn_kembali(' Kembali'); ?></a>
  <?php btn_simpan(' Proses Simpan Data '); ?>
+		</form>  
+
 </div>
     

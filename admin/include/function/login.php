@@ -1,107 +1,132 @@
  <?php
-include '../include/all_include.php'; 
+	include '../include/all_include.php';
 
-if(isset($_POST["login"])){ 
-$username = $_POST['username'];
-$password = $_POST['password'];
-$id_hotel=$_POST['id_hotel'];
-$username = mysql_real_escape_string($username);
-$id_hotel= mysql_real_escape_string($id_hotel);
-$password = md5(mysql_real_escape_string($password));
-$r = mysql_query("select * from $tabel_login where $field_password_login='$password' and $field_username_login='$username' and id_hotel='$id_hotel'");
-$data = mysql_fetch_array ($r);
-if (empty($username) && empty($password)) {
-	simpan_gagal();
-	echo "<script>alert('$pesan_gagal');</script>";	
-	?><script>location.href = "<?php index();?>";</script><?php
-} else if (empty($username)) {
-	simpan_gagal();
-	echo "<script>alert('$pesan_gagal');</script>";	
-	?><script>location.href = "<?php index();?>";</script><?php
-} else if (empty($password)) {
-	simpan_gagal();
-	echo "<script>alert('$pesan_gagal');</script>";	
-	?><script>location.href = "<?php index();?>";</script><?php
-}else
-if (mysql_num_rows($r) == 1) 
-{
-		kosongkan_gagal();
-		
-		$jenenge=encrypt($data["username"]);
-		setcookie('jenenge', $jenenge, time() + (6000 * 6000), '/');
-		
-		
-		$ip = $_SERVER['REMOTE_ADDR']; 
-		$useragent = $_SERVER['HTTP_USER_AGENT'];
-		$token = sha1($ip.$useragent.$key);
-		$token = crypt($token, $key);
-		setcookie('token', $token, time() + (6000 * 6000), '/');
-		setcookie('id_hotel',( encrypt($data["id_hotel"])), time() + (6000 * 6000), '/');
-		echo "<script> window.location = '../'</script>";		
-} 
-else 
-{
-	simpan_gagal();
-	echo "<script>alert('$pesan_gagal');</script>";	
-	?><script>location.href = "<?php index();?>";</script><?php
-}
-}
+	if (isset($_POST["login"])) {
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		$id_hotel = $_POST['id_hotel'];
+		$username = mysql_real_escape_string($username);
+		$id_hotel = mysql_real_escape_string($id_hotel);
+		$password = md5(mysql_real_escape_string($password));
+		if ($id_hotel == "") {
 
+			$r = mysql_query("select * from data_pengelola where $field_password_login='$password' and $field_username_login='$username' ");
 
-
-//GAGAL
-function simpan_gagal()
-{
-	if (isset($_COOKIE['gagal']))
-	{
-		$gagal = $_COOKIE['gagal'] + 1;
-	}
-	else
-	{
-		$gagal = 1;
-	}
-	setcookie('gagal', $gagal, time() + (6000 * 6000), '/');
-	
-	
-	
-	if ($gagal >= 3)
-	{
-	?>
-	
-
-        <div id="pesan"></div>
-        <script src="../data/cssjs/jquery/jquery.js"></script>
-        <script>
-            var url = "index.php?gagal=0"; // url tujuan
-            var count = 30 // dalam detik
-            function countDown() {
-                if (count > 0) {
-                    count--;
-                    var waktu = count + 1;
-                    $('#pesan').html('<br><br><br><br><br><br><br><br><br><br><br><center><h3>Anda Telah Salah Memasukkan Password 3x <br> Akses Diblokir Sementara <br> Anda Akan Dapat Kembali Login Dalam ' + waktu + ' detik. </h3>');
-                    setTimeout("countDown()", 1000);
-                } else {
-                    window.location.href = url;
-                }
-            }
-            countDown();
-        </script>
-   
-	<?php
-	die();
-	}
-}
-
-function kosongkan_gagal()
-{
-		if (isset($_COOKIE['gagal']))
-		{
-		setcookie('gagal', '', 0, '/');
+		}elseif($id_hotel=='operasional'){
+				$r=mysql_query("select * from data_pengelola where $field_password_login='$password' AND $field_username_login='$username'");
+				$op=encrypt("operasional");
+		}elseif($id_hotel=='cs'){
+		    	$r=mysql_query("select * from data_customer_service where $field_password_login='$password' AND $field_username_login='$username'");
+		} else {
+			$r = mysql_query("select * from $tabel_login where $field_password_login='$password' and $field_username_login='$username' and id_hotel='$id_hotel'");
 		}
-}
 
-if(isset($_GET["gagal"])){ 
-setcookie('gagal', "0", time() + (6000 * 6000), '/');
-	?><script>location.href = "<?php index();?>";</script><?php
-}
- ?>
+		$data = mysql_fetch_array($r);
+		if (empty($username) && empty($password)) {
+			simpan_gagal();
+			echo "<script>alert('$pesan_gagal');</script>";
+	?><script>
+ 			location.href = "<?php index(); ?>";
+ 		</script><?php
+				} else if (empty($username)) {
+					simpan_gagal();
+					echo "<script>alert('$pesan_gagal');</script>";
+					?><script>
+ 			location.href = "<?php index(); ?>";
+ 		</script><?php
+				} else if (empty($password)) {
+					simpan_gagal();
+					echo "<script>alert('$pesan_gagal');</script>";
+					?><script>
+ 			location.href = "<?php index(); ?>";
+ 		</script><?php
+				} else
+if (mysql_num_rows($r) == 1) {
+					kosongkan_gagal();
+
+					$jenenge = encrypt($data["username"]);
+					setcookie('jenenge', $jenenge, time() + (6000 * 6000), '/');
+
+
+					$ip = $_SERVER['REMOTE_ADDR'];
+					$useragent = $_SERVER['HTTP_USER_AGENT'];
+					$token = sha1($ip . $useragent . $key);
+					$token = crypt($token, $key);
+					setcookie('token', $token, time() + (6000 * 6000), '/');
+					if ($id_hotel == "") {
+						setcookie('id_hotel', "", time() + (6000 * 6000), '/');
+
+					}elseif(isset($op)){
+							setcookie('id_hotel', "", time() + (6000 * 6000), '/');
+							setcookie('operasional',$op,time()+(6000*6000),'/');
+					}elseif($id_hotel=="cs"){
+					    setcookie('id_hotel',$id_hotel,time()+(6000*6000));
+					} else {
+						setcookie('id_hotel', (encrypt($data["id_hotel"])), time() + (6000 * 6000), '/');
+					}
+
+					echo "<script> window.location = '../'</script>";
+				} else {
+					simpan_gagal();
+					echo "<script>alert('$pesan_gagal');</script>";
+					?><script>
+ 			location.href = "<?php index(); ?>";
+ 		</script><?php
+				}
+			}
+
+
+
+			//GAGAL
+			function simpan_gagal()
+			{
+				if (isset($_COOKIE['gagal'])) {
+					$gagal = $_COOKIE['gagal'] + 1;
+				} else {
+					$gagal = 1;
+				}
+				setcookie('gagal', $gagal, time() + (6000 * 6000), '/');
+
+
+
+				if ($gagal >= 3) {
+					?>
+
+
+ 		<div id="pesan"></div>
+ 		<script src="../data/cssjs/jquery/jquery.js"></script>
+ 		<script>
+ 			var url = "index.php?gagal=0"; // url tujuan
+ 			var count = 30 // dalam detik
+ 			function countDown() {
+ 				if (count > 0) {
+ 					count--;
+ 					var waktu = count + 1;
+ 					$('#pesan').html('<br><br><br><br><br><br><br><br><br><br><br><center><h3>Anda Telah Salah Memasukkan Password 3x <br> Akses Diblokir Sementara <br> Anda Akan Dapat Kembali Login Dalam ' + waktu + ' detik. </h3>');
+ 					setTimeout("countDown()", 1000);
+ 				} else {
+ 					window.location.href = url;
+ 				}
+ 			}
+ 			countDown();
+ 		</script>
+
+ 	<?php
+					die();
+				}
+			}
+
+			function kosongkan_gagal()
+			{
+				if (isset($_COOKIE['gagal'])) {
+					setcookie('gagal', '', 0, '/');
+				}
+			}
+
+			if (isset($_GET["gagal"])) {
+				setcookie('gagal', "0", time() + (6000 * 6000), '/');
+		?><script>
+ 		location.href = "<?php index(); ?>";
+ 	</script><?php
+			}
+				?>

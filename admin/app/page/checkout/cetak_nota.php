@@ -61,7 +61,7 @@ try {
     $admin = isset($data['username']) ? baca_database("", "nama", "select * from data_admin where username='$data[username]'") : $datas['nama_admin'];
 
     // Data lain
-    $metode_transaksi = $datas['metode_transaksi'];
+    $metode_pembayaran = $datas['metode_pembayaran'];
     $jumlah_dewasa = $datas['jumlah_dewasa'];
     $jumlah_anak_anak = $datas['jumlah_anak_anak'];
     $discount = $datas['discount'];

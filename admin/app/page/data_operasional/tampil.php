@@ -1,103 +1,112 @@
-<div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
-
-    <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold">
-        <i class='fas fa-add text-black'></i> Input Operasional
+<?php
+if ((isset($_COOKIE['operasional']) || $_COOKIE['id_hotel']=='') && !isset($_GET['id_hotel'])) {
+    include 'tampil_operasional.php';
+    die();
+} elseif ( (isset($_COOKIE['operasional'])||$_COOKIE['id_hotel']=='')&& isset($_GET['id_hotel'])) {
+    // Proceed with rendering the page content below
+}
+?>
+<div class="action-buttons" style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
+    <?php if (!isset($_COOKIE['id_hotel'])) { ?>
+        <a href="../data_operasional_super_admin/index.php?input=cetak" class="btn btn-sm btn-secondary fw-semibold btn-action" aria-label="Laporan Operasional">
+            <i class="fas fa-file-alt text-black"></i> Laporan Operasional
+        </a>
+        <a href="../grafik_operasional/" class="btn btn-sm btn-secondary fw-semibold btn-action" aria-label="Grafik Operasional">
+            <i class="fas fa-chart-pie text-black"></i> Grafik Operasional
+        </a>
+        <a href="index.php?input=tambah" class="btn btn-sm btn-secondary fw-semibold btn-action" aria-label="Input Operasional">
+            <i class="fas fa-add text-black"></i> Input Operasional
+        </a>
+    <?php } ?>
+    <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold btn-action" aria-label="Pencarian Data">
+        <i class="fas fa-search text-white"></i> Pencarian
     </a>
-
-
-    <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
-        <i class='fas fa-search text-white'></i> Pencarian
-    </a>
-
 </div>
 <br>
 
 <div class="content-widgets gray">
-
     <div class="widget-container">
         <div class="content-box">
-
-
-            <div style="overflow-x:auto;">
-                <table <?php tabel(100, '%', 1, 'left'); ?>>
-                    <tr style="background-color: #f9f9f9;">
-                        <!-- <th>Action</th> -->
-                        <th></th>
-                        <!--h <th>Id Operasional </th> h-->
-                        <th align="left" class="th_border cell">Operasional </th>
-                        <th align="left" class="th_border cell">Nama Hotel</th>
-                        <th align="left" class="th_border cell">Tanggal</th>
-
-                        <th align="left" class="th_border cell">Jumlah </th>
-                        <th align="left" class="th_border cell">Keperluan </th>
-                        <th align="left" class="th_border cell">Biaya </th>
-                        <th align="left" class="th_border cell">Penanggung Jawab </th>
-
-                    </tr>
-
+            <div style="overflow-x: auto;">
+                <table <?php tabel(100, '%', 1, 'left'); ?> class="data-table">
+                    <thead>
+                        <tr style="background-color: #f9f9f9;">
+                            <th scope="col"></th>
+                            <th scope="col" align="left" class="th_border cell">Operasional</th>
+                            <th scope="col" align="left" class="th_border cell">Nama Hotel</th>
+                            <th scope="col" align="left" class="th_border cell">Tanggal</th>
+                            <th scope="col" align="left" class="th_border cell">Jumlah</th>
+                            <th scope="col" align="left" class="th_border cell">Keperluan</th>
+                            <th scope="col" align="left" class="th_border cell">Biaya</th>
+                            <th scope="col" align="left" class="th_border cell">Penanggung Jawab</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <?php
                         $no = 0;
                         $startRow = ($page - 1) * $dataPerPage;
                         $no = $startRow;
-                        $id_hotel = decrypt($_COOKIE['id_hotel']);
-                        if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
-                            $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
-                            $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_operasional where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel' LIMIT $startRow ,$dataPerPage";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_operasional where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+
+                        if ($_COOKIE['id_hotel'] == "") {
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_operasional where $berdasarkan like '%$isi%' LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_operasional where $berdasarkan like '%$isi%'";
+                            } elseif (isset($_GET['id_hotel']) && isset($_GET['nama_hotel'])) {
+                                $id_hotel = decrypt($_GET['id_hotel']);
+                                $nama_hotel = $_GET['nama_hotel'];
+                                $querytabel = "SELECT * FROM data_operasional where id_hotel='$id_hotel' LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_operasional where id_hotel='$id_hotel'";
+                            } else {
+                                $querytabel = "SELECT * FROM data_operasional LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_operasional";
+                            }
+                            $proses = mysql_query($querytabel);
                         } else {
-                            $querytabel = "SELECT * FROM data_operasional  WHERE id_hotel='$id_hotel' LIMIT $startRow ,$dataPerPage ";
-                            $querypagination = "SELECT COUNT(*) AS total FROM data_operasional WHERE id_hotel='$id_hotel' ";
+                            $id_hotel = decrypt($_COOKIE['id_hotel']);
+                            if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                                $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                                $isi = mysql_real_escape_string($_GET['isi']);
+                                $querytabel = "SELECT * FROM data_operasional where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel' LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_operasional where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+                            } else {
+                                $querytabel = "SELECT * FROM data_operasional WHERE id_hotel='$id_hotel' LIMIT $startRow ,$dataPerPage";
+                                $querypagination = "SELECT COUNT(*) AS total FROM data_operasional WHERE id_hotel='$id_hotel'";
+                            }
+                            $proses = mysql_query($querytabel);
                         }
-                        $proses = mysql_query($querytabel);
-                        
+
                         while ($data = mysql_fetch_array($proses)) {
                         ?>
                             <tr class="event2">
-
-
-
-                                <td align="center" width="50"><?php $no = (($no + 1));
-                                                                echo $no; ?></td>
+                                <td align="center" width="50"><?php $no = (($no + 1)); echo $no; ?></td>
                                 <td align="left">
-                                    <a href="<?php index(); ?>?input=edit&proses=<?= encrypt($data['id_operasional']); ?>" class='mx-2'>
-
-
-                                        <?php echo ucwords($data['operasional']); ?>
+                                    <a href="<?php index(); ?>?input=<?= isset($_COOKIE['id_hotel']) ? 'detail' : 'edit' ?>&proses=<?= encrypt($data['id_operasional']); ?>" class="text-decoration-none">
+                                        <?php echo htmlspecialchars(ucwords($data['operasional'])); ?>
                                     </a>
                                 </td>
-                                
-                                <td align="left">
-                                    <?php echo ucwords(baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'")); ?></td>
-                                <td align="left"><?php echo format_indo($data['tanggal']); ?></td>
-
-                                <td align="left"><?php echo $data['jumlah']; ?></td>
-                                <td align="left"><?php echo $data['keperluan']; ?></td>
+                                <td align="left"><?php echo htmlspecialchars(ucwords(baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'"))); ?></td>
+                                <td align="left"><?php echo htmlspecialchars(format_indo($data['tanggal'])); ?></td>
+                                <td align="left"><?php echo htmlspecialchars($data['jumlah']); ?></td>
+                                <td align="left"><?php echo htmlspecialchars($data['keperluan']); ?></td>
                                 <td align="left"><?php echo rupiah($data['biaya']); ?></td>
-                                <td align="left"><?php echo ucwords(baca_database("","nama","select * from data_admin where id_admin='$data[id_admin]'")); ?></td>
-
-
+                                <td align="left"><?php
+                                    $admin_name = baca_database("", "nama", "select * from data_admin where id_admin='$data[id_admin]'");
+                                    echo htmlspecialchars(ucwords($admin_name ?: baca_database("", "nama", "select * from data_pengelola where id_pengelola='$data[id_admin]'")));
+                                ?></td>
                             </tr>
                         <?php
-                         }
- 
-                        
+                        }
                         ?>
                     </tbody>
                 </table>
             </div>
 
-            <?php 
-            Pagination($page, $dataPerPage, $querypagination);
-             ?>
-
+            <?php Pagination($page, $dataPerPage, $querypagination); ?>
         </div>
     </div>
 </div>
-
-
-
 
 <style>
     .swal-cancel-btn {
@@ -105,33 +114,75 @@
         color: #333 !important;
         border: none !important;
     }
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+    .btn-action:hover {
+        opacity: 0.9;
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .data-table th, .data-table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    .data-table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+    .data-table a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .data-table a:hover {
+        text-decoration: underline;
+    }
+    .swal2-form-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .swal2-form-label {
+        flex: 0 0 100px;
+        text-align: right;
+        font-size: 14px;
+    }
+    .swal2-form-input, .swal2-form-select {
+        flex: 1;
+        padding: 6px;
+        font-size: 13px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
 </style>
+
 <script>
     function pencarian() {
         const formHTML = `
-    <form id="formCariSweet" style="text-align: left; font-size: 14px;">
-      <div style="margin-bottom: 8px;">
-         <div style="display: flex; gap: 10px; align-items: left; margin-bottom: 12px;">
-        <label for="Berdasarkan" style="flex: 0 0 100px; text-align: right;">Berdasarkan</label>
-        <select id="Berdasarkan" name="Berdasarkan" style="flex: 1; height: 32px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc;">
-          <?php
-            $sql = "desc data_operasional";
-            $result = @mysql_query($sql);
-            while ($row = @mysql_fetch_array($result)) {
-
-                echo "<option name='berdasarkan' value=$row[0]>$row[0]</option>";
-            }
-            ?>
-        </select>
-      </div>
-
-      <div style="display: flex; gap: 10px; align-items: left;">
-        <label for="isi" style="flex: 0 0 100px; text-align: right;">Kata Kunci</label>
-        <input type="text" id="isi" name="isi" style="flex: 1; height: 32px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc;" required>
-      </div>
-      </div>
-    </form>
-  `;
+            <form id="formCariSweet" style="text-align: left; font-size: 14px;">
+                <div class="swal2-form-group">
+                    <label for="Berdasarkan" class="swal2-form-label">Berdasarkan</label>
+                    <select id="Berdasarkan" name="Berdasarkan" class="swal2-form-select">
+                        <?php
+                        $sql = "desc data_operasional";
+                        $result = @mysql_query($sql);
+                        while ($row = @mysql_fetch_array($result)) {
+                            echo "<option value='" . htmlspecialchars($row[0]) . "'>" . htmlspecialchars($row[0]) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="swal2-form-group">
+                    <label for="isi" class="swal2-form-label">Kata Kunci</label>
+                    <input type="text" id="isi" name="isi" class="swal2-form-input" required>
+                </div>
+            </form>
+        `;
 
         Swal.fire({
             title: '<b style="font-size:16px;">Pencarian Data</b>',
@@ -145,11 +196,11 @@
             focusConfirm: false,
             customClass: {
                 cancelButton: 'swal-cancel-btn',
-                denyButton: 'swal-cancel-btn' // sama class dengan cancel agar sama warna
+                denyButton: 'swal-cancel-btn'
             },
             preConfirm: () => {
                 const berdasarkan = document.getElementById('Berdasarkan').value;
-                const isi = document.getElementById('isi').value;
+                const isi = document.getElementById('isi').value.trim();
 
                 if (!berdasarkan || !isi) {
                     Swal.showValidationMessage('Semua field wajib diisi');
@@ -162,6 +213,5 @@
                 window.location.href = 'index.php';
             }
         });
-
     }
 </script>

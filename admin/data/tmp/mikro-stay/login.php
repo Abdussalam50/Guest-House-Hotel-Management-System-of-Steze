@@ -131,7 +131,7 @@ $url = "../data/tmp/mikro-stay/file/";
                                         <h1 class="text-dark fw-bolder mb-3 ">
                                             <?php echo $judul; ?>
                                             <hr>
-                                        <h2 class='text-center text-danger'>Admin</h2>
+                                            <h2 class='text-center text-danger'>Admin</h2>
                                         </h1>
                                     </div>
 
@@ -156,6 +156,8 @@ $url = "../data/tmp/mikro-stay/file/";
 
                                     <select class="form-control" name="id_hotel" id="id_hotel" placeholder=" Hotel ">
                                         <option>-- Select Kost or Guest House --</option><?php combo_database_v2('data_hotel', 'id_hotel', 'nama', ''); ?>
+                                        <option value="">Super Admin</option>
+                                        <option value="operasional">Operasional</option>
                                     </select>
                                 </div>
                                 <div class="fv-row mb-8 fv-plugins-icon-container">

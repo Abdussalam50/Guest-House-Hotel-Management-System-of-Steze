@@ -27,7 +27,15 @@ $query = mysql_query("insert into data_hotel values (
  ,'$koordinat'
  ,'$gambar'
 )");
-
+$sql="insert into data_hotel values (
+'$id_hotel'
+ ,'$nama'
+ ,'$alamat'
+ ,'$no_telepon'
+ ,'$koordinat'
+ ,'$gambar'
+)";
+simpan_riwayat("data_hotel","id_hotel",$id_hotel,$sql);
 if ($query) {
     ?>
     <script>location.href = "<?php index(); ?>?input=popup_tambah";</script>

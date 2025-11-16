@@ -1,5 +1,5 @@
-<a href="<?php index(); ?>">
-    <?php btn_kembali(' KEMBALI KE HALAMAN SEBELUMNYA'); ?>
+<a onclick="history.back()">
+    <?php btn_kembali(' Kembali  '); ?>
 </a>
 
 <?php $id_hotel = decrypt($_COOKIE['id_hotel']); ?>
@@ -136,6 +136,7 @@
                 <div class="content-box-content">
                     <center>
                         <?php btn_update(' PROSES UPDATE DATA'); ?>
+                         <a href="index.php?input=hapus&proses=<?= encrypt($proses)?>" class="btn btn-danger"><i class="fas fa-remove"></i> Hapus Data</a>
                     </center>
                 </div>
             </div>

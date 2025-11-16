@@ -1,9 +1,16 @@
 <?php
-//database
+
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+//include 'domain.php';
+// Variabel utama (kosong dulu)
 $db_server	= "localhost";
-$db_username	= "ridikc";
-$db_password	= "ridikc";
-$database	= "databases_2025_steze_manajemen_hotel";
+$db_username = "ridikc";
+$db_password = "ridikc";
+$database    = "databases_2025_steze_manajemen_hotel";
 
 date_default_timezone_set("Asia/Jakarta");
 
@@ -618,7 +625,27 @@ if ($php == "7") {
 	}
 }
 
-
+// Coba koneksi ke server utama
+$koneksi = mysql_connect($db_server, $db_username, $db_password);
+if ($koneksi && mysql_select_db($database, $koneksi)) {
+	// Berhasil pakai server utama
+	$db_server   = $db_server;
+	$db_username = $db_username;
+	$db_password = $db_password;
+	$database    = $database;
+} else {
+	// Jika gagal, coba koneksi ke server cadangan
+	$koneksi = mysql_connect($db_server2, $db_username2, $db_password2);
+	if ($koneksi && mysql_select_db($database2, $koneksi)) {
+		// Berhasil pakai server cadangan
+		$db_server   = $db_server2;
+		$db_username = $db_username2;
+		$db_password = $db_password2;
+		$database    = $database2;
+	} else {
+		die("Koneksi database gagal pada server utama maupun cadangan.");
+	}
+}
 
 mysql_connect($db_server, $db_username, $db_password) or die("Gagal konek ke server.");
 mysql_select_db($database) or die("Gagal membuka database.");
