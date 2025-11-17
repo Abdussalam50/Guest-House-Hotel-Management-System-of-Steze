@@ -1675,4 +1675,80 @@ function simpan_riwayat($nama_tabel, $nama_kolom, $id_kolom, $proses_query, $adm
 }
 
 
+
+
+function json_check($str)
+{
+	$data = json_decode($str, true);
+	return (json_last_error() === JSON_ERROR_NONE && is_array($data));
+}
+
+function json_sum($str)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+	return array_sum($data);
+}
+
+function json_count($str)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+	return count($data);
+}
+
+function json_preview($str)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+	return implode(",", $data);
+}
+
+
+function json_preview_br($str)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+	return implode("<br>", $data);
+}
+
+function json_preview_rupiah($str)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+
+	$formatted = array_map(function ($num) {
+		return number_format($num, 0, ",", ".");
+	}, $data);
+
+	return implode(",", $formatted);
+}
+
+function json_preview_rupiah_br($str)
+{
+	if (!json_check($str)) return "Rp" . number_format($str, 0, ",", ".");;
+	$data = json_decode($str, true);
+
+	$formatted = array_map(function ($num) {
+		return "Rp" . number_format($num, 0, ",", ".");
+	}, $data);
+
+	return implode("<br>", $formatted);
+}
+
+
+function json_count_sum($str, $kali)
+{
+	if (!json_check($str)) return $str;
+	$data = json_decode($str, true);
+
+	$total = 0;
+	foreach ($data as $num) {
+		$total += ($num * $kali);
+	}
+
+	return $total;
+}
+
+
 ?>

@@ -2,6 +2,9 @@
 	$color_type = "danger";
 	include 'loader.php';
 	?>
+
+
+
 	<style>
 		.bg-danger {
 			--bs-bg-rgb-color: var(--bs-danger-rgb);
@@ -97,6 +100,7 @@
 															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$idhotel' ");
 															while ($dataKamar = mysql_fetch_array($queryKamar)) {
 																if ($dataKamar['status_kamar'] == 'Kosong') {
+
 														?>
 																	<div class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center" style="width: 150px; position: relative; color: rgb(255, 255, 255);">
@@ -134,8 +138,10 @@
 																} else {
 
 
-																	$queryTransaksi = mysql_query("select * from data_transaksi left join data_kamar on data_transaksi.id_kamar=data_kamar.id_kamar where data_kamar.id_kamar='$dataKamar[id_kamar]' and (status_transaksi='Lunas' or status_transaksi='Belum Lunas')");
+
+																	$queryTransaksi = mysql_query("SELECT * FROM data_transaksi  WHERE id_kamar like '%$dataKamar[id_kamar]%' AND (status_transaksi='Lunas' OR status_transaksi='Belum Lunas')");
 																	$dataTransaksi = mysql_fetch_array($queryTransaksi);
+
 																?>
 																	<div onclick="open_detail('<?php echo $dataTransaksi['id_transaksi']; ?>')" class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card bg-<?php echo $color_type; ?>" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center " style="width: 150px; position: relative; color: rgb(255, 255, 255);">
@@ -180,7 +186,12 @@
 																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo intval($jumlah_hari) / 30 ?> Bulan
 																						<?php
 																						} else {
-																							echo rupiah($dataTransaksi['harga_harian']);
+																							if (json_check($dataTransaksi['harga_kamar_harian'])) {
+																								echo "<font color='orange'><b>Group</b></font>";
+																							} else {
+																								echo rupiah($dataTransaksi['harga_kamar_harian']);
+																							}
+
 																						?>
 																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo $jumlah_hari ?> Days
 																						<?php
@@ -211,6 +222,7 @@
 															};
 														} else {
 															$id_hotel = decrypt($_COOKIE['id_hotel']);
+
 
 															if ($_COOKIE['id_hotel'] == "") {
 																$id_hotel = pengaturan_aplikasi("default_hotel");
@@ -268,7 +280,8 @@
 
 																	<?php
 																	$tanggal_checkin = date("Y-m-d H:i:s");
-																	$queryTransaksi = mysql_query("SELECT * FROM data_transaksi LEFT JOIN data_kamar ON data_transaksi.id_kamar=data_kamar.id_kamar WHERE data_kamar.id_kamar='$data_kamar[id_kamar]' AND (data_transaksi.status_transaksi='Lunas' OR data_transaksi.status_transaksi='Belum Lunas')");
+
+																	$queryTransaksi = mysql_query("SELECT * FROM data_transaksi  WHERE id_kamar like '%$data_kamar[id_kamar]%' AND (data_transaksi.status_transaksi='Lunas' OR data_transaksi.status_transaksi='Belum Lunas')");
 																	$data_transaksi = mysql_fetch_array($queryTransaksi);
 																	?>
 
@@ -318,7 +331,11 @@
 																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo floor($jumlah_hari / 30) ?> Bulan
 																						<?php
 																						} else {
-																							echo rupiah($data_transaksi['harga_harian']);
+																							if (json_check($data_transaksi['harga_kamar_harian'])) {
+																								echo "<font color='orange'><b>Group</b></font>";
+																							} else {
+																								echo rupiah($data_transaksi['harga_kamar_harian']);
+																							}
 																						?>
 																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo $jumlah_hari ?> Days
 																						<?php

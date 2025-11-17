@@ -9,12 +9,12 @@ if (isset($_GET['id_hotel'])) {
 if ($id_hotel == "") {
     include 'tampil_admin.php';
     die();
-}elseif(isset($_COOKIE['operasional'])){
+} elseif (isset($_COOKIE['operasional'])) {
     // $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='pengaturan_oleh_operasional'")
-    ?>
+?>
     <script>
         alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
-        window.location.href='../../index.php'
+        window.location.href = '../../index.php'
     </script>
 <?php
 }
@@ -100,13 +100,15 @@ if ($id_hotel == "") {
                         // Build the WHERE clause
                         $where_clause = !empty($where_clauses) ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
-                        $querytabel = "SELECT dt.*,dp.nama, dk.no_kamar 
+                        $querytabel = "SELECT dt.*,dp.nama
                                        FROM data_transaksi dt
                                        JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
-                                       JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
                                        $where_clause
                                        ORDER BY dt.id_transaksi DESC 
                                        LIMIT " . (($page - 1) * $dataPerPage) . ", $dataPerPage";
+
+
+
 
 
                         $proses = mysql_query($querytabel);
@@ -117,12 +119,9 @@ if ($id_hotel == "") {
                             $tgl_checkout = new DateTime($data['waktu_checkout']);
                             $jumlah_hari = $data['jumlah_hari'];
 
-                            // Calculate room price based on transaction type
-                            if ($data['jenis_transaksi'] == 'bulanan') {
-                                $harga_kamar_total = $data['harga_kamar_bulanan'] * ($jumlah_hari / 30);
-                            } else {
-                                $harga_kamar_total = $harga_per_hari * $jumlah_hari;
-                            }
+
+
+                            $harga_kamar_total = json_count_sum($harga_per_hari, $jumlah_hari);
 
                             // Apply discount only to room price
                             $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
@@ -147,7 +146,7 @@ if ($id_hotel == "") {
                                 <td align="left"><a href="<?php index(); ?>?input=detail&proses=<?= encrypt($data['id_transaksi']); ?>">
                                         <?= $data['id_transaksi']; ?></a></td>
                                 <td align="left"><?= ucwords($data['nama']); ?></td>
-                                <td align="left"><?= $data['no_kamar']; ?></td>
+                                <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
                                 <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>
                                 <td><?php
                                     $today = strtotime(date('Y-m-d'));
@@ -176,7 +175,7 @@ if ($id_hotel == "") {
                                     }
                                     ?>
                                 </td>
-                                <td><?= rupiah($harga_per_hari); ?></td>
+                                <td><?= json_preview_rupiah_br($harga_per_hari); ?></td>
                                 <td><?= $jumlah_hari; ?></td>
                                 <td><?= rupiah($harga_kamar_total); ?></td>
                                 <td><?= $data['discount']; ?>%</td>

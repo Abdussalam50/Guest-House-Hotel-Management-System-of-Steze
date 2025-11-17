@@ -34,8 +34,10 @@
 
                     .room-badge {
                         background-color: #bf2b27;
+                        cursor: pointer;
+                        padding: 10px;
                         color: white;
-                        font-size: 2rem;
+                        font-size: 1rem;
                         font-weight: bold;
                         width: 70px;
                         height: 70px;
@@ -152,7 +154,35 @@
                     <div class="mb-4">
                         <div class="cardcheckin-body">
                             <div class="d-flex align-items-center mb-3">
-                                <div class="room-badge"><?php echo $data['no_kamar']; ?></div>
+
+                                <?php
+                                $noKamar = $data['no_kamar'];
+                                $displayKamar = strlen($noKamar) > 5 ? substr($noKamar, 0, 18) . "..." : $noKamar;
+                                ?>
+
+                                <div class="room-badge"
+                                    data-full="<?php echo htmlspecialchars($noKamar); ?>">
+                                    <?php echo htmlspecialchars($displayKamar); ?>
+                                </div>
+
+
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        document.querySelectorAll('.room-badge').forEach(function(el) {
+                                            el.addEventListener('click', function() {
+                                                const fullName = this.getAttribute('data-full');
+
+                                                Swal.fire({
+                                                    title: "No. Kamar",
+                                                    text: fullName,
+                                                    icon: "info",
+                                                    confirmButtonText: "OK"
+                                                });
+                                            });
+                                        });
+                                    });
+                                </script>
+
                                 <h4 class="mb-0"><i class="fas fa-sign-out-alt text-danger"></i> Check-out <?php echo $nama_hotel; ?></h4>
                             </div>
 
@@ -370,39 +400,39 @@
                                     </div>
                                     <div class="modal-body">
 
-                                        
+
                                         <label class="form-label">Informasi Deposit</label>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <input type="hidden" name="id_metode_deposit" id="id_metode_deposit">
                                             <div class="input-group mb-2">
                                                 <span class='input-group-text'>Metode</span>
-                                                <input type="text"  class="form-control" readonly id="metode_deposit" value='<?=$data['metode_deposit']?>' readonly>
-    
+                                                <input type="text" class="form-control" readonly id="metode_deposit" value='<?= $data['metode_deposit'] ?>' readonly>
+
                                             </div>
 
-                                            
+
                                             <div class="input-group mb-2 ms-2">
                                                 <span class="input-group-text">Rp</span>
-                                                <input type="hidden"  id="nominal_deposit">
-                                                <input type="number" class="form-control" id="nominal_deposit" value="<?= $data['nominal_deposit']?>" min="0" readonly>
+                                                <input type="hidden" id="nominal_deposit">
+                                                <input type="number" class="form-control" id="nominal_deposit" value="<?= $data['nominal_deposit'] ?>" min="0" readonly>
                                             </div>
                                         </div>
-                                        
-                                                                                <label id="labelTambahan" class="form-label">
-                                                                                    Tambahan Biaya Checkout
-                                                                                    <span id="infoPajak" style="cursor:pointer; display:none; color:#0d6efd; margin-left:5px;"
-                                                                                        onclick="showInfoPajak()">
-                                                                                        <i style="color:#bf2b27" class="fa fa-info-circle"></i>
-                                                                                    </span>
-                                                                                </label>
-                                        
-                                        
-                                                                                <div class="input-group mb-3">
-                                                                                    <span class="input-group-text">Rp</span>
-                                                                                    <input type="hidden" readonly class="form-control" id="total_tambahan_non_pajak" name="total_tambahan_non_pajak">
-                                                                                    <input type="hidden" readonly class="form-control" id="total_tambahan" name="total_tambahan">
-                                                                                    <input type="text" readonly class="form-control" id="total_tambahan_display">
-                                                                                </div>
+
+                                        <label id="labelTambahan" class="form-label">
+                                            Tambahan Biaya Checkout
+                                            <span id="infoPajak" style="cursor:pointer; display:none; color:#0d6efd; margin-left:5px;"
+                                                onclick="showInfoPajak()">
+                                                <i style="color:#bf2b27" class="fa fa-info-circle"></i>
+                                            </span>
+                                        </label>
+
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="hidden" readonly class="form-control" id="total_tambahan_non_pajak" name="total_tambahan_non_pajak">
+                                            <input type="hidden" readonly class="form-control" id="total_tambahan" name="total_tambahan">
+                                            <input type="text" readonly class="form-control" id="total_tambahan_display">
+                                        </div>
                                         <label class="form-label">Metode Pembayaran</label>
                                         <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran_modal">
                                         <div class="input-group mb-2">
@@ -432,7 +462,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="button" class="btn btn-danger" id="simpan_data" >Proses Checkout</button>
+                                        <button type="button" class="btn btn-danger" id="simpan_data">Proses Checkout</button>
                                     </div>
                                 </div>
                             </div>
@@ -451,30 +481,30 @@
                                         Tekan tombol <b>Proses Checkout</b> untuk melanjutkan proses checkout. Pastikan tidak ada biaya tambahan atau deposit yang belum tercatat.
                                         </p>
                                         <?php
-                                        if($data['nominal_deposit']>0){
-                                            ?>
-                                        <p class="text-start fw-bold">Informasi Deposit</p>
-                                        <div class="d-flex p-2 justify-between align-items-center">
-                                            <div class="input-group me-3">
-                                               
-                                               <span class="input-group-text">Metode</span> 
-                                               <input type="text" class="form-control" value="<?= $data['metode_deposit']?>" readonly>
-                                            </div>
-                                            <div class="input-group">
-                                               
-                                               <span class="input-group-text">Rp</span> 
-                                               <input type="text" class="form-control" value="<?= rupiah($data['nominal_deposit'])?>" readonly>
-                                            </div>
-                                            
+                                        if ($data['nominal_deposit'] > 0) {
+                                        ?>
+                                            <p class="text-start fw-bold">Informasi Deposit</p>
+                                            <div class="d-flex p-2 justify-between align-items-center">
+                                                <div class="input-group me-3">
 
-                                        </div>
+                                                    <span class="input-group-text">Metode</span>
+                                                    <input type="text" class="form-control" value="<?= $data['metode_deposit'] ?>" readonly>
+                                                </div>
+                                                <div class="input-group">
+
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" value="<?= rupiah($data['nominal_deposit']) ?>" readonly>
+                                                </div>
+
+
+                                            </div>
                                         <?php
                                         }
                                         ?>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-danger" >Proses Checkout</button>
+                                        <button type="submit" class="btn btn-danger">Proses Checkout</button>
                                     </div>
                                 </div>
                             </div>
@@ -587,8 +617,8 @@
     const total_tambahan = document.getElementById('total_tambahan');
     const total_tambahan_non_pajak = document.getElementById('total_tambahan_non_pajak');
     const total_tambahan_display = document.getElementById('total_tambahan_display');
-    const payment_nominal=document.getElementById('nominal');
-    const payment_nominal_modal=document.getElementById('nominal_bayar_modal');
+    const payment_nominal = document.getElementById('nominal');
+    const payment_nominal_modal = document.getElementById('nominal_bayar_modal');
     const open_checkout = document.getElementById('open_checkout');
     if (open_checkout) {
         open_checkout.addEventListener('click', () => {
@@ -625,8 +655,8 @@
                 total_tambahan_non_pajak.value = tambahan_value;
                 total_tambahan.value = tambahan_final;
                 total_tambahan_display.value = formatRupiah(tambahan_final);
-                payment_nominal.value=tambahan_final;
-                payment_nominal_modal.value=tambahan_final;
+                payment_nominal.value = tambahan_final;
+                payment_nominal_modal.value = tambahan_final;
                 createPrediksiButtons(tambahan_final, 'prediksi_buttons_modal');
                 modal.show();
 
@@ -660,9 +690,9 @@
         remainingDisplay: document.getElementById('sisa_value'),
         remainingDisplayModal: document.getElementById('sisa_value_modal'),
         form: document.getElementById('formini'),
-        proses_checkout:document.getElementById('simpan_data')
-        
-        
+        proses_checkout: document.getElementById('simpan_data')
+
+
     };
 
     const formatRupiah = (value) =>
@@ -739,13 +769,13 @@
         }
     };
 
-    const validation_payment=()=>{
-        const payment_value=document.getElementById('nominal').value;
-        if(Number(payment_value)-Number(total_tambahan.value)<0){
+    const validation_payment = () => {
+        const payment_value = document.getElementById('nominal').value;
+        if (Number(payment_value) - Number(total_tambahan.value) < 0) {
             alert('Maaf Nominal Pembayaran yang Diberikan Tidak Mencukupi, Silahkan Input Ulang Nominal yang Sesuai');
-        }else{
+        } else {
             elements.form.submit();
-            
+
         }
     }
 
@@ -760,6 +790,4 @@
         elements.paymentModal.addEventListener('input', () => updatePaymentCalculations('prediksi_buttons_modal'));
     }
     elements.proses_checkout.addEventListener('click', validation_payment)
-
- 
 </script>

@@ -1,3 +1,10 @@
+<?php $id_transaksi =  id_otomatis("data_transaksi", "id_transaksi", "10"); ?>
+
+<script>
+    var idTransaksi = "<?php echo $id_transaksi; ?>";
+</script>
+
+
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
@@ -106,27 +113,10 @@
                             $idHotel = $_GET['id_hotel'];
                         }
                         $namaHotel = baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'");
-
-                        if (isset($_GET['id'])) {
-                            $idKamar = $_GET['id'];
-                            $noKamar = baca_database('', 'no_kamar', "select * from data_kamar where id_hotel='$id_hotel' and id_kamar='$_GET[id]'");
-                        } else {
-                            $idKamar = '';
-                            $noKamar = '';
-                        }
-
-                        $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$_GET[id]'");
-                        $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$_GET[id]'");
-                        $kapasitas = baca_database("", "kapasitas", "select * from data_kamar where id_kamar='$_GET[id]'");
-                        $id_tipe_kamar = baca_database("", "id_tipe_kamar", "select * from data_kamar where id_kamar='$_GET[id]'");
-                        $tipe_kamar = baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$id_tipe_kamar'");
-
-
                         ?>
 
-                        <input type="hidden" value="<?php echo id_otomatis("data_transaksi", "id_transaksi", "10"); ?>" name="id_transaksi" placeholder="Id Transaksi " id="id_transaksi" required="required">
-                        <input type="hidden" value="<?php echo  $idKamar; ?>" style="width:80%" name="id_kamar" id="id_kamar" placeholder="Id kamar " required="required">
-                        <input type="hidden" name="jumlah_bulan" id="jumlah_bulan" placeholder="Jumlah Bulan">
+                        <input type="hidden" value="<?php echo $id_transaksi; ?>" name="id_transaksi" placeholder="Id Transaksi " id="id_transaksi" required="required">
+
                         <input type="hidden" name="status" id="status" value="Lunas">
                         <input type="hidden" name="id_admin" value='<?php
                                                                     $username = decrypt($_COOKIE['jenenge']);
@@ -250,15 +240,12 @@
 
 
 
-                                                <input type="hidden" class="form-control mb-2" readonly name="tipe_kamar" redonly value="<?php echo $tipe_kamar; ?>">
-                                                <input type="hidden" class="form-control" min="1" value="1" style="text-align: center;" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa " required="required">
-                                                <input type="hidden" class="form-control" value="0" min="0" style="text-align: center;" name="jumlah_anak_anak" id="jumlah_anak_anak" placeholder="Jumlah Anak Anak ">
 
 
                                                 <label class="form-label">Pilih Kamar</label>
                                                 <div class="input-group mb-2">
 
-                                                    <input class="form-control" type="text" name="pilih_kamar" id="pilih_kamar" placeholder="Pilih Kamar" readonly required="">
+                                                    <input class="form-control" type="text" id="pilih_kamar" placeholder="Pilih Kamar" readonly>
                                                     <button type="button" id="btn_pilih_kamar" class="btn btn-secondary">
                                                         <i class="fas fa-search"></i>
                                                     </button>
@@ -283,6 +270,45 @@
                                                         transform: scale(1.05);
                                                     }
                                                 </style>
+
+                                                <style>
+                                                    .room-table {
+                                                        width: 100%;
+                                                        border-collapse: separate;
+
+                                                        border-spacing: 0;
+                                                        border: 2px dashed rgba(99, 102, 241, 0.18);
+                                                        border-radius: 10px;
+                                                        overflow: hidden;
+                                                        background: #fff;
+                                                    }
+
+                                                    .room-table td:first-child,
+                                                    .room-table th:first-child {
+                                                        padding-left: 5px !important;
+                                                    }
+
+                                                    .room-table td:last-child,
+                                                    .room-table th:last-child {
+                                                        padding-right: 5px !important;
+                                                    }
+
+                                                    .table-scroll {
+                                                        max-height: 330px;
+                                                        /* bebas ubah tinggi */
+                                                        overflow-y: auto;
+                                                        overflow-x: hidden;
+                                                        border-radius: 10px;
+                                                        /* biar tetap rapi */
+                                                    }
+
+                                                    .room-table tbody tr {
+                                                        border-bottom: 2px dashed rgba(99, 102, 241, 0.18) !important;
+
+                                                    }
+                                                </style>
+
+
                                                 <div class="modal fade" id="modalKamar" tabindex="-1">
                                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                                         <div class="modal-content">
@@ -322,9 +348,10 @@
                                                                         while ($row = mysql_fetch_assoc($result)) {
                                                                             $badgeClass = ($row['status_kamar'] == 'Kosong') ? 'bg-success' : 'bg-danger';
                                                                             $statusText = ($row['status_kamar'] == 'Kosong') ? 'Tersedia' : 'Terisi';
+                                                                            $bgcolor = ($row['status_kamar'] == 'Kosong') ? 'background-color: #ffffff;' : 'background-color: #f6f7f9;';
                                                                         ?>
                                                                             <div class="col-6 col-md-4 col-lg-3 mb-3">
-                                                                                <div class="card kamar-card p-2 pilih-kamar-item" data-kamar="<?= htmlspecialchars($row['no_kamar']) ?>" style="display: flex; flex-direction: column; justify-content: space-between; height: 150px;">
+                                                                                <div class="card kamar-card p-2 pilih-kamar-item" data-kamar="<?= htmlspecialchars($row['no_kamar']) ?>" style="display: flex; flex-direction: column; justify-content: space-between; height: 150px; <?php echo $bgcolor; ?>">
                                                                                     <div style="margin-top: 10px;">
                                                                                         <div class="fw-bold text-primary text-left" style="font-size: 13px;">
                                                                                             Kamar <?= htmlspecialchars($row['no_kamar']) ?>
@@ -338,7 +365,7 @@
                                                                                             <br>
                                                                                             <span class="text-dark"><?= rupiah($row['harga_harian']) ?> @ 1 Days</span>
                                                                                         </div>
-                                                                                        <span class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
+                                                                                        <span style="color: white;" class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
 
                                                                                     </div>
                                                                                 </div>
@@ -356,181 +383,15 @@
                                                     </div>
                                                 </div>
 
-                                                <script>
-                                                    function showJumlahTamu() {
-
-                                                        Swal.fire({
-                                                            title: "Jumlah Tamu",
-                                                            width: 500,
-                                                            html: `
-            <style>
-                .tamu-wrapper {
-                    border: 1px solid #cdd2dd;
-                    border-radius: 10px;
-                    display: flex;
-                    overflow: hidden;
-                    width: 100%;
-                    margin-top: 10px;
-                }
-                .tamu-label {
-                    background: #f8f9fa;
-                    color: #3a3f4b;
-                    padding: 10px;
-                    font-size: 15px;
-                    width: 100px;
-                    text-align: center;
-                    border-right: 1px solid #cdd2dd;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 500;
-                }
-                .tamu-input {
-                    width: 60px;
-                    padding: 10px;
-                    text-align: center;
-                    border: none;
-                    outline: none;
-                    font-size: 16px;
-                    color: #3a3f4b;
-                    border-right: 1px solid #cdd2dd;
-                }
-                .tamu-input:last-child {
-                    border-right: none !important;
-                }
-            </style>
-
-            <div class="tamu-wrapper">
-                <div class="tamu-label">Dewasa</div>
-                <input id="dewasaVal" type="number" min="1" value="1" class="tamu-input">
-
-                <div class="tamu-label">Anak</div>
-                <input id="anakVal" type="number" min="0" value="0" class="tamu-input">
-            </div>
-        `,
-                                                            confirmButtonText: "Simpan",
-                                                            preConfirm: () => {
-                                                                return {
-                                                                    dewasa: document.getElementById("dewasaVal").value,
-                                                                    anak: document.getElementById("anakVal").value
-                                                                };
-                                                            }
-                                                        });
-                                                    }
-
-
-                                                    // klik input atau tombol → buka modal
-                                                    document.getElementById("pilih_kamar").addEventListener("click", function() {
-                                                        new bootstrap.Modal(document.getElementById('modalKamar')).show();
-                                                    });
-
-                                                    document.getElementById("btn_pilih_kamar").addEventListener("click", function() {
-                                                        new bootstrap.Modal(document.getElementById('modalKamar')).show();
-                                                    });
-
-                                                    // klik kamar di modal
-                                                    document.querySelectorAll(".pilih-kamar-item").forEach(function(card) {
-                                                        card.addEventListener("click", function() {
-
-                                                            let kamar = this.getAttribute("data-kamar");
-
-                                                            // Tutup modal
-                                                            var modal = bootstrap.Modal.getInstance(document.getElementById('modalKamar'));
-                                                            modal.hide();
-
-                                                            // Minta input jumlah dewasa & anak
-                                                            setTimeout(() => {
-                                                                showJumlahTamu(kamar);
-                                                            }, 300);
-                                                        });
-                                                    });
-                                                </script>
-
 
 
 
 
                                                 <label class="form-label">List Kamar</label>
-                                                <style>
-                                                    .room-table {
-                                                        width: 100%;
-                                                        border-collapse: separate;
 
-                                                        border-spacing: 0;
-                                                        border: 2px dashed rgba(99, 102, 241, 0.18);
-                                                        border-radius: 10px;
-                                                        overflow: hidden;
-                                                        background: #fff;
-                                                    }
 
-                                                    .room-table td:first-child,
-                                                    .room-table th:first-child {
-                                                        padding-left: 5px !important;
-                                                    }
 
-                                                    .room-table td:last-child,
-                                                    .room-table th:last-child {
-                                                        padding-right: 5px !important;
-                                                    }
-
-                                                    .table-scroll {
-                                                        max-height: 330px;
-                                                        /* bebas ubah tinggi */
-                                                        overflow-y: auto;
-                                                        overflow-x: hidden;
-                                                        border-radius: 10px;
-                                                        /* biar tetap rapi */
-                                                    }
-                                                </style>
-
-                                                <?php
-                                                // contoh data (bisa dari database)
-                                                $kamarList = [
-                                                    ["nama" => "Deluxe Double", "dewasa" => 2, "anak" => 1],
-                                                    ["nama" => "Family Suite", "dewasa" => 2, "anak" => 2],
-                                                    ["nama" => "Presidential View", "dewasa" => 2, "anak" => 3],
-                                                    ["nama" => "Single Cozy", "dewasa" => 1, "anak" => 0],
-                                                ];
-
-                                                // Jika mau tes kondisi kosong → uncomment ini
-                                                $kamarList = [];
-                                                ?>
-
-                                                <div class="table-scroll">
-                                                    <table class="room-table table align-middle">
-                                                        <thead>
-                                                            <tr style="background-color: #f9f9f9;">
-                                                                <th scope="col">Kamar</th>
-                                                                <th scope="col" class="text-center">Dewasa</th>
-                                                                <th scope="col" class="text-center">Anak</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-
-                                                            <?php if (count($kamarList) > 0): ?>
-
-                                                                <?php foreach ($kamarList as $kamar): ?>
-                                                                    <tr>
-                                                                        <td><?= $kamar["nama"] ?></td>
-                                                                        <td class="text-center"><?= $kamar["dewasa"] ?></td>
-                                                                        <td class="text-center"><?= $kamar["anak"] ?></td>
-                                                                    </tr>
-                                                                <?php endforeach; ?>
-
-                                                            <?php else: ?>
-
-                                                                <tr>
-                                                                    <td colspan="3" class="text-center py-4">
-                                                                        <img src="https://media.baamboozle.com/uploads/images/113260/1638441135_66175_gif-url.gif"
-                                                                            width="60" class="mb-2 opacity-75">
-                                                                        <div class="fw-semibold text-muted">Belum ada kamar yang dipilih</div>
-                                                                    </td>
-                                                                </tr>
-
-                                                            <?php endif; ?>
-
-                                                        </tbody>
-                                                    </table>
+                                                <div class="table-scroll" id="list_kamar">
 
                                                 </div>
 
@@ -547,11 +408,7 @@
                                             <div class="cardcheckin-body">
                                                 <div class="card-group-title">Informasi Transaksi</div>
 
-                                                <label class="form-label">Harga Sewa / Hari</label>
-                                                <div class="input-group mb-2">
-                                                    <span class="input-group-text">Rp</span>
-                                                    <input type="text" class="form-control" name="harga_hari" readonly value="<?php echo rupiah_format($harga_harian); ?>">
-                                                </div>
+
 
                                                 <label class="form-label">Total Harga Sewa</label>
                                                 <div class="input-group mb-2">
@@ -931,7 +788,6 @@
             checkin: document.getElementById('waktu_checkin'),
             checkout: document.getElementById('waktu_check_out'),
             days: document.getElementById('jumlah_hari'),
-            months: document.getElementById('jumlah_bulan'),
             priceDisplay: document.getElementById('harga'),
             grandtotal: document.getElementById('grand_total'),
             priceInput: document.getElementById('harga_input'),
@@ -960,8 +816,8 @@
 
 
         // Constants
-        const DAILY_RATE = <?php echo intval($harga_harian) ?>;
-        const MONTHLY_RATE = <?php echo intval($harga_bulanan) ?>;
+
+
         const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
         // Format number to Rupiah
@@ -970,16 +826,11 @@
             maximumFractionDigits: 0
         }).format(value)
 
-        // Calculate base price based on days or months
-        const calculateBasePrice = (days) => {
-            days = parseInt(days) || 1;
-            return days < 30 || days % 30 !== 0 ?
-                days * DAILY_RATE :
-                Math.floor(days / 30) * MONTHLY_RATE;
-        };
+
 
         // Update final price with discount applied only to room price
         const updateFinalPrice = () => {
+
             const basePrice = Number(elements.harga_kamar.value) || 0;
             const additional = Number(elements.additionalFee.value) || 0;
             const discountPercent = Number(elements.discount.value) || 0;
@@ -1010,6 +861,183 @@
             document.getElementById('nominal').value = "";
 
         };
+
+
+
+        function refreshListKamar() {
+
+            $.post('ajax_load_list_kamar.php', {
+                id_transaksi: idTransaksi
+            }, function(data) {
+                $('#list_kamar').html(data);
+                refreshTotalHarga();
+            });
+        }
+
+        function refreshTotalHarga() {
+            $.post('total_harga.php', {
+                id_transaksi: idTransaksi
+            }, function(res) {
+
+                $('#harga_kamar').val(res.total);
+                $('#total_harga_kamar').val(res.format);
+                updateFinalPrice();
+
+
+            }, 'json');
+        }
+
+
+        // Jalankan pertama kali saat halaman dibuka
+        $(document).ready(function() {
+            refreshListKamar();
+
+            // Buka modal pilih kamar
+            $('#pilih_kamar, #btn_pilih_kamar').on('click', function() {
+                new bootstrap.Modal(document.getElementById('modalKamar')).show();
+            });
+        });
+
+        // Event klik card kamar (pakai event delegation karena card di-generate PHP)
+        $(document).on('click', '.pilih-kamar-item', function() {
+            var badge = $(this).find('.badge').text().trim();
+            if (badge === 'Terisi') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamar Sedang Digunakan',
+                    text: 'Anda tidak dapat melakukan transaksi untuk kamar ini.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            var kamar = $(this).data('kamar');
+
+            // Tutup modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('modalKamar'));
+            modal.hide();
+
+            // Tampilkan input jumlah tamu
+            setTimeout(function() {
+                showJumlahTamu(kamar);
+            }, 300);
+        });
+
+        function showJumlahTamu(kamarDipilih) {
+            Swal.fire({
+                title: "Jumlah Tamu - Kamar " + kamarDipilih,
+                width: 500,
+                html: `
+                                                                            <style>
+                                                                                .tamu-wrapper {border:1px solid #cdd2dd;border-radius:10px;display:flex;overflow:hidden;width:100%;margin-top:10px;}
+                                                                                .tamu-label {background:#f8f9fa;color:#3a3f4b;padding:12px;width:100px;text-align:center;border-right:1px solid #cdd2dd;display:flex;align-items:center;justify-content:center;font-weight:500;}
+                                                                                .tamu-input {width:80px;padding:12px;text-align:center;border:none;outline:none;font-size:16px;border-right:1px solid #cdd2dd;}
+                                                                                .tamu-input:last-child {border-right:none !important;}
+                                                                            </style>
+                                                                            <div class="tamu-wrapper">
+                                                                                <div class="tamu-label">Dewasa</div>
+                                                                                <input id="dewasaVal" type="number" min="1" value="1" class="tamu-input">
+                                                                                <div class="tamu-label">Anak</div>
+                                                                                <input id="anakVal" type="number" min="0" value="0" class="tamu-input">
+                                                                            </div>
+                                                                        `,
+                confirmButtonText: "Simpan",
+                preConfirm: () => {
+                    const dewasa = document.getElementById("dewasaVal").value;
+                    const anak = document.getElementById("anakVal").value;
+                    if (dewasa < 1) {
+                        Swal.showValidationMessage('Minimal 1 dewasa');
+                        return false;
+                    }
+                    return {
+                        dewasa: dewasa,
+                        anak: anak
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    $.post('proses_simpan_list.php', {
+                        id_transaksi: idTransaksi,
+                        jumlah_hari: document.getElementById('jumlah_hari').value,
+                        no_kamar: kamarDipilih,
+                        jumlah_dewasa: result.value.dewasa,
+                        jumlah_anak_anak: result.value.anak
+                    }, function(res) {
+                        if (res.status === 'success') {
+                            // Update field yang terlihat
+                            $('#pilih_kamar').val(kamarDipilih);
+                            $('#jumlah_dewasa').val(result.value.dewasa);
+                            $('#jumlah_anak_anak').val(result.value.anak);
+
+                            // Refresh tabel list kamar
+                            refreshListKamar();
+
+                            Swal.fire('Berhasil!', 'Kamar ' + kamarDipilih + ' ditambahkan ke daftar', 'success');
+
+                        } else {
+                            Swal.fire('Gagal', res.msg || 'Terjadi kesalahan saat menyimpan', 'error');
+                        }
+                    }, 'json').fail(function() {
+                        Swal.fire('Error', 'Tidak dapat terhubung ke server', 'error');
+                    });
+                }
+            });
+        }
+
+        $(document).on("click", ".hapus-kamar", function(e) {
+            e.preventDefault();
+
+            const idKamar = $(this).data("id");
+
+            Swal.fire({
+                title: "Hapus Kamar?",
+                text: "Data kamar ini akan dihapus dari transaksi.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    $.post("ajax_hapus_list_kamar.php", {
+                            id: idKamar
+                        }, function(response) {
+
+                            // =======================
+                            // HANDLE SUCCESS / ERROR
+                            // =======================
+
+                            if (response.status === "success") {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Berhasil",
+                                    text: response.message,
+                                    timer: 1300,
+                                    showConfirmButton: false
+                                });
+
+                                refreshListKamar(); // refresh tabel
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal",
+                                    text: response.message
+                                });
+                            }
+
+                        }, "json")
+                        .fail(function() {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Kesalahan",
+                                text: "Tidak dapat terhubung ke server."
+                            });
+                        });
+
+                }
+            });
+        });
 
 
         const total_plus_depo = (e) => {
@@ -1126,9 +1154,35 @@
             const checkout = new Date(checkin.getTime() + days * MS_PER_DAY);
             elements.checkout.value = checkout.toISOString().split('T')[0];
 
-            elements.harga_kamar.value = calculateBasePrice(days);
+
             updateFinalPrice();
+            updateJumlahHariTransaksi(idTransaksi, days);
         };
+
+
+        const updateJumlahHariTransaksi = (idTransaksi, jumlahHari) => {
+            const formData = new FormData();
+            formData.append('id_transaksi', idTransaksi);
+            formData.append('jumlah_hari', jumlahHari);
+
+            fetch("update_jumlah_hari.php", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+
+                        refreshListKamar();
+
+                    } else {
+                        console.error("Gagal update jumlah hari:", data.msg);
+                    }
+                })
+                .catch(err => console.error("Fetch error:", err));
+        };
+
+
 
         // Update days based on checkin and checkout
         const updateDays = () => {
@@ -1137,20 +1191,13 @@
             const days = Math.floor((checkout - checkin) / MS_PER_DAY);
             days == 0 ? elements.days.value = 1 : elements.days.value = days;
 
-            elements.harga_kamar.value = calculateBasePrice(days);
+
             updateFinalPrice();
         };
 
-        // Update based on months
-        const updateByMonths = () => {
-            const months = parseInt(elements.months.value) || 0;
-            const days = months * 30;
-            elements.days.value = days;
-            updateCheckoutDate();
-        };
+
 
         // Event Listeners
-        elements.months.addEventListener('change', updateByMonths);
         elements.days.addEventListener('input', updateCheckoutDate);
         elements.checkin.addEventListener('change', updateCheckoutDate);
         elements.checkout.addEventListener('change', updateDays);
@@ -1504,8 +1551,6 @@ WHERE b.id_hotel = '$idHotel'
                         alamat: element.alamat,
                         no_hp: element.no_hp,
                         jenis_kelamin: element.jenis_kelamin,
-                        jumlah_dewasa: element.jumlah_dewasa,
-                        jumlah_anak_anak: element.jumlah_anak_anak,
                         frekuensi_member: element.member_cabang_ini,
                         frekuensi_lain: element.member_lain
                     });
@@ -1569,8 +1614,6 @@ WHERE b.id_hotel = '$idHotel'
                 document.getElementById("no_identitas").value = element.no_identitas || '';
                 document.getElementById("alamat").value = element.alamat || '';
                 document.getElementById("no_telp").value = element.no_hp || '';
-                document.getElementById("jumlah_dewasa").value = element.jumlah_dewasa || 1;
-                document.getElementById("jumlah_anak_anak").value = element.jumlah_anak_anak || 0;
                 document.getElementById("jenis_kelamin").value = element.jenis_kelamin || 'laki-laki';
 
 
@@ -1619,8 +1662,6 @@ WHERE b.id_hotel = '$idHotel'
                             document.getElementById("no_identitas").value = data.no_identitas || '';
                             document.getElementById("alamat").value = data.alamat || '';
                             document.getElementById("no_telp").value = data.no_hp || '';
-                            document.getElementById("jumlah_dewasa").value = data.jumlah_dewasa || 1;
-                            document.getElementById("jumlah_anak_anak").value = data.jumlah_anak_anak || 0;
                             document.getElementById("jenis_kelamin").value = data.jenis_kelamin || 'laki-laki';
 
                             // reset form input tambah baru
@@ -1645,4 +1686,12 @@ WHERE b.id_hotel = '$idHotel'
 
 
     }
+</script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
 </script>

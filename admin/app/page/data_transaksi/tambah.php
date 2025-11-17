@@ -116,7 +116,6 @@
                         }
 
                         $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$_GET[id]'");
-                        $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$_GET[id]'");
                         $kapasitas = baca_database("", "kapasitas", "select * from data_kamar where id_kamar='$_GET[id]'");
                         $id_tipe_kamar = baca_database("", "id_tipe_kamar", "select * from data_kamar where id_kamar='$_GET[id]'");
                         $tipe_kamar = baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$id_tipe_kamar'");
@@ -722,7 +721,6 @@
 
         // Constants
         const DAILY_RATE = <?php echo intval($harga_harian) ?>;
-        const MONTHLY_RATE = <?php echo intval($harga_bulanan) ?>;
         const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
         // Format number to Rupiah
@@ -731,12 +729,8 @@
             maximumFractionDigits: 0
         }).format(value)
 
-        // Calculate base price based on days or months
         const calculateBasePrice = (days) => {
-            days = parseInt(days) || 1;
-            return days < 30 || days % 30 !== 0 ?
-                days * DAILY_RATE :
-                Math.floor(days / 30) * MONTHLY_RATE;
+            return days * DAILY_RATE;
         };
 
         // Update final price with discount applied only to room price
