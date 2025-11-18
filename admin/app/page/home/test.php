@@ -106,7 +106,7 @@
                                                 <div class="card-group-title">Informasi Kamar</div>
 
                                                 <label class="form-label">Tanggal</label>
-                                                <input type="date" class="form-control mb-2" name="tanggal" value="2013-05-20">
+                                                <input type="date" class="form-control mb-2" name="tanggal" value="<?php echo date('Y-m-d'); ?>">
 
                                                 <label class="form-label">Channel</label>
                                                 <select class="form-select mb-2" name="channel">
@@ -149,7 +149,7 @@
 
 
                                                 <label class="form-label">Tanggal Cek In</label>
-                                                <input type="date" class="form-control mb-2" name="cek_in" value="2013-05-20">
+                                                <input type="date" class="form-control mb-2" name="cek_in" value="<?php echo date('Y-m-d'); ?>">
 
                                                 <label class="form-label">Tanggal Cek Out</label>
                                                 <input type="date" class="form-control mb-2" name="cek_out">

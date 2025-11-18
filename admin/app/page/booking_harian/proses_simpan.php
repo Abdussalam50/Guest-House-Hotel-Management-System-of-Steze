@@ -309,7 +309,7 @@ if ($persentase_pajak > 0) {
 
 // INSERT DATA PEMASUKAN DP BOOKING
 $id_pemasukan = id_otomatis("data_pemasukan", "id_pemasukan", "10");
-$keterangan = 'Pembayaran Booking Harian A.n ' . $nama_pelanggan . ', Kamar Nomor ' . $no_kamar . ' (' . ($tipe_kamar) . ")";
+$keterangan = 'Pembayaran DP Booking Harian A.n ' . $nama_pelanggan . ', Kamar Nomor ' . $no_kamar . ' (' . ($tipe_kamar) . ")";
 $query_pemasukan = mysql_query("INSERT INTO data_pemasukan VALUES (
     '$id_pemasukan','$waktu','$id_transaksi','$nominal_bayar','$id_metode_pembayaran','$metode_pembayaran','$nama_bank','$no_rekening','$nama_pelanggan','$keterangan','$id_hotel'
 )");

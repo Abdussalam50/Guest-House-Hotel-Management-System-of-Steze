@@ -143,8 +143,14 @@ if ($id_hotel == "") {
                         ?>
                             <tr class="event2" style="text-align:left;">
                                 <td><?= $no ?></td>
-                                <td align="left"><a href="<?php index(); ?>?input=detail&proses=<?= encrypt($data['id_transaksi']); ?>">
-                                        <?= $data['id_transaksi']; ?></a></td>
+                                <td align="left"><a href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
+                                        <?= $data['id_transaksi']; ?></a>
+
+                                    <?php if (json_check($data['no_kamar'])) {
+                                        echo "Group Transaksi";
+                                    }
+                                    ?>
+                                </td>
                                 <td align="left"><?= ucwords($data['nama']); ?></td>
                                 <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
                                 <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>

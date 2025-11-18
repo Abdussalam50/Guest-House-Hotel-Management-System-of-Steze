@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php include '../../../include/all_include.php'; ?>
+
+<?php if ($read != "detail") { ?>
+    <?php include '../../../include/all_include.php'; ?>
+<?php } ?>
 
 <?php
 try {
@@ -245,16 +248,19 @@ try {
 
     <body id="form-rekap-pembayaran">
         <div class="container" style="padding-left: 0px;">
-            <table>
-                <tr>
-                    <td width="60%" align="left">
-                        <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
-                        <h6><?php echo $alamat ?></h6>
-                        <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
-                    </td>
-                    <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
-                </tr>
-            </table>
+
+            <?php if ($read != "detail") { ?>
+                <table>
+                    <tr>
+                        <td width="60%" align="left">
+                            <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
+                            <h6><?php echo $alamat ?></h6>
+                            <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
+                        </td>
+                        <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
+                    </tr>
+                </table>
+            <?php } ?>
         </div>
 
         <div class="row" style="display:flex;margin-right:0px;margin-left:0px;">
@@ -328,15 +334,18 @@ try {
         <div id='box' style='display:flex;width:100%;'>
             <div class="footer">
                 <div class="left">
-                    <p style="margin-bottom:3px;margin-top:14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
-                    <p style="margin-bottom:3px;margin-top:3px;font-size:12px">Hormat Kami,</p>
-                    <br><br>
-                    <p style="margin-bottom:3px;margin-top:3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
 
-                    <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
-                        <div style="border:1px solid #ccc;padding:10px;margin-top:10px;width:90%;font-size:11px;background:#f9f9f9;">
-                            <?php echo $catatan_kaki; ?>
-                        </div>
+                    <?php if ($read != "detail") { ?>
+                        <p style="margin-bottom:3px;margin-top:14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
+                        <p style="margin-bottom:3px;margin-top:3px;font-size:12px">Hormat Kami,</p>
+                        <br><br>
+                        <p style="margin-bottom:3px;margin-top:3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
+
+                        <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
+                            <div style="border:1px solid #ccc;padding:10px;margin-top:10px;width:90%;font-size:11px;background:#f9f9f9;">
+                                <?php echo $catatan_kaki; ?>
+                            </div>
+                        <?php } ?>
                     <?php } ?>
                 </div>
             </div>
@@ -428,10 +437,13 @@ try {
                 text-transform: none !important;
             }
         </style>
-        <div id="print-area-btn" class="no-print" style="margin-top:20px;text-align:right;">
-            <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;"><i class="fa fa-print"></i> Print</button>
-            <button id="btnSelesai" class="btn btn-secondary">Selesai</button>
-        </div>
+
+        <?php if ($read != "detail") { ?>
+            <div id="print-area-btn" class="no-print" style="margin-top:20px;text-align:right;">
+                <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;"><i class="fa fa-print"></i> Print</button>
+                <button id="btnSelesai" class="btn btn-secondary">Selesai</button>
+            </div>
+        <?php } ?>
 
         <script>
             document.getElementById('btnPrint').addEventListener('click', function() {

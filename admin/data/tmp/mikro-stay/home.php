@@ -141,7 +141,9 @@
 																						$dataBooking = mysql_fetch_array($qBooking);
 																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
 																						$book_id_transaksi = $dataBooking['id_transaksi'];
-
+																						$book_dp = $dataBooking['nominal_bayar'];
+																						?>
+																						<?php
 																						if ($book_waktu_checkin == "") {
 																						?>
 																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
@@ -151,7 +153,7 @@
 																							<p style='color:#2196f3'><b><br>
 																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
 																										<font>
-																											Booked : <?php echo date("d-m-Y", strtotime($book_waktu_checkin)); ?>
+																											Booked : <?php echo rupiah($book_dp); ?>
 																										</font>
 																									</a>
 																								</b></p>
@@ -165,7 +167,23 @@
 																						if (decrypt($_COOKIE['id_hotel']) === $idhotel) {
 																						?>
 
-																							<p></p> <button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $dataKamar['id_kamar']; ?>')">Check In</button>
+
+																							<?php
+																							if ($book_waktu_checkin == "") {
+																							?>
+																								<p></p> <button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $dataKamar['id_kamar']; ?>')">Check In</button>
+																							<?php
+																							} else {
+																							?>
+																								<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
+																									<p></p> <button class="btn btn-primary btn-sm">Check In</button>
+																								</a>
+																							<?php
+																							}
+																							?>
+
+
+
 																						<?php
 																						} else { ?>
 																							<p></p> <button class="btn btn-light btn-sm">Ready</button>
@@ -329,7 +347,10 @@
 																						$dataBooking = mysql_fetch_array($qBooking);
 																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
 																						$book_id_transaksi = $dataBooking['id_transaksi'];
+																						$book_dp = $dataBooking['nominal_bayar'];
+																						?>
 
+																						<?php
 																						if ($book_waktu_checkin == "") {
 																						?>
 																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
@@ -339,7 +360,7 @@
 																							<p style='color:#2196f3'><b><br>
 																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
 																										<font>
-																											Booked : <?php echo date("d-m-Y", strtotime($book_waktu_checkin)); ?>
+																											Booked : <?php echo rupiah($book_dp); ?>
 																										</font>
 																									</a>
 																								</b></p>
@@ -355,7 +376,23 @@
 																						} else {
 																						?>
 
-																							<button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $data_kamar['id_kamar']; ?>')">Check In</button>
+
+																							<?php
+																							if ($book_waktu_checkin == "") {
+																							?>
+																								<button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $data_kamar['id_kamar']; ?>')">Check In</button>
+																							<?php
+																							} else {
+																							?>
+																								<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
+																									<button class="btn btn-primary btn-sm">Check In</button>
+																								</a>
+																							<?php
+																							}
+																							?>
+
+
+
 
 																						<?php
 																						}

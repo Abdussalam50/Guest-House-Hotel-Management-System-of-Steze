@@ -80,14 +80,14 @@ mysql_query("START TRANSACTION");
 try {
     // 1. INSERT ke data_transaksi (pindah dari booking)
     // === PERBAIKAN KHUSUS UNTUK JSON (TANPA UBAH STRUKTUR KODE LAMA) ===
-    $id_kamar_escaped       = mysql_real_escape_string($bk['id_kamar']);
-    $no_kamar_escaped       = mysql_real_escape_string($bk['no_kamar']);
-    $tipe_kamar_escaped     = mysql_real_escape_string($bk['tipe_kamar']);
-    $jumlah_dewasa_escaped  = mysql_real_escape_string($bk['jumlah_dewasa']);
-    $jumlah_anak_escaped    = mysql_real_escape_string($bk['jumlah_anak_anak']);
-    $harga_harian_escaped   = mysql_real_escape_string($bk['harga_kamar_harian']);
-    $harga_bulanan_escaped  = mysql_real_escape_string($bk['harga_kamar_bulanan']);
-    $alamat_escaped         = mysql_real_escape_string($bk['alamat_pelanggan']);
+    $id_kamar_escaped       = ($bk['id_kamar']);
+    $no_kamar_escaped       = ($bk['no_kamar']);
+    $tipe_kamar_escaped     = ($bk['tipe_kamar']);
+    $jumlah_dewasa_escaped  = ($bk['jumlah_dewasa']);
+    $jumlah_anak_escaped    = ($bk['jumlah_anak_anak']);
+    $harga_harian_escaped   = ($bk['harga_kamar_harian']);
+    $harga_bulanan_escaped  = ($bk['harga_kamar_bulanan']);
+    $alamat_escaped         = ($bk['alamat_pelanggan']);
     // =====================================================================
 
     // 1. INSERT ke data_transaksi (pindah dari booking)

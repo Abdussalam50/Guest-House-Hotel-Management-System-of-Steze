@@ -1,10 +1,10 @@
 <?php
-$id_trx=decrypt($_GET['proses']);
-$id_kamar=baca_database("","id_kamar","select * from data_transaksi where id_transaksi='$id_trx'");
-$id_hotel=baca_database("","id_hotel","select * from data_hotel where id_transaksi='$id_trx'");
-$no_kamar=baca_database("","no_kamar","select * from data_transaksi where id_transaksi='$id_trx'");
-$id_pelanggan=baca_database("","id_pelanggan","select * from data_transaksi where id_transaksi='$id_trx'");
-$nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_pelanggan='$id_pelanggan'");
+$id_trx = decrypt($_GET['proses']);
+$id_kamar = baca_database("", "id_kamar", "select * from data_transaksi where id_transaksi='$id_trx'");
+$id_hotel = baca_database("", "id_hotel", "select * from data_hotel where id_transaksi='$id_trx'");
+$no_kamar = baca_database("", "no_kamar", "select * from data_transaksi where id_transaksi='$id_trx'");
+$id_pelanggan = baca_database("", "id_pelanggan", "select * from data_transaksi where id_transaksi='$id_trx'");
+$nama_pelanggan = baca_database("", "nama", "select * from data_pelanggan where id_pelanggan='$id_pelanggan'");
 
 ?>
 <div class="">
@@ -118,10 +118,10 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                         $kapasitas = baca_database("", "kapasitas", "select * from data_kamar where id_kamar='$id_kamar'");
                         $id_tipe_kamar = baca_database("", "id_tipe_kamar", "select * from data_kamar where id_kamar='$id_kamar'");
                         $tipe_kamar = baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$id_tipe_kamar'");
-                        $query_transaksi=mysql_query("SELECT * FROM data_transaksi WHERE id_transaksi='$id_trx'");
-                        $data=mysql_fetch_array($query_transaksi);
-                        $query_pelanggan=mysql_query("SELECT * FROM data_pelanggan WHERE id_pelanggan='$id_pelanggan'");
-                        $data_pelanggan=mysql_fetch_array($query_pelanggan);
+                        $query_transaksi = mysql_query("SELECT * FROM data_transaksi WHERE id_transaksi='$id_trx'");
+                        $data = mysql_fetch_array($query_transaksi);
+                        $query_pelanggan = mysql_query("SELECT * FROM data_pelanggan WHERE id_pelanggan='$id_pelanggan'");
+                        $data_pelanggan = mysql_fetch_array($query_pelanggan);
                         ?>
 
                         <input type="hidden" value="<?php echo $id_trx; ?>" name="id_transaksi" placeholder="Id Transaksi " id="id_transaksi" required="required">
@@ -149,11 +149,11 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                 <div class="card-group-title">Informasi Kamar</div>
 
                                                 <label class="form-label">Tanggal</label>
-                                                <input type="date" class="form-control mb-2" name="tanggal" value="2013-05-20">
+                                                <input type="date" class="form-control mb-2" name="tanggal" value="<?php echo date('Y-m-d'); ?>">
 
                                                 <label class="form-label">Channel</label>
                                                 <select class="form-select mb-2" name="id_channel">
-                                                    <option value="<?= $data['id_channel']?>"><?= $data['channel']?></option>
+                                                    <option value="<?= $data['id_channel'] ?>"><?= $data['channel'] ?></option>
                                                     <?php combo_database_v2("data_channel", "id_channel", "channel", ""); ?>
                                                 </select>
 
@@ -217,8 +217,8 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
 
                                                 <div class="input-group mb-2">
 
-                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan" value="<?php echo $nama_pelanggan?>"required>
-                                                    <input type="hidden" name="id_pelanggan" id="id_pelanggan" value="<?= $id_pelanggan?>">
+                                                    <input class="form-control" type="text" name="nama" id="nama" placeholder="Nama Pelanggan" value="<?php echo $nama_pelanggan ?>" required>
+                                                    <input type="hidden" name="id_pelanggan" id="id_pelanggan" value="<?= $id_pelanggan ?>">
 
 
                                                     <button type="button" class="btn btn-secondary" onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")'>
@@ -230,27 +230,27 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                 <div class="row g-2 mb-1">
                                                     <div class="col-4">
                                                         <label class="form-label">Identitas</label>
-                                                        <input required class="form-control " name="identitas" id="identitas" value=<?= $data_pelanggan['identitas']?> placeholder="Identitas">
+                                                        <input required class="form-control " name="identitas" id="identitas" value=<?= $data_pelanggan['identitas'] ?> placeholder="Identitas">
 
                                                     </div>
                                                     <div class="col-8">
                                                         <label class="form-label">No. Identitas</label>
                                                         <div class="input-group ">
-                                                            <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" value=<?= $data_pelanggan['no_identitas']?> placeholder="No Identitas">
+                                                            <input required type="text" style="height: 38px;" class="form-control" name="no_identitas" id="no_identitas" value=<?= $data_pelanggan['no_identitas'] ?> placeholder="No Identitas">
 
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <label class="form-label">Alamat</label>
-                                                <input required type="text" class="form-control mb-1" name="alamat" id="alamat" value="<?= $data_pelanggan['alamat']?>" placeholder="Alamat">
+                                                <input required type="text" class="form-control mb-1" name="alamat" id="alamat" value="<?= $data_pelanggan['alamat'] ?>" placeholder="Alamat">
 
                                                 <label class="form-label">No. Telp</label>
-                                                <input required type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp" value="<?= $data_pelanggan['no_hp']?>">
+                                                <input required type="text" class="form-control mb-2" name="no_telp" id="no_telp" placeholder="No Telp" value="<?= $data_pelanggan['no_hp'] ?>">
 
                                                 <label class="form-label">Jenis Kelamin</label>
                                                 <select required class="form-control mb-2" name="jenis_kelamin" id="jenis_kelamin">
-                                                    <option value="<?= $data_pelanggan['jenis_kelamin']?>" disabled selected><?= $data_pelanggan['jenis_kelamin']?></option>
+                                                    <option value="<?= $data_pelanggan['jenis_kelamin'] ?>" disabled selected><?= $data_pelanggan['jenis_kelamin'] ?></option>
                                                     <option value="laki-laki">Laki-laki</option>
                                                     <option value="perempuan">Perempuan</option>
                                                 </select>
@@ -262,10 +262,10 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                 <label class="form-label">Jumlah Tamu</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text">Dewasa</span>
-                                                    <input class="form-control" min="1" value="1" style="text-align: center;" type="number" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa" value="<?=$data['jumlah_dewasa']?>" required="required">
+                                                    <input class="form-control" min="1" value="1" style="text-align: center;" type="number" name="jumlah_dewasa" id="jumlah_dewasa" placeholder="Jumlah Dewasa" value="<?= $data['jumlah_dewasa'] ?>" required="required">
 
                                                     <span class="input-group-text">Anak</span>
-                                                    <input class="form-control" value="0" min="0" style="text-align: center;" type="number" name="jumlah_anak_anak" id="jumlah_anak_anak" value="<?=$data['jumlah_anak_anak']?>" placeholder="Jumlah Anak Anak ">
+                                                    <input class="form-control" value="0" min="0" style="text-align: center;" type="number" name="jumlah_anak_anak" id="jumlah_anak_anak" value="<?= $data['jumlah_anak_anak'] ?>" placeholder="Jumlah Anak Anak ">
                                                 </div>
                                             </div>
                                         </div>
@@ -297,7 +297,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                         <div class="input-group">
                                                             <span class="input-group-text">%</span>
 
-                                                            <input class="form-control" type="number" name="discount" id="discount" placeholder="Discount " value='<?= $data['discount']?>'>
+                                                            <input class="form-control" type="number" name="discount" id="discount" placeholder="Discount " value='<?= $data['discount'] ?>'>
 
                                                         </div>
                                                     </div>
@@ -306,7 +306,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                         <div class="input-group">
                                                             <span class="input-group-text">Rp</span>
 
-                                                            <input class="form-control" type="number" name="potongan_harga" id="potongan_harga" placeholder="potongan_harga " value='<?= $data['potongan_harga']?>'>
+                                                            <input class="form-control" type="number" name="potongan_harga" id="potongan_harga" placeholder="potongan_harga " value='<?= $data['potongan_harga'] ?>'>
 
                                                         </div>
                                                     </div>
@@ -317,7 +317,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                 <div class="input-group mb-2">
                                                     <span class="input-group-text">Rp</span>
 
-                                                    <input class="form-control" type="varchar" name="tambahan" id="tambahan" placeholder="Biaya Tambahan" value='<?= $data['biaya_tambahan_checkin']?>'>
+                                                    <input class="form-control" type="varchar" name="tambahan" id="tambahan" placeholder="Biaya Tambahan" value='<?= $data['biaya_tambahan_checkin'] ?>'>
 
 
 
@@ -336,7 +336,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <textarea class="form-control" name="deskripsi" rows="4" placeholder="Tulis catatan di sini..."><?= $data['deskripsi_biaya_checkin']?></textarea>
+                                                                <textarea class="form-control" name="deskripsi" rows="4" placeholder="Tulis catatan di sini..."><?= $data['deskripsi_biaya_checkin'] ?></textarea>
                                                                 <input type="hidden" name="catatan" id="catatan" class='form-control'>
                                                             </div>
                                                             <div class="modal-footer">
@@ -352,8 +352,8 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                 <label class="form-label">Grandtotal</label>
                                                 <div class="input-group mb-2">
                                                     <span class="input-group-text">Rp</span>
-                                                    <input type="hidden" name="harga" id='harga_input' value='<?= $data['total_harga_kamar']?>'>
-                                                    <input type="text" readonly class="form-control" id='harga' value='<?= $data['total_harga_kamar']?>'>
+                                                    <input type="hidden" name="harga" id='harga_input' value='<?= $data['total_harga_kamar'] ?>'>
+                                                    <input type="text" readonly class="form-control" id='harga' value='<?= $data['total_harga_kamar'] ?>'>
 
 
 
@@ -366,8 +366,8 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                     <?php
                                                     $nilai_pajak = pengaturan_aplikasi('persentase_pajak');
                                                     $defaut_checklist = pengaturan_aplikasi('default_checklist_pajak');
-                                                    if ($data['pajak']> "0") {
-                                                        $checked = "checked" ;
+                                                    if ($data['pajak'] > "0") {
+                                                        $checked = "checked";
                                                     } else {
                                                         $checked =  "";
                                                     }
@@ -375,7 +375,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                                     $nilai_input = ($nilai_pajak > 0) ? $nilai_pajak : 0;
                                                     ?>
                                                     <div class="d-flex align-items-center">
-                                                        <input class="form-check-input me-2" type="checkbox" value="<?= $data['pajak']?>" id="pajakCheck" name="pajak" <?= $checked; ?>>
+                                                        <input class="form-check-input me-2" type="checkbox" value="<?= $data['pajak'] ?>" id="pajakCheck" name="pajak" <?= $checked; ?>>
 
                                                         <input class="form-control me-2" style="width:80%"
                                                             type="hidden" name="persentase_pajak"
@@ -421,18 +421,18 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
 
-                                            <input type="text" readonly class="form-control" id="grand_total" name="grand_total" value='<?= $data['total_bayar']?>'>
+                                            <input type="text" readonly class="form-control" id="grand_total" name="grand_total" value='<?= $data['total_bayar'] ?>'>
                                         </div>
 
 
                                         <label class="form-label">Metode Pembayaran</label>
 
 
-                                        <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran" value='<?= $data['id_metode_pembayaran']?>'>
-                                        <input type="hidden" name="no_rekening" id="no_rekening" value='<?= $data['no_rekening']?>'>
+                                        <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran" value='<?= $data['id_metode_pembayaran'] ?>'>
+                                        <input type="hidden" name="no_rekening" id="no_rekening" value='<?= $data['no_rekening'] ?>'>
                                         <div class="input-group mb-2">
 
-                                            <input type="text" onclick='pilih_metode_pembayaran()' class="form-control" name="metode_pembayaran" id="metode_pembayaran" value='<?= $data['metode_pembayaran']?>' required readonly>
+                                            <input type="text" onclick='pilih_metode_pembayaran()' class="form-control" name="metode_pembayaran" id="metode_pembayaran" value='<?= $data['metode_pembayaran'] ?>' required readonly>
 
                                             <button type="button" onclick='pilih_metode_pembayaran()' class="btn btn-secondary">
                                                 Pilih
@@ -442,11 +442,11 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
 
 
                                         <label class="form-label">Nominal Bayar</label>
-                                        (<span class='text-start fw-bold text-danger'>Sebelumnya: <?= rupiah($data['total_bayar'])?> </span>)
+                                        (<span class='text-start fw-bold text-danger'>Sebelumnya: <?= rupiah($data['total_bayar']) ?> </span>)
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
-                                            <input type="hidden" id="nominal" name="nominal" value="<?=$data['total_bayar']?>">
-                                            <input class="form-control" type="varchar" name="nominal_bayar" id="nominal_bayar" value="<?=$data['total_bayar']?>">
+                                            <input type="hidden" id="nominal" name="nominal" value="<?= $data['total_bayar'] ?>">
+                                            <input class="form-control" type="varchar" name="nominal_bayar" id="nominal_bayar" value="<?= $data['total_bayar'] ?>">
                                         </div>
 
 
@@ -466,14 +466,14 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
 
-                                            <input type="hidden" class="form-control" name="kembalian" id='kembalian' value='<?= $data['jumlah_kembalian']?>'>
-                                            <input type="text" class="form-control" name="kembalian_value" id='kembalian_value' value='<?= $data['jumlah_kembalian']?>'>
+                                            <input type="hidden" class="form-control" name="kembalian" id='kembalian' value='<?= $data['jumlah_kembalian'] ?>'>
+                                            <input type="text" class="form-control" name="kembalian_value" id='kembalian_value' value='<?= $data['jumlah_kembalian'] ?>'>
 
                                         </div>
 
 
-                                        <input type="hidden" class="form-control" name="sisa" id='sisa' value='<?= $data['sisa_pembayaran']?>'>
-                                        <input type="hidden" class="form-control" name="sisa_value" id='sisa_value' value='<?= $data['sisa_pembayaran']?>'>
+                                        <input type="hidden" class="form-control" name="sisa" id='sisa' value='<?= $data['sisa_pembayaran'] ?>'>
+                                        <input type="hidden" class="form-control" name="sisa_value" id='sisa_value' value='<?= $data['sisa_pembayaran'] ?>'>
 
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" id='simpan_data'>Edit Check-in</button>
@@ -684,7 +684,7 @@ $nama_pelanggan=baca_database("","nama","select * from data_pelanggan where id_p
 
             updatePaymentCalculations();
 
-            createPrediksiButtons(Math.floor(finalPrice-<?= intval($data['total_bayar'])?>));
+            createPrediksiButtons(Math.floor(finalPrice - <?= intval($data['total_bayar']) ?>));
             // Set default prediksi pertama
             document.getElementById('nominal_bayar').value = "";
             document.getElementById('nominal').value = "";

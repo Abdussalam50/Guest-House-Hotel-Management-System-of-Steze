@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php include '../../../include/all_include.php'; ?>
+<?php
+if ($read != "detail") {
+    include '../../../include/all_include.php';
+}
+?>
 <?php
 
 
@@ -14,14 +18,14 @@ try {
 
     // Ambil data transaksi sekaligus
     $datas = mysql_fetch_array(mysql_query("SELECT * FROM data_transaksi WHERE id_transaksi='$id_transaksi'"));
-     $deposit=rupiah_format($datas['nominal_deposit']==null?0:$datas['nominal_deposit']);
+    $deposit = rupiah_format($datas['nominal_deposit'] == null ? 0 : $datas['nominal_deposit']);
     // Ambil data hotel
     $id_hotel = baca_database("", "id_hotel", "SELECT * FROM data_transaksi WHERE id_transaksi='$id_transaksi'");
     $hotel = mysql_fetch_array(mysql_query("SELECT * FROM data_hotel WHERE id_hotel='$id_hotel'"));
     $alamat = $hotel['alamat'];
     $cabang = $hotel['nama'];
-    $no_telepon_arr = explode(",",$hotel['no_telepon']);
-    $no_telepon=$no_telepon_arr[0];
+    $no_telepon_arr = explode(",", $hotel['no_telepon']);
+    $no_telepon = $no_telepon_arr[0];
     // Ambil data pelanggan
     $nama = ucwords(baca_database("", "nama", "SELECT * FROM data_pelanggan WHERE id_pelanggan='{$datas['id_pelanggan']}'"));
 
@@ -78,14 +82,14 @@ try {
         $nominal_bayar = $grand_total;
     }
     $kembalian = $datas['jumlah_kembalian'];
-    $sisa_pembayaran = number_format($datas['sisa_pembayaran']==null ?0:$datas['sisa_pembayaran']);
+    $sisa_pembayaran = number_format($datas['sisa_pembayaran'] == null ? 0 : $datas['sisa_pembayaran']);
 
     $catatan_kaki = pengaturan_aplikasi("catatan_kaki_nota");
     $tampilkan_catatan_kaki_nota = pengaturan_aplikasi("tampilkan_catatan_kaki_nota");
     $catatan_kaki = str_replace("{nama_hotel}",  $judul . " " . ucwords($cabang), $catatan_kaki);
     $catatan_kaki = str_replace("{telepon_hotel}",  $telepon, $catatan_kaki);
     $catatan_kaki = str_replace("{cs}",  $no_telepon, $catatan_kaki);
-    
+
     //informasi deposit
 
 
@@ -215,17 +219,19 @@ try {
             }
         </style>
         <div class="container" style="padding-left: 0px;">
-            <table>
-                <tr>
 
-                    <td width="60%" align="left">
-                        <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
-                        <h6><?php echo $alamat ?></h6>
-                        <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
-                    </td>
-                    <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
-                </tr>
-            </table>
+            <?php if ($read != "detail") { ?>
+                <table>
+                    <tr>
+                        <td width="60%" align="left">
+                            <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
+                            <h6><?php echo $alamat ?></h6>
+                            <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
+                        </td>
+                        <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
+                    </tr>
+                </table>
+            <?php } ?>
         </div>
         <div class="row" style="display:flex;margin-right: 0px;margin-left: 0px;">
             <table style="border:collapse; width:50%;border:none;margin-bottom:10px;font-size:12px">
@@ -330,20 +336,22 @@ try {
                 <div class="left">
 
 
+                    <?php if ($read != "detail") { ?>
+                        <p style="margin-bottom: 3px; margin-top: 14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
+                        <p style="margin-bottom: 3px; margin-top: 3px;font-size:12px">Hormat Kami,</p>
+                        <br><br>
+                        <p style="margin-bottom: 3px; margin-top: 3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
 
-                    <p style="margin-bottom: 3px; margin-top: 14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
-                    <p style="margin-bottom: 3px; margin-top: 3px;font-size:12px">Hormat Kami,</p>
-                    <br><br>
-                    <p style="margin-bottom: 3px; margin-top: 3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
 
+                        <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
+                            <div style="border:1px solid #ccc; padding:10px;  margin-top: 10px;  width: 90%; font-size:11px; background:#f9f9f9;">
 
-                    <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
-                        <div style="border:1px solid #ccc; padding:10px;  margin-top: 10px;  width: 90%; font-size:11px; background:#f9f9f9;">
+                                <?php
+                                echo $catatan_kaki;
+                                ?>
+                            </div>
+                        <?php } ?>
 
-                            <?php
-                            echo $catatan_kaki;
-                            ?>
-                        </div>
                     <?php } ?>
                 </div>
             </div>
@@ -404,9 +412,9 @@ try {
                     <td style="text-align:right; padding:2px; font-weight:bold; border-top:2px solid #000; border-bottom:2px solid #000;"><?php echo 'Rp' . rupiah_format($grand_total) ?></td>
                 </tr>
                 <tr>
-                    <td style="text-align:left; padding:2px; font-weight:bold;color:#c02b27" >Deposit</td>
+                    <td style="text-align:left; padding:2px; font-weight:bold;color:#c02b27">Deposit</td>
                     <td style='font-weight:700;color:#c02b27'>:</td>
-                    <td style="text-align:right; padding:2px;color:#c02b27"><?php echo "Rp ".$deposit ?></td>
+                    <td style="text-align:right; padding:2px;color:#c02b27"><?php echo "Rp " . $deposit ?></td>
                 </tr>
                 <tr>
                     <td style="text-align:left; padding:2px; font-weight:bold;">Bayar</td>
@@ -455,15 +463,19 @@ try {
             text-transform: none !important;
         }
     </style>
-    <div id="print-area-btn" class="no-print" style="margin-top:20px; text-align:right;">
-        <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;">
-            <i class="fa fa-print"></i> Print
-        </button>
-        <button id="btnSelesai" class="btn btn-secondary">
-            Selesai
-        </button>
 
-    </div>
+
+    <?php if ($read != "detail") { ?>
+        <div id="print-area-btn" class="no-print" style="margin-top:20px; text-align:right;">
+            <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;">
+                <i class="fa fa-print"></i> Print
+            </button>
+            <button id="btnSelesai" class="btn btn-secondary">
+                Selesai
+            </button>
+
+        </div>
+    <?php } ?>
 
     <script>
         document.getElementById('btnPrint').addEventListener('click', function() {
@@ -476,7 +488,9 @@ try {
         });
     </script>
 
-    <textarea class="hidden" name="script_map" cols="50" rows="10">W10=</textarea>
+    <?php if ($read != "detail") { ?>
+        <textarea class="hidden" name="script_map" cols="50" rows="10">W10=</textarea>
+    <?php } ?>
     </body>
 
     </html>

@@ -1373,7 +1373,6 @@ function detail_transaksi($id_transaksi)
 		$status_deposit = "Tidak";
 	}
 	// konversi ke jam (dibulatkan ke bawah)
-	$jam = floor($selisih / 3600);
 
 ?>
 	<div class="card shadow-sm mb-3" style="max-width:900px;margin:auto;">
@@ -1538,6 +1537,8 @@ function detail_transaksi($id_transaksi)
 				</div>
 			</div>
 			<?php
+			$jam = floor($selisih / 3600);
+
 			$jam_default = baca_database("", "value", "select * from data_pengaturan_aplikasi where nama_pengaturan='jam_batal_transaksi'");
 			if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
 			?>
@@ -1618,8 +1619,11 @@ function detail_transaksi($id_transaksi)
 		}
 	?>
 		<button class="btn btn-light-danger btn-sm" onclick="window.location.href='../data_transaksi/index.php?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?= $id_admin ?>'"> Hapus Transaksi</button>
-<?php
+	<?php
 	}
+	?>
+
+<?php
 }
 ?>
 
