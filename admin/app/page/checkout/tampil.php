@@ -123,9 +123,13 @@
                     $harga_per_hari = $data['harga_kamar_harian'];
                     $harga_per_bulan = $data['harga_kamar_bulanan'];
                     $jumlah_hari = $data['jumlah_hari'];
-                    $harga_kamar_total = ($data['jenis_transaksi'] == 'bulanan')
-                        ? $harga_per_bulan * ($jumlah_hari / 30)
-                        : $harga_per_hari * $jumlah_hari;
+
+                    if ($data['jenis_transaksi'] == 'bulanan') {
+                        $harga_kamar_total =  $harga_per_bulan *  $jumlah_hari;
+                    } else {
+                        $harga_kamar_total =  $harga_per_hari *  $jumlah_hari;
+                    }
+
 
                     // Discount
                     $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
@@ -156,13 +160,13 @@
                             <div class="d-flex align-items-center mb-3">
 
                                 <?php
-                                $noKamar = $data['no_kamar'];
+                                $noKamar = json_preview_br($data['no_kamar']);
                                 $displayKamar = strlen($noKamar) > 5 ? substr($noKamar, 0, 18) . "..." : $noKamar;
                                 ?>
 
                                 <div class="room-badge"
-                                    data-full="<?php echo htmlspecialchars($noKamar); ?>">
-                                    <?php echo htmlspecialchars($displayKamar); ?>
+                                    data-full="<?php echo str_replace("<br>", ",", $noKamar); ?>">
+                                    <?php echo ($displayKamar); ?>
                                 </div>
 
 
@@ -199,7 +203,7 @@
                                             <input type="text" class="form-control mb-2" readonly value="Walk-In Guest">
 
                                             <label class="form-label">Tipe Kamar</label>
-                                            <input type="text" class="form-control mb-2" readonly value="<?php echo $data['tipe_kamar']; ?>">
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo json_preview($data['tipe_kamar']); ?>">
 
                                             <label class="form-label">Tanggal Cek In</label>
                                             <input type="text" class="form-control mb-2" readonly value="<?php echo format_indo($data['waktu_checkin']); ?>">
@@ -218,13 +222,27 @@
                                                                                             ?></b></label>
                                             <input type="text" class="form-control mb-2" readonly value="<?php echo str_replace(' ', '&nbsp;', format_indo($data['waktu_checkout'])) ?>">
 
-                                            <label class="form-label">Jumlah Hari</label>
-                                            <div class="input-group mb-2">
 
-                                                <input type="text" class="form-control" readonly value="<?php echo $j_hari = $data['jumlah_hari']; ?>">
+                                            <?php if ($data['jenis_transaksi'] === 'bulanan') { ?>
+                                                <label class="form-label">Jumlah Bulan</label>
+                                                <div class="input-group mb-2">
 
-                                                <span class="input-group-text">Hari</span>
-                                            </div>
+                                                    <input type="text" class="form-control" readonly value="<?php echo $j_hari = $data['jumlah_hari']; ?>">
+
+                                                    <span class="input-group-text">Bulan</span>
+                                                </div>
+                                            <?php } else { ?>
+                                                <label class="form-label">Jumlah Hari</label>
+                                                <div class="input-group mb-2">
+
+                                                    <input type="text" class="form-control" readonly value="<?php echo $j_hari = $data['jumlah_hari']; ?>">
+
+                                                    <span class="input-group-text">Hari</span>
+                                                </div>
+                                            <?php } ?>
+
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -266,9 +284,9 @@
                                             <label class="form-label">Jumlah Tamu</label>
                                             <div class="input-group mb-2">
                                                 <span class="input-group-text">Dewasa</span>
-                                                <input type="number" class="form-control" readonly value="<?php echo $data['jumlah_dewasa']; ?>">
+                                                <input type="number" class="form-control" readonly value="<?php echo json_sum($data['jumlah_dewasa']); ?>">
                                                 <span class="input-group-text">Anak</span>
-                                                <input type="number" class="form-control" readonly value="<?php echo $data['jumlah_anak_anak']; ?>">
+                                                <input type="number" class="form-control" readonly value="<?php echo json_sum($data['jumlah_anak_anak']); ?>">
                                             </div>
 
                                         </div>
@@ -283,18 +301,35 @@
 
 
 
+                                            <?php if ($data['jenis_transaksi'] === 'bulanan') { ?>
+                                                <label class="form-label">Harga Sewa / Bulan</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_per_bulan) ?>">
+                                                </div>
 
-                                            <label class="form-label">Harga Sewa / Hari</label>
-                                            <div class="input-group mb-2">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_per_hari) ?>">
-                                            </div>
+                                                <label class="form-label">Total Harga Sewa</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_kamar_total); ?>">
+                                                </div>
+                                            <?php } else {  ?>
+                                                <label class="form-label">Harga Sewa / Hari</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_per_hari) ?>">
+                                                </div>
 
-                                            <label class="form-label">Total Harga Sewa</label>
-                                            <div class="input-group mb-2">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_kamar_total); ?>">
-                                            </div>
+                                                <label class="form-label">Total Harga Sewa</label>
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" readonly value="<?php echo rupiah_format($harga_kamar_total); ?>">
+                                                </div>
+                                            <?php } ?>
+
+
+
+
 
 
 

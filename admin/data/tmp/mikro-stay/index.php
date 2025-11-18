@@ -958,7 +958,7 @@ $color_type = "danger";
                 } else {
 
 
-                    if ((lastpath("data_transaksi") || lastpath("data_transaksi_group")) && isset($_GET['input']) && $_GET['input'] == "tambah") {
+                    if ((lastpath("data_transaksi") || lastpath("data_transaksi_group") || lastpath("data_transaksi_bulanan") || lastpath("data_transaksi_bulanan_group")  || lastpath("booking_bulanan")  || lastpath("booking_harian")) && isset($_GET['input']) && $_GET['input'] == "tambah") {
                         include 'halaman.php';
                     } else if (lastpath("checkout") && isset($_GET['input']) && $_GET['input'] == "tampil") {
                         include 'halaman.php';

@@ -1316,11 +1316,20 @@ function detail_transaksi($id_transaksi)
 
 	$id_transaksi = (mysql_real_escape_string($id_transaksi));
 
-	$sql = mysql_query("SELECT dt.*,dp.nama, dk.no_kamar 
-                        FROM data_transaksi dt
-                        JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
-                        JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
-                        WHERE dt.id_transaksi='$id_transaksi'");
+	// $sql = mysql_query("SELECT dt.*,dp.nama, dk.no_kamar 
+	//                     FROM data_transaksi dt
+	//                     JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
+	//                     JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
+	//                     WHERE dt.id_transaksi='$id_transaksi'");
+
+	$sql = mysql_query("SELECT dt.*, dp.nama, dk.no_kamar
+		FROM data_booking dt
+		JOIN data_pelanggan dp 
+			ON dt.id_pelanggan = dp.id_pelanggan
+		JOIN data_kamar dk 
+			ON dt.id_kamar LIKE CONCAT('%', dk.id_kamar, '%')
+		WHERE dt.id_transaksi='$id_transaksi'
+		");
 	$data = mysql_fetch_array($sql);
 
 	if (!$data) {
@@ -1613,6 +1622,10 @@ function detail_transaksi($id_transaksi)
 	}
 }
 ?>
+
+
+
+
 
 
 <?php

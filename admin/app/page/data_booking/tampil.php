@@ -1,113 +1,296 @@
-<body>
+<?php
 
-    <form name="formcari" id="formcari" action="" method="get">
-        <fieldset>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>Berdasarkan</td>
-                        <td>:</td>
-                        <td>
-                            <!-- <input value="" name="Berdasarkan" id="Berdasarkan" > -->
-                            <select class="form-control selectpicker" data-live-search="true" name="Berdasarkan" id="Berdasarkan">
-                                <?php
-                                $sql = "desc data_booking";
-                                $result = @mysql_query($sql);
-                                while ($row = @mysql_fetch_array($result)) {
-                                    echo "<option name='berdasarkan' value=$row[0]>$row[0]</option>";
-                                }
-                                ?>
-                            </select>
-                        </td>
-                    </tr>
+if (isset($_GET['id_hotel'])) {
+    $id_hotel = decrypt($_GET['id_hotel']);
+} else {
+    $id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+}
 
-                    <tr>
-                        <td>Pencarian</td>
-                        <td>:</td>
-                        <td>
-                            <!--<input class="form-control" type="text" name="isi" value="" >--> <input type="text" name="isi" value="">
-                            <?php btn_cari('Cari'); ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </fieldset>
-    </form>
+if ($id_hotel == "") {
+    include 'tampil_admin.php';
+    die();
+} elseif (isset($_COOKIE['operasional'])) {
+    // $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='pengaturan_oleh_operasional'")
+?>
+    <script>
+        alert('Perhatian! \nAnda tidak dapat mengakses dan menggunakan menu pelanggan\n');
+        window.location.href = '../../index.php'
+    </script>
+<?php
+}
+?>
 
-    <div style="overflow-x:auto;">
-        <table <?php tabel(100, '%', 1, 'left'); ?>>
-            <tr>
-                <th>Action</th>
-                <th>No</th>
-                <!--h <th>Id Booking </th> h-->
-                <th align="center" class="th_border cell">Waktu Booking </th>
-                <th align="center" class="th_border cell">Id Hotel </th>
-                <th align="center" class="th_border cell">Nama </th>
-                <th align="center" class="th_border cell">No Kamar </th>
-                <th align="center" class="th_border cell">Waktu Checkin </th>
-                <th align="center" class="th_border cell">Nama </th>
-                <th align="center" class="th_border cell">No Telepon </th>
-                <th align="center" class="th_border cell">Catatan </th>
+<div style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
 
-            </tr>
+    <?php if ($_COOKIE['id_hotel'] == "") {
+    ?>
 
-            <tbody>
-                <?php
-                $no = 0;
-                $startRow = ($page - 1) * $dataPerPage;
-                $no = $startRow;
+        <a href="index.php" class=" btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-backward text-black'></i> Kembali
+        </a>
+        <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
+            <i class='fas fa-search text-white'></i> Pencarian
+        </a>
+    <?php
+    } else { ?>
+        <a href="../data_booking/index.php?input=cetak" class="btn btn-sm btn-secondary fw-semibold">
+            <i class='fas fa-print text-black'></i> Report Booking
+        </a>
 
-                if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
-                    $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
-                    $isi = mysql_real_escape_string($_GET['isi']);
-                    $querytabel = "SELECT * FROM data_booking where $berdasarkan like '%$isi%'  LIMIT $startRow ,$dataPerPage";
-                    $querypagination = "SELECT COUNT(*) AS total FROM data_booking where $berdasarkan like '%$isi%'";
-                } else {
-                    $querytabel = "SELECT * FROM data_booking  LIMIT $startRow ,$dataPerPage";
-                    $querypagination = "SELECT COUNT(*) AS total FROM data_booking";
-                }
-                $proses = mysql_query($querytabel);
-                while ($data = mysql_fetch_array($proses)) {
-                ?>
-                    <tr class="event2">
+        <a onclick="pencarian()" class="btn btn-sm btn-danger fw-semibold">
+            <i class='fas fa-search text-white'></i> Pencarian
+        </a>
 
-                        <td class="th_border cell" align="center" width="200">
-                            <table border="0">
-                                <tr>
+    <?php } ?>
+</div>
+<br>
 
-                                    <td>
-                                        <a href="<?php index(); ?>?input=edit&proses=<?= encrypt($data['id_booking']); ?>">
-                                            <?php btn_edit('Edit'); ?>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-secondary" href="<?php index(); ?>?input=hapus&proses=<?= encrypt($data['id_booking']); ?>">
-                                            Batal
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
+<div class="content-widgets gray">
+    <div class="widget-container">
+        <div class="content-box">
+            <div style="overflow-x:auto;">
+                <table <?php tabel(100, '%', 1, 'left'); ?> border="1" cellspacing="0" cellpadding="5">
+                    <thead>
+                        <tr style="background-color: #f9f9f9; text-align:center;">
+                            <th>No</th>
+                            <th>Kode&nbsp;Transaksi</th>
+                            <th>Pelanggan</th>
+                            <th>Kamar</th>
+                            <th>Check&nbsp;In</th>
+                            <th>Check&nbsp;Out</th>
+                            <th>Harga/Hari</th>
+                            <th>Jumlah&nbsp;Hari</th>
+                            <th>Harga&nbsp;Kamar&nbsp;Total</th>
+                            <th>Disc&nbsp;Kamar%</th>
+                            <th>Disc&nbsp;Nominal</th>
+                            <th>Harga&nbsp;Setelah&nbsp;Disc</th>
+                            <th>Tambahan&nbsp;In</th>
+                            <th>Tambahan&nbsp;Out</th>
+                            <th>Potongan&nbsp;Harga</th>
+                            <th>Sub&nbsp;Total</th>
+                            <th>Pajak</th>
+                            <th>Total&nbsp;Bayar</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = ($page - 1) * $dataPerPage;
+                        $basepagination = "SELECT COUNT(*) AS total FROM data_booking WHERE id_hotel='$id_hotel'";
+                        // Query dengan filter jika ada
+                        $where_clauses = [];
+                        if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
+                            $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
+                            $isi = mysql_real_escape_string($_GET['isi']);
+                            $where_clauses[] = "$berdasarkan LIKE '%$isi%'";
+                            $querypagination = $basepagination . " AND $berdasarkan LIKE '%$isi%'";
+                        }
 
-                        <td align="center" width="50"><?php $no = (($no + 1));
-                                                        echo $no; ?></td>
-                        <!--h <td align="center"><?php echo $data['id_booking']; ?></td> h-->
-                        <td align="center"><?php echo $data['waktu_booking']; ?></td>
-                        <td align="center"><?php echo baca_database("", "id_hotel", "select * from data_admin where id_admin='$data[id_admin]'")  ?></td>
-                        <td align="center"><?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'")  ?></td>
-                        <td align="center"><?php echo baca_database("", "no_kamar", "select * from data_kamar where id_kamar='$data[id_kamar]'")  ?></td>
-                        <td align="center"><?php echo $data['waktu_checkin']; ?></td>
-                        <td align="center"><?php echo $data['nama']; ?></td>
-                        <td align="center"><?php echo $data['no_telepon']; ?></td>
-                        <td align="center"><?php echo $data['catatan']; ?></td>
+                        // Add id_hotel filter only if it exists and is not empty
+                        if (!empty($id_hotel)) {
+                            $where_clauses[] = "dt.id_hotel='$id_hotel'";
+                            $where_clauses[] = "dt.status_transaksi='Booking'";
+                            $querypagination = $basepagination;
+                        }
+
+                        // Build the WHERE clause
+                        $where_clause = !empty($where_clauses) ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+
+                        $querytabel = "SELECT dt.*,dp.nama
+                                       FROM data_booking dt
+                                       JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
+                                       $where_clause
+                                       ORDER BY dt.id_transaksi DESC 
+                                       LIMIT " . (($page - 1) * $dataPerPage) . ", $dataPerPage";
 
 
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+
+
+
+                        $proses = mysql_query($querytabel);
+                        while ($data = mysql_fetch_array($proses)) {
+                            $no++;
+                            $harga_per_hari = $data['harga_kamar_harian'];
+                            $tgl_checkin = new DateTime($data['waktu_checkin']);
+                            $tgl_checkout = new DateTime($data['waktu_checkout']);
+                            $jumlah_hari = $data['jumlah_hari'];
+
+
+
+                            $harga_kamar_total = json_count_sum($harga_per_hari, $jumlah_hari);
+
+                            // Apply discount only to room price
+                            $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
+                            $harga_setelah_disc = $harga_kamar_total - $disc_nominal;
+
+                            // Additional fees and price cut
+                            $tambahan_in = $data['biaya_tambahan_checkin'];
+                            $tambahan_out = $data['biaya_tambahan_checkout'];
+                            $potongan_harga = $data['potongan_harga'];
+
+                            // Calculate subtotal (discounted room price + additional fees - price cut)
+                            $sub_total = $harga_setelah_disc + $tambahan_in + $tambahan_out - $potongan_harga;
+
+                            // Calculate tax
+                            $pajak = ($sub_total * $data['persentase_pajak']) / 100;
+
+                            // Total price
+                            $total_bayar = $sub_total + $pajak;
+                        ?>
+                            <tr class="event2" style="text-align:left;">
+                                <td><?= $no ?></td>
+                                <td align="left"><a href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
+                                        <?= $data['id_transaksi']; ?></a>
+                                    <?php if (json_check($data['no_kamar'])) {
+                                        echo "Group Booking";
+                                    }
+                                    ?>
+                                </td>
+                                <td align="left"><?= ucwords($data['nama']); ?></td>
+                                <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
+                                <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>
+                                <td><?php
+                                    $today = strtotime(date('Y-m-d'));
+                                    $checkout = strtotime($data['waktu_checkout']);
+                                    $hari_tersisa = ($checkout - $today) / (60 * 60 * 24);
+
+                                    if ($hari_tersisa > 0) {
+                                        $hari_tersisa = ceil($hari_tersisa);
+                                        if ($data['status_transaksi'] == 'Selesai') {
+                                            echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
+                                        } else {
+                                            echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
+                                        }
+                                    } elseif ($hari_tersisa == 0) {
+                                        if ($data['status_transaksi'] == 'Selesai') {
+                                            echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
+                                        } else {
+                                            // Hari ini
+                                            echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']))
+                                                . "<b style='color:green'>&nbsp;Hari ini</b>";
+                                        }
+                                    } else {
+                                        // Lewat
+                                        echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
+                                    }
+                                    ?>
+                                </td>
+                                <td><?= json_preview_rupiah_br($harga_per_hari); ?></td>
+                                <td><?= $jumlah_hari; ?></td>
+                                <td><?= rupiah($harga_kamar_total); ?></td>
+                                <td><?= $data['discount']; ?>%</td>
+                                <td><?= rupiah($disc_nominal); ?></td>
+                                <td><?= rupiah($harga_setelah_disc); ?></td>
+                                <td><?= rupiah($tambahan_in); ?></td>
+                                <td><?= rupiah($tambahan_out); ?></td>
+                                <td><?= rupiah($potongan_harga); ?></td>
+                                <td><?= rupiah($sub_total); ?></td>
+                                <td><?= rupiah($pajak); ?></td>
+                                <td><b><?= rupiah($total_bayar); ?></b></td>
+                                <td style="background-color: <?php
+                                                                if ($data['status_transaksi'] == 'Selesai') {
+                                                                    echo '#f3ffe6';
+                                                                } elseif ($data['status_transaksi'] == 'Lunas') {
+                                                                    echo '#fffee6';
+                                                                } else {
+                                                                    echo '#ffe8e8';
+                                                                } ?>">
+                                    <?= $data['status_transaksi']; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <?php
+            //perlu perbaikan handle paginationnya
+            if ($_COOKIE['id_hotel'] == "") {
+            } else {
+                Pagination($page, $dataPerPage, $querypagination);
+            }
+            ?>
+
+
+        </div>
     </div>
+</div>
 
-    <?php Pagination($page, $dataPerPage, $querypagination); ?>
+<style>
+    .swal-cancel-btn {
+        background-color: #ccc !important;
+        color: #333 !important;
+        border: none !important;
+    }
+</style>
 
-</body>
+<script>
+    function pencarian() {
+        const formHTML = `
+    <form id="formCariSweet" style="text-align: left; font-size: 14px;">
+      <div style="margin-bottom: 8px;">
+         <div style="display: flex; gap: 10px; align-items: left; margin-bottom: 12px;">
+        <label for="Berdasarkan" style="flex: 0 0 100px; text-align: right;">Berdasarkan</label>
+        <select id="Berdasarkan" name="Berdasarkan" style="flex: 1; height: 32px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc;">
+          <?php
+            $sql = "desc data_booking";
+            $result = @mysql_query($sql);
+            while ($row = @mysql_fetch_array($result)) {
+                echo "<option name='berdasarkan' value=$row[0]>$row[0]</option>";
+            }
+            ?>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: left;">
+        <label for="isi" style="flex: 0 0 100px; text-align: right;">Kata Kunci</label>
+        <input type="text" id="isi" name="isi" style="flex: 1; height: 32px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc;" required>
+      </div>
+      </div>
+    </form>
+  `;
+
+        Swal.fire({
+            title: '<b style="font-size:16px;">Pencarian Data</b>',
+            html: formHTML,
+            width: 400,
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: 'Pencarian',
+            cancelButtonText: 'Cancel',
+            denyButtonText: 'Reset Pencarian',
+            focusConfirm: false,
+            customClass: {
+                cancelButton: 'swal-cancel-btn',
+                denyButton: 'swal-cancel-btn'
+            },
+            preConfirm: () => {
+                const berdasarkan = document.getElementById('Berdasarkan').value;
+                const isi = document.getElementById('isi').value;
+
+                if (!berdasarkan || !isi) {
+                    Swal.showValidationMessage('Semua field wajib diisi');
+                    return false;
+                }
+
+
+                <?php
+                if (isset($_GET['id_hotel'])) {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}&id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>`;
+                <?php
+                } else {
+                ?>
+                    window.location.href = `?Berdasarkan=${encodeURIComponent(berdasarkan)}&isi=${encodeURIComponent(isi)}`;
+                <?php
+                }
+                ?>
+
+
+            },
+            preDeny: () => {
+                window.location.href = 'index.php?id_hotel=<?php echo $_GET['id_hotel']; ?>&nama_hotel=<?php echo $_GET['nama_hotel']; ?>';
+            }
+        });
+    }
+</script>

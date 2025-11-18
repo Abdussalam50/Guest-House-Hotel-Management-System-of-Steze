@@ -9,12 +9,13 @@
 <!-- MASTERDATA -->
 
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Transaksi </n><l>../data_transaksi/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Booking </n><l>../data_booking/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Pelanggan </n><l>../data_pelanggan/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Laporan </n><l>../data_laporan/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Operasional </n><l>../data_operasional/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Kamar </n><l>../data_kamar/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Admin </n><l>../data_admin/index.php</l></menu>
-<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Type </n><l>../data_tipe_kamar/index.php</l></menu>
+
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Pengaturan </n><l>../data_pengaturan/index.php</l></menu>
 
 

@@ -49,7 +49,7 @@
                     .room-badge {
                         cursor: pointer;
                         padding: 10px;
-                        background-color: #3bc3b6;
+                        background-color: #75cc68;
                         color: white;
                         font-size: 1rem;
                         font-weight: bold;
@@ -130,18 +130,40 @@
                         <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
                         <div class="mb-4">
                             <div class="cardcheckin-body">
-                                <div class="d-flex align-items-center mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
 
-
-                                    <div class="room-badge">
-                                        GROUP
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="room-badge" data-full="">
+                                            Group
+                                        </div>
+                                        <h4 class="mb-0">
+                                            <i class="fas fa-sign-in-alt text-success"></i>
+                                            Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?>
+                                        </h4>
                                     </div>
 
-
-
-
-                                    <h4 class="mb-0"><i class="fas fa-sign-in-alt text-success"></i> Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?></h4>
+                                    <h4 class="mb-0 fw-bold text-success">
+                                        Transaksi group harian
+                                    </h4>
                                 </div>
+
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        document.querySelectorAll('.room-badge').forEach(function(el) {
+                                            el.addEventListener('click', function() {
+                                                const fullName = this.getAttribute('data-full');
+
+                                                Swal.fire({
+                                                    title: "No. Kamar",
+                                                    text: fullName,
+                                                    icon: "info",
+                                                    confirmButtonText: "OK"
+                                                });
+                                            });
+                                        });
+                                    });
+                                </script>
+
 
                                 <div class="row g-3">
                                     <!-- Informasi Kamar -->
@@ -321,61 +343,63 @@
                                                             <div class="modal-body">
                                                                 <div class="row g-3">
                                                                     <?php
-                                                                    // Asumsi $idHotel sudah didefinisikan sebelumnya
-                                                                    $query = "SELECT * FROM data_kamar 
+
+                                                                    $tanggal_check = date('Y-m-d');
+                                                                    $query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY no_kamar ASC";
+                                                                    $result = mysql_query($query) or die('Query Error: ' . mysql_error());
+
+                                                                    while ($kamar = mysql_fetch_assoc($result)) {
+                                                                        $idKamar = $kamar['id_kamar'];
+                                                                        $noKamar = $kamar['no_kamar'];
+
+                                                                        // Cek apakah kamar ini sedang dibooking hari ini (overlap dengan hari ini)
+                                                                        $qBooking = "SELECT id_transaksi FROM data_booking 
                                                                         WHERE id_hotel = '$idHotel'
-                                                                        ORDER BY no_kamar ASC";
-                                                                    $result = mysql_query($query);
+                                                                        AND ('$tanggal_check' BETWEEN waktu_checkin AND DATE_SUB(waktu_checkout, INTERVAL 1 DAY))
+                                                                        AND (id_kamar LIKE '%" . $idKamar . "%') 
+                                                                        AND status_transaksi = 'Booking'";
 
-                                                                    if (!$result) {
-                                                                        die('Query Error: ' . mysql_error());
-                                                                    }
-                                                                    ?>
+                                                                        $resBooking = mysql_query($qBooking);
+                                                                        $sedangDibooking = mysql_num_rows($resBooking) > 0;
+                                                                        $statusAwal = $kamar['status_kamar']; // Kosong atau Terisi
 
-                                                                    <style>
-                                                                        /* Buat semua kartu kamar memiliki tinggi sama */
-                                                                        .kamar-card {
-                                                                            height: 115px;
-                                                                            padding: 10px !important;
-                                                                            display: flex;
-                                                                            flex-direction: column;
-                                                                            justify-content: space-between;
+                                                                        // Prioritas status: Booking > Terisi > Kosong
+                                                                        if ($sedangDibooking) {
+                                                                            $badgeClass = 'bg-primary';      // biru
+                                                                            $statusText = 'Booking';
+                                                                            $bgcolor    = 'background-color: #f6f7f9;';
+                                                                        } elseif ($statusAwal == 'Terisi') {
+                                                                            $badgeClass = 'bg-danger';
+                                                                            $statusText = 'Terisi';
+                                                                            $bgcolor    = 'background-color: #f6f7f9;';
+                                                                        } else {
+                                                                            $badgeClass = 'bg-success';
+                                                                            $statusText = 'Tersedia';
+                                                                            $bgcolor    = 'background-color: #ffffff;';
                                                                         }
-                                                                    </style>
+                                                                    ?>
+                                                                        <div class="col-6 col-md-4 col-lg-3 mb-3">
+                                                                            <div class="card kamar-card p-2 pilih-kamar-item"
+                                                                                data-kamar="<?= htmlspecialchars($noKamar) ?>"
+                                                                                style="height: 150px; <?= $bgcolor ?> display: flex; flex-direction: column; justify-content: space-between;">
 
-                                                                    <div class="row">
-                                                                        <?php
-                                                                        while ($row = mysql_fetch_assoc($result)) {
-                                                                            $badgeClass = ($row['status_kamar'] == 'Kosong') ? 'bg-success' : 'bg-danger';
-                                                                            $statusText = ($row['status_kamar'] == 'Kosong') ? 'Tersedia' : 'Terisi';
-                                                                            $bgcolor = ($row['status_kamar'] == 'Kosong') ? 'background-color: #ffffff;' : 'background-color: #f6f7f9;';
-                                                                        ?>
-                                                                            <div class="col-6 col-md-4 col-lg-3 mb-3">
-                                                                                <div class="card kamar-card p-2 pilih-kamar-item" data-kamar="<?= htmlspecialchars($row['no_kamar']) ?>" style="display: flex; flex-direction: column; justify-content: space-between; height: 150px; <?php echo $bgcolor; ?>">
-                                                                                    <div style="margin-top: 10px;">
-                                                                                        <div class="fw-bold text-primary text-left" style="font-size: 13px;">
-                                                                                            Kamar <?= htmlspecialchars($row['no_kamar']) ?>
-                                                                                        </div>
-
-                                                                                    </div>
-                                                                                    <!-- Badge selalu di bawah -->
-                                                                                    <div class="mt-auto" style="margin-bottom: 10px;">
-                                                                                        <div class="text-left small mb-2">
-                                                                                            <?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$row[id_tipe_kamar]'")); ?>
-                                                                                            <br>
-                                                                                            <span class="text-dark"><?= rupiah($row['harga_harian']) ?> @ 1 Days</span>
-                                                                                        </div>
-                                                                                        <span style="color: white;" class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
-
+                                                                                <div style="margin-top: 10px;">
+                                                                                    <div class="fw-bold text-primary" style="font-size: 13px;">
+                                                                                        Kamar <?= htmlspecialchars($noKamar) ?>
                                                                                     </div>
                                                                                 </div>
+
+                                                                                <div class="mt-auto" style="margin-bottom: 10px;">
+                                                                                    <div class="text-left small mb-2">
+                                                                                        <?= ucwords(baca_database("", "tipe_kamar", "SELECT * FROM data_tipe_kamar WHERE id_tipe_kamar='" . $kamar['id_tipe_kamar'] . "'")) ?>
+                                                                                        <br>
+                                                                                        <span class="text-dark"><?= rupiah($kamar['harga_harian']) ?> @ 1 Days</span>
+                                                                                    </div>
+                                                                                    <span style="color: white;" class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
+                                                                                </div>
                                                                             </div>
-
-                                                                        <?php
-                                                                        }
-                                                                        ?>
-                                                                    </div>
-
+                                                                        </div>
+                                                                    <?php } ?>
                                                                 </div>
                                                             </div>
 
@@ -905,6 +929,14 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Kamar Sedang Digunakan',
+                    text: 'Anda tidak dapat melakukan transaksi untuk kamar ini.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            } else if (badge === 'Booking') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Kamar Sudah Dibooking',
                     text: 'Anda tidak dapat melakukan transaksi untuk kamar ini.',
                     confirmButtonText: 'OK'
                 });

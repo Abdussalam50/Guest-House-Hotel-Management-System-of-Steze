@@ -139,37 +139,44 @@
                         <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
                         <div class="mb-4">
                             <div class="cardcheckin-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <?php
-                                    $displayKamar = strlen($noKamar) > 5 ? substr($noKamar, 0, 18) . "..." : $noKamar;
-                                    ?>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <!-- KIRI: Badge + Judul Check-in (satu grup rata kiri) -->
+                                    <div class="d-flex align-items-center gap-3">
+                                        <?php
+                                        $displayKamar = strlen($noKamar) > 5 ? substr($noKamar, 0, 18) . "..." : $noKamar;
+                                        ?>
+                                        <div class="room-badge" data-full="<?php echo htmlspecialchars($noKamar); ?>">
+                                            <?php echo htmlspecialchars($displayKamar); ?>
+                                        </div>
 
-                                    <div class="room-badge"
-                                        data-full="<?php echo htmlspecialchars($noKamar); ?>">
-                                        <?php echo htmlspecialchars($displayKamar); ?>
+                                        <h4 class="mb-0">
+                                            <i class="fas fa-sign-in-alt text-success"></i>
+                                            Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?>
+                                        </h4>
                                     </div>
 
+                                    <!-- KANAN: Sendirian di ujung kanan -->
+                                    <h4 class="mb-0 fw-bold text-success">
+                                        Transaksi harian
+                                    </h4>
+                                </div>
 
-                                    <script>
-                                        document.addEventListener("DOMContentLoaded", function() {
-                                            document.querySelectorAll('.room-badge').forEach(function(el) {
-                                                el.addEventListener('click', function() {
-                                                    const fullName = this.getAttribute('data-full');
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        document.querySelectorAll('.room-badge').forEach(function(el) {
+                                            el.addEventListener('click', function() {
+                                                const fullName = this.getAttribute('data-full');
 
-                                                    Swal.fire({
-                                                        title: "No. Kamar",
-                                                        text: fullName,
-                                                        icon: "info",
-                                                        confirmButtonText: "OK"
-                                                    });
+                                                Swal.fire({
+                                                    title: "No. Kamar",
+                                                    text: fullName,
+                                                    icon: "info",
+                                                    confirmButtonText: "OK"
                                                 });
                                             });
                                         });
-                                    </script>
-
-
-                                    <h4 class="mb-0"><i class="fas fa-sign-in-alt text-success"></i> Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?></h4>
-                                </div>
+                                    });
+                                </script>
 
                                 <div class="row g-3">
                                     <!-- Informasi Kamar -->

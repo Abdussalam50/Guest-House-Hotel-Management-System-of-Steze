@@ -1,6 +1,7 @@
 	<?php
 	$color_type = "danger";
 	include 'loader.php';
+	$tanggal_check = date('Y-m-d');
 	?>
 
 
@@ -105,8 +106,17 @@
 																	<div class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center" style="width: 150px; position: relative; color: rgb(255, 255, 255);">
 																			<div class="mb-2">
-																				<div class="text-left">
-																					<span onclick="window.location.href='../data_booking/index.php?input=tambah&id_kamar=<?php echo $dataKamar['id_kamar'] ?>'" class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;"> Kamar <?php echo $dataKamar['no_kamar'] ?></span>
+																				<div class="text-left" <?php
+																										if (strlen($dataKamar['no_kamar']) > 10) {
+																											echo "style='margin-top: -13px;'";
+																										} ?>>
+																					<span class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;
+																					<?php
+																					if (strlen($dataKamar['no_kamar']) > 10) {
+																						echo "font-size: 11px !important;";
+																					} ?>
+																						 ">Kamar <?php echo $dataKamar['no_kamar'] ?></span>
+
 																					<span class="<?php echo $dataKamar['status_kamar'] == 'Kosong' ? 'text-gray-600' : 'text-blank' ?> fw-semibold d-block fs-6 mt-n1" style="text-align: left;">
 																						<p></p>
 																						<?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$dataKamar[id_tipe_kamar]'")); ?> <br>
@@ -118,11 +128,44 @@
 																						<?php echo rupiah($dataKamar['harga_harian']) ?> <b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b>/Days
 																						<br>
 
-																						<p style='color:#000000'><b><br>Total: Rp 0</b></p>
+																						<?php
+																						$idKamar = $dataKamar['id_kamar'];
+																						$qb = " SELECT * 
+																								FROM data_booking 
+																								WHERE id_hotel = '$idHotel'
+																								AND (id_kamar LIKE '%$idKamar%')
+																								AND status_transaksi = 'Booking'
+																							";
+
+																						$qBooking = mysql_query($qb);
+																						$dataBooking = mysql_fetch_array($qBooking);
+																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
+																						$book_id_transaksi = $dataBooking['id_transaksi'];
+
+																						if ($book_waktu_checkin == "") {
+																						?>
+																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
+																						<?php
+																						} else {
+																						?>
+																							<p style='color:#2196f3'><b><br>
+																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
+																										<font>
+																											Booked : <?php echo date("d-m-Y", strtotime($book_waktu_checkin)); ?>
+																										</font>
+																									</a>
+																								</b></p>
+																						<?php
+																						}
+																						?>
+
+
+
 																						<?php
 																						if (decrypt($_COOKIE['id_hotel']) === $idhotel) {
 																						?>
-																							<p></p> <button class="btn btn-light btn-sm" onclick="window.location.href='../data_transaksi/index.php?input=tambah&id=<?php echo $dataKamar['id_kamar'] ?>'">Check In</button> <!---->
+
+																							<p></p> <button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $dataKamar['id_kamar']; ?>')">Check In</button>
 																						<?php
 																						} else { ?>
 																							<p></p> <button class="btn btn-light btn-sm">Ready</button>
@@ -146,8 +189,16 @@
 																	<div onclick="open_detail('<?php echo $dataTransaksi['id_transaksi']; ?>')" class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card bg-<?php echo $color_type; ?>" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center " style="width: 150px; position: relative; color: rgb(255, 255, 255);">
 																			<div class="mb-2">
-																				<div class="text-left">
-																					<span onclick="window.location.href='../data_booking/index.php?input=tambah&id_kamar=<?php echo $dataKamar['id_kamar'] ?>'" class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;"> Kamar <?php echo $dataKamar['no_kamar'] ?></span>
+																				<div class="text-left" <?php
+																										if (strlen($dataKamar['no_kamar']) > 10) {
+																											echo "style='margin-top: -13px;'";
+																										} ?>>
+																					<span class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;
+																					<?php
+																					if (strlen($dataKamar['no_kamar']) > 10) {
+																						echo "font-size: 11px !important;";
+																					} ?>
+																						 ">Kamar <?php echo $dataKamar['no_kamar'] ?></span>
 																					<span class="<?php echo $dataKamar['status_kamar'] == 'Kosong' ? 'text-gray-600' : 'text-black' ?> fw-semibold d-block fs-6 mt-n1" style="text-align: left;">
 																						<p></p>
 																						<?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$dataKamar[id_tipe_kamar]'")); ?> <br>
@@ -161,7 +212,12 @@
 																							$tgl_checkout = new DateTime($dataTransaksi['waktu_checkout']);
 
 																							$selisih = $tgl_checkin->diff($tgl_checkout);
-																							$jumlah_hari = $selisih->days;
+																							if ($dataTransaksi['jenis_transaksi'] === 'bulanan') {
+																								$jumlah_hari = $selisih->m;
+																							} else {
+																								$jumlah_hari = $selisih->days;
+																							}
+
 
 																							echo "<i class='fas fa-sign-in-alt text-success'></i> " . format_indo($waktu_checkin[0]) . " " . $waktu_checkin[1];
 																							echo "<br>";
@@ -181,9 +237,10 @@
 																						<br>
 																						<?php
 																						if ($dataTransaksi['jenis_transaksi'] === 'bulanan') {
-																							echo rupiah($dataTransaksi['harga_bulanan']);
+																							//echo rupiah($dataTransaksi['harga_kamar_bulanan']);
 																						?>
-																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo intval($jumlah_hari) / 30 ?> Bulan
+																							<font color='orange'><b>Bulanan</b></font>
+																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo $jumlah_hari ?> Month
 																						<?php
 																						} else {
 																							if (json_check($dataTransaksi['harga_kamar_harian'])) {
@@ -236,9 +293,17 @@
 																	<div class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card <?php echo $data_kamar['status_kamar'] == 'Kosong' ? 'bg-white' : 'bg-' . $color_type . '' ?>" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center" style="width: 150px; position: relative; color: rgb(255, 255, 255);">
 																			<div class="mb-2">
-																				<div class="text-left">
-																					<span onclick="window.location.href='../data_booking/index.php?input=tambah&id_kamar=<?php echo $data_kamar['id_kamar'] ?>'" class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;">Kamar <?php echo $data_kamar['no_kamar'] ?></span>
-																					<span class="<?php echo $data_kamar['status_kamar'] == 'Kosong' ? 'text-gray-600' : 'text-black' ?> fw-semibold d-block fs-6 mt-n1" style="text-align: left;">
+																				<div class="text-left" <?php
+																										if (strlen($data_kamar['no_kamar']) > 10) {
+																											echo "style='margin-top: -13px;'";
+																										} ?>>
+																					<span class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;
+																					<?php
+																					if (strlen($data_kamar['no_kamar']) > 10) {
+																						echo "font-size: 11px !important;";
+																					} ?>
+																						 ">Kamar <?php echo $data_kamar['no_kamar'] ?></span>
+																					<span class=" <?php echo $data_kamar['status_kamar'] == 'Kosong' ? 'text-gray-600' : 'text-black' ?> fw-semibold d-block fs-6 mt-n1" style="text-align: left;">
 																						<p></p>
 																						<?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$data_kamar[id_tipe_kamar]'")) ?> <br>
 
@@ -251,7 +316,36 @@
 																						<br>
 
 
-																						<p style='color:#000000'><b><br>Total: Rp 0 </b></p>
+																						<?php
+																						$idKamar = $data_kamar['id_kamar'];
+																						$qb = " SELECT * 
+																								FROM data_booking 
+																								WHERE id_hotel = '$idHotel'
+																								AND (id_kamar LIKE '%$idKamar%')
+																								AND status_transaksi = 'Booking'
+																							";
+
+																						$qBooking = mysql_query($qb);
+																						$dataBooking = mysql_fetch_array($qBooking);
+																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
+																						$book_id_transaksi = $dataBooking['id_transaksi'];
+
+																						if ($book_waktu_checkin == "") {
+																						?>
+																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
+																						<?php
+																						} else {
+																						?>
+																							<p style='color:#2196f3'><b><br>
+																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
+																										<font>
+																											Booked : <?php echo date("d-m-Y", strtotime($book_waktu_checkin)); ?>
+																										</font>
+																									</a>
+																								</b></p>
+																						<?php
+																						}
+																						?>
 
 																						<?php
 																						if ($_COOKIE['id_hotel'] == "") {
@@ -260,7 +354,9 @@
 																						<?php
 																						} else {
 																						?>
-																							<button class="btn btn-light btn-sm" onclick="window.location.href='../data_transaksi/index.php?input=tambah&id=<?php echo $data_kamar['id_kamar'] ?>'">Check in</button>
+
+																							<button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $data_kamar['id_kamar']; ?>')">Check In</button>
+
 																						<?php
 																						}
 																						?>
@@ -289,8 +385,17 @@
 																	<div onclick="open_detail('<?php echo $data_transaksi['id_transaksi']; ?>')" class="card card-flush flex-row-fluid p-8 pb-5 mw-100 card <?php echo $data_kamar['status_kamar'] == 'Kosong' ? 'bg-white' : 'bg-' . $color_type . '' ?>" style="--bs-card-box-shadow: 0px 0px 20px 0px rgb(72 85 127 / 55%); cursor: pointer; background-position: right top; background-size: 30%; background-repeat: no-repeat; background-image: url(&quot;../../../upload/1747180187-26415-1698105518-17748-abstract-1.svg&quot;); visibility: visible;">
 																		<div class="card-body text-center" style="width: 150px; position: relative; color: rgb(255, 255, 255);">
 																			<div class="mb-2">
-																				<div class="text-left">
-																					<span onclick="window.location.href='../data_booking/index.php?input=tambah&id_kamar=<?php echo $data_kamar['id_kamar'] ?>'" class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;">Kamar <?php echo $data_kamar['no_kamar'] ?></span>
+																				<div class="text-left" <?php
+																										if (strlen($data_kamar['no_kamar']) > 10) {
+																											echo "style='margin-top: -13px;'";
+																										} ?>>
+																					<span class="fw-bold text-gray-800 cursor-pointer text-hover-<?php echo $color_type; ?> fs-3 fs-xl-1" style="text-align: left;
+																					<?php
+																					if (strlen($data_kamar['no_kamar']) > 10) {
+																						echo "font-size: 11px !important;";
+																					} ?>
+																						 ">Kamar <?php echo $data_kamar['no_kamar'] ?></span>
+
 																					<span class="<?php echo $data_kamar['status_kamar'] == 'Kosong' ? 'text-gray-600' : 'text-black' ?> fw-semibold d-block fs-6 mt-n1" style="text-align: left;">
 																						<p></p>
 
@@ -313,7 +418,11 @@
 																							$tgl_checkout = new DateTime($data_transaksi['waktu_checkout']);
 
 																							$selisih = $tgl_checkin->diff($tgl_checkout);
-																							$jumlah_hari = $selisih->days;
+																							if ($data_transaksi['jenis_transaksi'] === 'bulanan') {
+																								$jumlah_hari = $selisih->m;
+																							} else {
+																								$jumlah_hari = $selisih->days;
+																							}
 
 																							echo "<i class='fas fa-sign-in-alt text-success'></i> " . format_indo($waktu_checkin[0]) . " " . $waktu_checkin[1];
 																							echo "<br>";
@@ -325,10 +434,11 @@
 
 																						<?php
 																						if ($data_transaksi['jenis_transaksi'] == 'bulanan') {
-																							echo rupiah($data_transaksi['harga_bulanan']);
+																							//echo rupiah($data_transaksi['harga_kamar_bulanan']);
 																						?>
+																							<font color='orange'><b>Bulanan</b></font>
 
-																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo floor($jumlah_hari / 30) ?> Bulan
+																							<b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b> @ <?php echo $jumlah_hari  ?> Month
 																						<?php
 																						} else {
 																							if (json_check($data_transaksi['harga_kamar_harian'])) {
@@ -539,6 +649,8 @@
 				<path d="M10.1818182,4 L17.8181818,4 C19.2324881,4 20,4.76751186 20,6.18181818 L20,13.8181818 C20,15.2324881 19.2324881,16 17.8181818,16 L10.1818182,16 C8.76751186,16 8,15.2324881 8,13.8181818 L8,6.18181818 C8,4.76751186 8.76751186,4 10.1818182,4 Z" fill="#000000" opacity="0.3" />
 			</g>
 		</svg><!--end::Svg Icon-->&nbsp;Dashboard</span> </button>
+
+
 
 
 	<style>
@@ -839,5 +951,131 @@
 				}
 			};
 			xhr.send();
+		}
+	</script>
+
+	<style>
+		.cursor-pointer {
+			cursor: pointer;
+		}
+
+		.hover-shadow {
+			transition: all 0.3s ease;
+		}
+
+		.swal2-container .swal2-html-container {
+			max-height: 324px;
+			overflow: auto;
+		}
+	</style>
+
+	<script>
+		function pilihJenisCheckin(idKamar) {
+			Swal.fire({
+				title: 'Pilih Jenis Check-in',
+				html: `
+    <div style="width: 460px; margin: auto;">
+
+        <!-- ====== BARIS 1: HARIAN ====== -->
+        <div class="d-flex justify-content-between mt-3">
+
+            <!-- Check-in Harian -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../data_transaksi/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-calendar-day text-success mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Harian</h6>
+                    <small class="text-muted">Check-in harian</small>
+                </div>
+            </div>
+
+            <!-- Group Harian -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../data_transaksi_group/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-users text-primary mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Group Harian</h6>
+                    <small class="text-muted">Check-in harian</small>
+                </div>
+            </div>
+
+            <!-- Booking Harian -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../booking_harian/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-book text-success mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Booking Harian</h6>
+                    <small class="text-muted">Pesan harian</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== BARIS 2: BULANAN ====== -->
+        <div class="d-flex justify-content-between mt-3">
+
+            <!-- Check-in Bulanan -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../data_transaksi_bulanan/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-calendar-alt text-warning mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Bulanan</h6>
+                    <small class="text-muted">Check-in bulanan</small>
+                </div>
+            </div>
+
+            <!-- Group Bulanan -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../data_transaksi_bulanan_group/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-users-cog text-info mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Group Bulanan</h6>
+                    <small class="text-muted">Check-in bulanan</small>
+                </div>
+            </div>
+
+            <!-- Booking Bulanan -->
+            <div class="text-center cursor-pointer"
+                onclick="Swal.close(); window.location.href='../booking_bulanan/index.php?input=tambah&id=${idKamar}'">
+                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                    style="width: 140px; height: 130px; transition: .3s;">
+                    <i class="fas fa-book-open text-warning mb-2" style="margin-top: 10px; font-size: 48px;"></i>
+                    <h6 class="mb-1">Booking Bulanan</h6>
+                    <small class="text-muted">Pesan bulanan</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+`,
+
+				showConfirmButton: false,
+				showCancelButton: false,
+				cancelButtonText: '<i class="fas fa-times"></i> Batal',
+				width: '600px',
+				padding: '2rem',
+				background: '#fff',
+				backdrop: `rgba(0,0,0,0.7)`,
+				customClass: {
+					cancelButton: 'btn btn-secondary'
+				},
+				didOpen: () => {
+					// Tambah efek hover pada card
+					document.querySelectorAll('.hover-shadow').forEach(card => {
+						card.addEventListener('mouseenter', () => {
+							card.style.transform = 'translateY(-8px)';
+							card.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+						});
+						card.addEventListener('mouseleave', () => {
+							card.style.transform = 'translateY(0)';
+							card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+						});
+					});
+				}
+			});
 		}
 	</script>
