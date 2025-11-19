@@ -17,9 +17,9 @@ if (isset($data['name'])) {
         if (mysql_num_rows($query) > 0) {
             $names = [];
             while ($data = mysql_fetch_array($query)) {
-                $query_frekuensi_inhotel = mysql_query("SELECT COUNT(*) AS member FROM data_booking WHERE id_hotel='$id_hotel' AND id_pelanggan='$data[id_pelanggan]'");
+                $query_frekuensi_inhotel = mysql_query("SELECT COUNT(*) AS member FROM data_transaksi WHERE id_hotel='$id_hotel' AND id_pelanggan='$data[id_pelanggan]'");
                 $frekuensi1 = mysql_fetch_array($query_frekuensi_inhotel);
-                $query_frekuensi = mysql_query("SELECT COUNT(*) AS another FROM data_booking WHERE id_pelanggan='$data[id_pelanggan]'");
+                $query_frekuensi = mysql_query("SELECT COUNT(*) AS another FROM data_transaksi WHERE id_pelanggan='$data[id_pelanggan]'");
                 $frekuensi2 = mysql_fetch_array($query_frekuensi);
                 $names[] = [
                     'nama' => $data['nama'],

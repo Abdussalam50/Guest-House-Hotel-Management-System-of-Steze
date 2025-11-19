@@ -83,21 +83,17 @@
                         </tr>
 
 
-                        <?php if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") { ?>
-                            <tr>
-                                <td width="25%" class="leftrowcms">
-                                    <label>Harga Bulanan <span class="highlight"></span></label>
-                                </td>
-                                <td width="2%">:</td>
-                                <td>
-                                    <input onkeypress='return a(event)' class="form-control" style="width:50%" type="varchar" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required" value="<?php echo ($data['harga_bulanan']); ?>">
-                                </td>
-                            </tr>
 
-                        <?php } else { ?>
-                            <input onkeypress='return a(event)' class="form-control" style="width:50%" type="hidden" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required" value="<?php echo ($data['harga_bulanan']); ?>">
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>Harga Bulanan <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <input onkeypress='return a(event)' class="form-control" style="width:50%" type="varchar" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required" value="<?php echo ($data['harga_bulanan']); ?>">
+                            </td>
+                        </tr>
 
-                        <?php } ?>
                         <tr>
                             <td width="25%" class="leftrowcms">
                                 <label>No Kamar <span class="highlight"></span></label>
@@ -136,7 +132,7 @@
                 <div class="content-box-content">
                     <center>
                         <?php btn_update(' PROSES UPDATE DATA'); ?>
-                         <a href="index.php?input=hapus&proses=<?= encrypt($proses)?>" class="btn btn-danger"><i class="fas fa-remove"></i> Hapus Data</a>
+                        <a href="index.php?input=hapus&proses=<?= encrypt($proses) ?>" class="btn btn-danger"><i class="fas fa-remove"></i> Hapus Data</a>
                     </center>
                 </div>
             </div>

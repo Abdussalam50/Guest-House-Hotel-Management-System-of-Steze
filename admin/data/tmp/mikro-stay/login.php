@@ -158,6 +158,7 @@ $url = "../data/tmp/mikro-stay/file/";
                                         <option>-- Select Kost or Guest House --</option><?php combo_database_v2('data_hotel', 'id_hotel', 'nama', ''); ?>
                                         <option value="">Super Admin</option>
                                         <option value="operasional">Operasional</option>
+                                        <option value="customer_service">Customer Service</option>
                                     </select>
                                 </div>
                                 <div class="fv-row mb-8 fv-plugins-icon-container">

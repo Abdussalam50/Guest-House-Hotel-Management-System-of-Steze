@@ -357,6 +357,9 @@ if ($query_transaksi) {
   }
 } else {
   mysql_query("ROLLBACK");
-  echo "Terjadi kesalahan: " . mysql_error();
+  echo "<script>
+        alert('Silahkan lengkapi data!');
+        window.history.back();
+    </script>";
 }
 ?>

@@ -2,6 +2,20 @@
 	$color_type = "danger";
 	include 'loader.php';
 	$tanggal_check = date('Y-m-d');
+
+	$id_hotel = isset($_COOKIE['id_hotel']) ? decrypt($_COOKIE['id_hotel']) : '';
+
+
+	if ($id_hotel == "") {
+		$view_other_hotel = 1;
+		$view_tombol_booking_group = 1;
+	} else {
+		$view_other_hotel = 0;
+		$view_tombol_booking_group = 1;
+	}
+
+
+
 	?>
 
 
@@ -44,7 +58,23 @@
 					</style>
 
 					<div class="btn-group">
+						<?php if ($view_tombol_booking_group == 1) { ?>
+							<button onclick="pilihBooking()" class="btn btn-secondary btn-sm">
+								<i class="fas fa-sign-in-alt text-danger"></i> Booking Transaksi
+							</button>
+
+							<?php if (!isset($_COOKIE['customer_service'])) { ?>
+
+								<button onclick="pilihGroup()" class="btn btn-secondary btn-sm">
+									<i class="fas fa-sign-in-alt text-danger"></i> Transaksi Group
+								</button>
+							<?php } ?>
+						<?php } ?>
+
 						<?php
+
+
+
 						$idhotel_cookie = decrypt($_COOKIE['id_hotel']);
 
 						if ($_COOKIE['id_hotel'] == "") {
@@ -53,17 +83,29 @@
 
 						$idhotel_aktif = isset($_GET['hotel']) ? decrypt($_GET['hotel']) : $idhotel_cookie;
 
-						// Atur urutan: yang sama dengan COOKIE muncul di atas
-						$queryHotel = mysql_query("SELECT * FROM data_hotel ORDER BY id_hotel = '$idhotel_cookie' DESC, id_hotel ASC");
 
+						$queryHotel = mysql_query("SELECT * FROM data_hotel ORDER BY id_hotel = '$idhotel_cookie' DESC, id_hotel ASC");
 						while ($data = mysql_fetch_array($queryHotel)) {
 							$isActive = ($data['id_hotel'] == $idhotel_aktif);
 							$textClass = $isActive ? "btn btn-secondary btn-sm" : "btn btn-light btn-sm";
 							$icon = $isActive ? "fas fa-bed text-black" : "";
+							if ($view_other_hotel == 0) {
+								if ($data['id_hotel'] == $idhotel_aktif) {
+
 						?>
-							<button onclick="window.location.href='index.php?hotel=<?php echo encrypt($data['id_hotel']) ?>';" class="<?php echo $textClass ?>">
-								<i class="<?php echo $icon ?>"></i> <?php echo $data['nama'] ?>
-							</button>
+									<button onclick="window.location.href='index.php?hotel=<?php echo encrypt($data['id_hotel']) ?>';" class="btn btn-light btn-sm">
+										<i class="fas fa-bed text-black"></i> <?php echo $data['nama'] ?>
+									</button>
+								<?php
+								}
+							} else {
+
+
+								?>
+								<button onclick="window.location.href='index.php?hotel=<?php echo encrypt($data['id_hotel']) ?>';" class="<?php echo $textClass ?>">
+									<i class="<?php echo $icon ?>"></i> <?php echo $data['nama'] ?>
+								</button>
+							<?php } ?>
 						<?php } ?>
 					</div>
 
@@ -128,38 +170,9 @@
 																						<?php echo rupiah($dataKamar['harga_harian']) ?> <b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b>/Days
 																						<br>
 
-																						<?php
-																						$idKamar = $dataKamar['id_kamar'];
-																						$qb = " SELECT * 
-																								FROM data_booking 
-																								WHERE id_hotel = '$idHotel'
-																								AND (id_kamar LIKE '%$idKamar%')
-																								AND status_transaksi = 'Booking'
-																							";
 
-																						$qBooking = mysql_query($qb);
-																						$dataBooking = mysql_fetch_array($qBooking);
-																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
-																						$book_id_transaksi = $dataBooking['id_transaksi'];
-																						$book_dp = $dataBooking['nominal_bayar'];
-																						?>
-																						<?php
-																						if ($book_waktu_checkin == "") {
-																						?>
-																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
-																						<?php
-																						} else {
-																						?>
-																							<p style='color:#2196f3'><b><br>
-																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
-																										<font>
-																											Booked : <?php echo rupiah($book_dp); ?>
-																										</font>
-																									</a>
-																								</b></p>
-																						<?php
-																						}
-																						?>
+																						<p style='color:#000000'><b><br>Total: Rp 0</b></p>
+
 
 
 
@@ -168,19 +181,9 @@
 																						?>
 
 
-																							<?php
-																							if ($book_waktu_checkin == "") {
-																							?>
-																								<p></p> <button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $dataKamar['id_kamar']; ?>')">Check In</button>
-																							<?php
-																							} else {
-																							?>
-																								<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
-																									<p></p> <button class="btn btn-primary btn-sm">Check In</button>
-																								</a>
-																							<?php
-																							}
-																							?>
+
+																							<p></p> <button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $dataKamar['id_kamar']; ?>')">Check In</button>
+
 
 
 
@@ -282,7 +285,12 @@
 																							<p></p> <button class="btn btn-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $dataTransaksi['id_kamar'] ?>&trx=<?php echo encrypt($dataTransaksi['id_transaksi']) ?>'">Check Out</button>
 																						<?php
 																						} else { ?>
-																							<p></p> <button class="btn btn-danger btn-sm"><?php echo baca_database("", "status_kamar", "select * from data_kamar where id_kamar='$dataTransaksi[id_kamar]'")
+																							<p></p> <button class="btn btn-danger btn-sm"><?php $status_kamar = baca_database("", "status_kamar", "select * from data_kamar where id_kamar='$dataTransaksi[id_kamar]'");
+																																			if ($status_kamar == "") {
+																																				echo "Terisi";
+																																			} else {
+																																				echo $status_kamar;
+																																			}
 																																			?></button>
 																						<?php
 																						} ?>
@@ -333,40 +341,8 @@
 																						<?php echo rupiah($data_kamar['harga_harian']) ?> <b style="font-size: 9px;"></b> <b style="font-size: 9px;"></b>/Days
 																						<br>
 
+																						<p style='color:#000000'><b><br>Total: Rp 0</b></p>
 
-																						<?php
-																						$idKamar = $data_kamar['id_kamar'];
-																						$qb = " SELECT * 
-																								FROM data_booking 
-																								WHERE id_hotel = '$idHotel'
-																								AND (id_kamar LIKE '%$idKamar%')
-																								AND status_transaksi = 'Booking'
-																							";
-
-																						$qBooking = mysql_query($qb);
-																						$dataBooking = mysql_fetch_array($qBooking);
-																						$book_waktu_checkin = $dataBooking['waktu_checkin'];
-																						$book_id_transaksi = $dataBooking['id_transaksi'];
-																						$book_dp = $dataBooking['nominal_bayar'];
-																						?>
-
-																						<?php
-																						if ($book_waktu_checkin == "") {
-																						?>
-																							<p style='color:#000000'><b><br>Total: Rp 0</b></p>
-																						<?php
-																						} else {
-																						?>
-																							<p style='color:#2196f3'><b><br>
-																									<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
-																										<font>
-																											Booked : <?php echo rupiah($book_dp); ?>
-																										</font>
-																									</a>
-																								</b></p>
-																						<?php
-																						}
-																						?>
 
 																						<?php
 																						if ($_COOKIE['id_hotel'] == "") {
@@ -377,19 +353,9 @@
 																						?>
 
 
-																							<?php
-																							if ($book_waktu_checkin == "") {
-																							?>
-																								<button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $data_kamar['id_kamar']; ?>')">Check In</button>
-																							<?php
-																							} else {
-																							?>
-																								<a href="../data_booking/index.php?input=detail&id_trx=<?php echo ($book_id_transaksi); ?>">
-																									<button class="btn btn-primary btn-sm">Check In</button>
-																								</a>
-																							<?php
-																							}
-																							?>
+
+																							<button class="btn btn-light btn-sm" onclick="pilihJenisCheckin('<?php echo $data_kamar['id_kamar']; ?>')">Check In</button>
+
 
 
 
@@ -676,16 +642,21 @@
 		</button>
 	</a>
 
-	<button onclick="showHotelModal()" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" class="explore-toggle btn btn-sm bg-body btn-color-gray-700 btn-active-danger shadow-sm position-fixed px-5 fw-bolder zindex-2 top-50 mt-10 end-0 transform-90 fs-6 rounded-top-0"> <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Design/Substract.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-			<title>Stockholm-icons / Design / Substract</title>
-			<desc>Created with Sketch.</desc>
-			<defs />
-			<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-				<rect x="0" y="0" width="24" height="24" />
-				<path d="M6,9 L6,15 C6,16.6568542 7.34314575,18 9,18 L15,18 L15,18.8181818 C15,20.2324881 14.2324881,21 12.8181818,21 L5.18181818,21 C3.76751186,21 3,20.2324881 3,18.8181818 L3,11.1818182 C3,9.76751186 3.76751186,9 5.18181818,9 L6,9 Z" fill="#000000" fill-rule="nonzero" />
-				<path d="M10.1818182,4 L17.8181818,4 C19.2324881,4 20,4.76751186 20,6.18181818 L20,13.8181818 C20,15.2324881 19.2324881,16 17.8181818,16 L10.1818182,16 C8.76751186,16 8,15.2324881 8,13.8181818 L8,6.18181818 C8,4.76751186 8.76751186,4 10.1818182,4 Z" fill="#000000" opacity="0.3" />
-			</g>
-		</svg><!--end::Svg Icon-->&nbsp;Dashboard</span> </button>
+
+
+	<?php if (!isset($_COOKIE['customer_service'])) { ?>
+		<button onclick="showHotelModal()" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" class="explore-toggle btn btn-sm bg-body btn-color-gray-700 btn-active-danger shadow-sm position-fixed px-5 fw-bolder zindex-2 top-50 mt-10 end-0 transform-90 fs-6 rounded-top-0"> <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Design/Substract.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+				<title>Stockholm-icons / Design / Substract</title>
+				<desc>Created with Sketch.</desc>
+				<defs />
+				<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+					<rect x="0" y="0" width="24" height="24" />
+					<path d="M6,9 L6,15 C6,16.6568542 7.34314575,18 9,18 L15,18 L15,18.8181818 C15,20.2324881 14.2324881,21 12.8181818,21 L5.18181818,21 C3.76751186,21 3,20.2324881 3,18.8181818 L3,11.1818182 C3,9.76751186 3.76751186,9 5.18181818,9 L6,9 Z" fill="#000000" fill-rule="nonzero" />
+					<path d="M10.1818182,4 L17.8181818,4 C19.2324881,4 20,4.76751186 20,6.18181818 L20,13.8181818 C20,15.2324881 19.2324881,16 17.8181818,16 L10.1818182,16 C8.76751186,16 8,15.2324881 8,13.8181818 L8,6.18181818 C8,4.76751186 8.76751186,4 10.1818182,4 Z" fill="#000000" opacity="0.3" />
+				</g>
+			</svg><!--end::Svg Icon-->&nbsp;Dashboard</span>
+		</button>
+	<?php } ?>
 
 
 
@@ -976,7 +947,7 @@
 
 			// Panggil PHP detail_transaksi.php via AJAX
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "detail_transaksi.php?proses=" + id_transaksi, true);
+			xhr.open("GET", "detail_transaksi.php?id_trx=" + id_transaksi, true);
 			xhr.onload = function() {
 				if (xhr.status === 200) {
 					modalBody.innerHTML = xhr.responseText;
@@ -1011,108 +982,138 @@
 			Swal.fire({
 				title: 'Pilih Jenis Check-in',
 				html: `
-    <div style="width: 460px; margin: auto;">
+            <div style="width: 310px; margin:auto;">
+                <div class="d-flex justify-content-between mt-3">
 
-        <!-- ====== BARIS 1: HARIAN ====== -->
-        <div class="d-flex justify-content-between mt-3">
+                    <!-- Check-in Harian -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../data_transaksi/index.php?input=tambah&id=${idKamar}'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-calendar-day text-success mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Harian</h6>
+                            <small class="text-muted">Check-in harian</small>
+                        </div>
+                    </div>
 
-            <!-- Check-in Harian -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../data_transaksi/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-calendar-day text-success mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Harian</h6>
-                    <small class="text-muted">Check-in harian</small>
+                    <!-- Check-in Bulanan -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../data_transaksi_bulanan/index.php?input=tambah&id=${idKamar}'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-calendar-alt text-warning mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Bulanan</h6>
+                            <small class="text-muted">Check-in bulanan</small>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-
-            <!-- Group Harian -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../data_transaksi_group/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-users text-primary mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Group Harian</h6>
-                    <small class="text-muted">Check-in harian</small>
-                </div>
-            </div>
-
-            <!-- Booking Harian -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../booking_harian/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-book text-success mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Booking Harian</h6>
-                    <small class="text-muted">Pesan harian</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- ====== BARIS 2: BULANAN ====== -->
-        <div class="d-flex justify-content-between mt-3">
-
-            <!-- Check-in Bulanan -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../data_transaksi_bulanan/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-calendar-alt text-warning mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Bulanan</h6>
-                    <small class="text-muted">Check-in bulanan</small>
-                </div>
-            </div>
-
-            <!-- Group Bulanan -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../data_transaksi_bulanan_group/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-users-cog text-info mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Group Bulanan</h6>
-                    <small class="text-muted">Check-in bulanan</small>
-                </div>
-            </div>
-
-            <!-- Booking Bulanan -->
-            <div class="text-center cursor-pointer"
-                onclick="Swal.close(); window.location.href='../booking_bulanan/index.php?input=tambah&id=${idKamar}'">
-                <div class="border rounded-4 p-3 shadow-sm hover-shadow"
-                    style="width: 140px; height: 130px; transition: .3s;">
-                    <i class="fas fa-book-open text-warning mb-2" style="margin-top: 10px; font-size: 48px;"></i>
-                    <h6 class="mb-1">Booking Bulanan</h6>
-                    <small class="text-muted">Pesan bulanan</small>
-                </div>
-            </div>
-        </div>
-
-    </div>
-`,
-
+        `,
 				showConfirmButton: false,
-				showCancelButton: false,
-				cancelButtonText: '<i class="fas fa-times"></i> Batal',
-				width: '600px',
-				padding: '2rem',
+				width: '450px',
 				background: '#fff',
 				backdrop: `rgba(0,0,0,0.7)`,
-				customClass: {
-					cancelButton: 'btn btn-secondary'
-				},
-				didOpen: () => {
-					// Tambah efek hover pada card
-					document.querySelectorAll('.hover-shadow').forEach(card => {
-						card.addEventListener('mouseenter', () => {
-							card.style.transform = 'translateY(-8px)';
-							card.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
-						});
-						card.addEventListener('mouseleave', () => {
-							card.style.transform = 'translateY(0)';
-							card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-						});
-					});
-				}
+				didOpen: addHoverShadowEffect
+			});
+		}
+
+
+
+		function pilihGroup() {
+			Swal.fire({
+				title: 'Pilih Group Check-in',
+				html: `
+            <div style="width: 310px; margin:auto;">
+                <div class="d-flex justify-content-between mt-3">
+
+                    <!-- Group Harian -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../data_transaksi_group/index.php?input=tambah&id=#'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-users text-primary mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Group Harian</h6>
+                            <small class="text-muted">Check-in harian</small>
+                        </div>
+                    </div>
+
+                    <!-- Group Bulanan -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../data_transaksi_bulanan_group/index.php?input=tambah&id=#'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-users-cog text-info mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Group Bulanan</h6>
+                            <small class="text-muted">Check-in bulanan</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `,
+				showConfirmButton: false,
+				width: '450px',
+				background: '#fff',
+				backdrop: `rgba(0,0,0,0.7)`,
+				didOpen: addHoverShadowEffect
+			});
+		}
+
+
+
+		function pilihBooking() {
+			Swal.fire({
+				title: 'Pilih Jenis Booking',
+				html: `
+            <div style="width: 310px; margin:auto;">
+                <div class="d-flex justify-content-between mt-3">
+
+                    <!-- Booking Harian -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../booking_harian/index.php?input=tambah&id=#'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-book text-success mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Booking Harian</h6>
+                            <small class="text-muted">Pesan harian</small>
+                        </div>
+                    </div>
+
+                    <!-- Booking Bulanan -->
+                    <div class="text-center cursor-pointer"
+                        onclick="Swal.close(); window.location.href='../booking_bulanan/index.php?input=tambah&id=#'">
+                        <div class="border rounded-4 p-3 shadow-sm hover-shadow"
+                            style="width: 140px; height: 130px; transition:.3s;">
+                            <i class="fas fa-book-open text-warning mb-2" style="margin-top:10px; font-size:48px;"></i>
+                            <h6 class="mb-1">Booking Bulanan</h6>
+                            <small class="text-muted">Pesan bulanan</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `,
+				showConfirmButton: false,
+				width: '450px',
+				background: '#fff',
+				backdrop: `rgba(0,0,0,0.7)`,
+				didOpen: addHoverShadowEffect
+			});
+		}
+
+
+
+		function addHoverShadowEffect() {
+			document.querySelectorAll('.hover-shadow').forEach(card => {
+				card.addEventListener('mouseenter', () => {
+					card.style.transform = 'translateY(-8px)';
+					card.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+				});
+				card.addEventListener('mouseleave', () => {
+					card.style.transform = 'translateY(0)';
+					card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+				});
 			});
 		}
 	</script>

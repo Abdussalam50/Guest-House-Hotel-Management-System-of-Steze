@@ -136,26 +136,26 @@ try {
         $total_anak = (int)$jumlah_anak_anak;
     }
 ?>
+    <?php if ($read != "detail") { ?>
+        <!DOCTYPE html>
+        <html id="print-page" class="display">
 
-    <!DOCTYPE html>
-    <html id="print-page" class="display">
-
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title><?php echo $judul; ?> <?php echo ucwords($cabang) ?></title>
-        <link rel="stylesheet" href="./notaA4/admin.css">
-        <link rel="stylesheet" href="./notaA4/style.css">
-        <link rel="stylesheet" href="./notaA4/bootstrap.min.css">
-        <link rel="stylesheet" href="./notaA4/style.min.css">
-        <link rel="stylesheet" href="./notaA4/font-awesome.min.css">
-        <link rel="icon" href="../../../data/image/logo/steze-2.png" type="image/x-icon">
-        <script src="./notaA4/jquery-1.10.2.min.js.download"></script>
-        <script src="./notaA4/bootstrap.min.js.download"></script>
-        <script src="./notaA4/accounting.min.js.download"></script>
-        <script src="./notaA4/cssmenu.js.download"></script>
-        <script src="./notaA4/main-script.js.download"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <title><?php echo $judul; ?> <?php echo ucwords($cabang) ?></title>
+            <link rel="stylesheet" href="./notaA4/admin.css">
+            <link rel="stylesheet" href="./notaA4/style.css">
+            <link rel="stylesheet" href="./notaA4/bootstrap.min.css">
+            <link rel="stylesheet" href="./notaA4/style.min.css">
+            <link rel="stylesheet" href="./notaA4/font-awesome.min.css">
+            <link rel="icon" href="../../../data/image/logo/steze-2.png" type="image/x-icon">
+            <script src="./notaA4/jquery-1.10.2.min.js.download"></script>
+            <script src="./notaA4/bootstrap.min.js.download"></script>
+            <script src="./notaA4/accounting.min.js.download"></script>
+            <script src="./notaA4/cssmenu.js.download"></script>
+            <script src="./notaA4/main-script.js.download"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <?php } ?>
         <style>
             @media print {
 
@@ -244,221 +244,233 @@ try {
                 margin-top: 20px;
             }
         </style>
-    </head>
+        </head>
 
-    <body id="form-rekap-pembayaran">
-        <div class="container" style="padding-left: 0px;">
+        <body id="form-rekap-pembayaran">
+            <div class="container" style="padding-left: 0px;">
 
-            <?php if ($read != "detail") { ?>
-                <table>
+                <?php if ($read != "detail") { ?>
+                    <table>
+                        <tr>
+                            <td width="60%" align="left">
+                                <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
+                                <h6><?php echo $alamat ?></h6>
+                                <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
+                            </td>
+                            <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
+                        </tr>
+                    </table>
+                <?php } ?>
+            </div>
+
+            <div class="row" style="display:flex;margin-right:0px;margin-left:0px;">
+                <table style="border:collapse; width:50%;border:none;margin-bottom:10px;font-size:12px">
                     <tr>
-                        <td width="60%" align="left">
-                            <h1><?php echo $judul; ?> <?php echo ucwords($cabang) ?></h1>
-                            <h6><?php echo $alamat ?></h6>
-                            <h6>Telp: <?php echo $no_telepon ?> | Email: <?php echo $email ?></h6>
+                        <td style='font-weight:700;'>Tanggal</td>
+                        <td>:</td>
+                        <td><?php echo format_indo($waktu_transaksi) ?></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight:700;'>Pelanggan</td>
+                        <td>:</td>
+                        <td><?php echo $nama ?></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight:700;'>Jumlah Tamu</td>
+                        <td>:</td>
+                        <td><?php echo $total_dewasa ?> Dewasa
+                            <?php if ($total_anak > 0) echo ", " . $total_anak . " Anak-anak"; ?>
                         </td>
-                        <td width="20%" align="right"><img src="<?php echo $logo_laporan1 ?>" alt="Logo Hotel" width="70"></td>
                     </tr>
                 </table>
-            <?php } ?>
-        </div>
-
-        <div class="row" style="display:flex;margin-right:0px;margin-left:0px;">
-            <table style="border:collapse; width:50%;border:none;margin-bottom:10px;font-size:12px">
-                <tr>
-                    <td style='font-weight:700;'>Tanggal</td>
-                    <td>:</td>
-                    <td><?php echo format_indo($waktu_transaksi) ?></td>
-                </tr>
-                <tr>
-                    <td style='font-weight:700;'>Pelanggan</td>
-                    <td>:</td>
-                    <td><?php echo $nama ?></td>
-                </tr>
-                <tr>
-                    <td style='font-weight:700;'>Jumlah Tamu</td>
-                    <td>:</td>
-                    <td><?php echo $total_dewasa ?> Dewasa
-                        <?php if ($total_anak > 0) echo ", " . $total_anak . " Anak-anak"; ?>
-                    </td>
-                </tr>
-            </table>
-            <table style="border:collapse; width:50%;border:none;margin-bottom:10px;margin-left:auto;font-size:12px">
-                <tr>
-                    <td style='font-weight:700;'>Kode Transaksi</td>
-                    <td>:</td>
-                    <td>&nbsp;<?php echo $id_transaksi ?></td>
-                </tr>
-                <tr>
-                    <td style='font-weight:700;'>Status Transaksi</td>
-                    <td>:</td>
-                    <td>&nbsp;<?php echo ($status_transaksi == "Belum Lunas") ? "Belum Lunas" : "Lunas"; ?></td>
-                </tr>
-                <tr>
-                    <td style='font-weight:700;'>Resepsionis</td>
-                    <td>:</td>
-                    <td>&nbsp;<?php echo ucwords($admin) ?></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="content" style='font-size:12px'>
-            <table>
-                <thead>
+                <table style="border:collapse; width:50%;border:none;margin-bottom:10px;margin-left:auto;font-size:12px">
                     <tr>
-                        <th>No Kamar</th>
-                        <th>Tipe</th>
-                        <th>Check-in</th>
-                        <th>Check-out</th>
-                        <th>Jumlah Hari</th>
-                        <th>Harga/Hari</th>
-                        <th>Sub Total</th>
+                        <td style='font-weight:700;'>Kode Transaksi</td>
+                        <td>:</td>
+                        <td>&nbsp;<?php echo $id_transaksi ?></td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($daftar_kamar as $k): ?>
+                    <tr>
+                        <td style='font-weight:700;'>Status Transaksi</td>
+                        <td>:</td>
+                        <td>&nbsp;<?php echo ($status_transaksi == "Belum Lunas") ? "Belum Lunas" : "Lunas"; ?></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight:700;'>Resepsionis</td>
+                        <td>:</td>
+                        <td>&nbsp;<?php echo ucwords($admin) ?></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="content" style='font-size:12px'>
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($k['no_kamar']); ?></td>
-                            <td><?php echo htmlspecialchars($k['tipe_kamar']); ?></td>
-                            <td><?php echo $waktu_checkin; ?></td>
-                            <td><?php echo $waktu_checkout; ?></td>
-                            <td><?php echo (int)$k['jumlah_hari']; ?> hari</td>
-                            <td>Rp<?php echo rupiah_format($k['harga_kamar_harian']); ?></td>
-                            <td>Rp<?php echo rupiah_format($k['total_harga_kamar']); ?></td>
+                            <th>No Kamar</th>
+                            <th>Tipe</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Jumlah Hari</th>
+                            <th>Harga/Hari</th>
+                            <th>Sub Total</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($daftar_kamar as $k): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($k['no_kamar']); ?></td>
+                                <td><?php echo htmlspecialchars($k['tipe_kamar']); ?></td>
+                                <td><?php echo $waktu_checkin; ?></td>
+                                <td><?php echo $waktu_checkout; ?></td>
+                                <td><?php echo (int)$k['jumlah_hari']; ?> hari</td>
+                                <td>Rp<?php echo rupiah_format($k['harga_kamar_harian']); ?></td>
+                                <td>Rp<?php echo rupiah_format($k['total_harga_kamar']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
-        <div id='box' style='display:flex;width:100%;'>
-            <div class="footer">
-                <div class="left">
+            <div id='box' style='display:flex;width:100%;'>
+                <div class="footer">
+                    <div class="left">
 
-                    <?php if ($read != "detail") { ?>
-                        <p style="margin-bottom:3px;margin-top:14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
-                        <p style="margin-bottom:3px;margin-top:3px;font-size:12px">Hormat Kami,</p>
-                        <br><br>
-                        <p style="margin-bottom:3px;margin-top:3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
+                        <?php if ($read != "detail") { ?>
+                            <p style="margin-bottom:3px;margin-top:14px;font-size:12px"><b>Jambi, <?php echo format_indo(date("Y-m-d")) ?></b></p>
+                            <p style="margin-bottom:3px;margin-top:3px;font-size:12px">Hormat Kami,</p>
+                            <br><br>
+                            <p style="margin-bottom:3px;margin-top:3px;font-size:12px">( <?php echo ucwords($admin) ?> )</p>
 
-                        <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
-                            <div style="border:1px solid #ccc;padding:10px;margin-top:10px;width:90%;font-size:11px;background:#f9f9f9;">
-                                <?php echo $catatan_kaki; ?>
-                            </div>
+                            <?php if ($tampilkan_catatan_kaki_nota == "1") { ?>
+                                <div style="border:1px solid #ccc;padding:10px;margin-top:10px;width:90%;font-size:11px;background:#f9f9f9;">
+                                    <?php echo $catatan_kaki; ?>
+                                </div>
+                            <?php } ?>
                         <?php } ?>
-                    <?php } ?>
+                    </div>
                 </div>
+
+                <table id="table-bottom" style="width:60%;float:right;border:none;font-size:12px">
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Harga Kamar</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($total_harga_kamar_semua); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Diskon <?php echo $discount; ?>%</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($disc_nominal); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Potongan Harga</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($potongan_harga); ?></td>
+                    </tr>
+                    <?php if ($biaya_tambahan_checkin > 0) { ?>
+                        <tr>
+                            <td style="text-align:left;padding:2px;font-weight:bold;">Biaya Tambahan Check-in</td>
+                            <td style='font-weight:700'>:</td>
+                            <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($biaya_tambahan_checkin); ?></td>
+                        </tr>
+                    <?php } ?>
+                    <?php if ($biaya_tambahan_checkout > 0) { ?>
+                        <tr>
+                            <td style="text-align:left;padding:2px;font-weight:bold;">Biaya Tambahan Check-out</td>
+                            <td style='font-weight:700'>:</td>
+                            <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($biaya_tambahan_checkout); ?></td>
+                        </tr>
+                    <?php } ?>
+                    <?php if ($biaya_tambahan_checkin == 0 && $biaya_tambahan_checkout == 0) { ?>
+                        <tr>
+                            <td style="text-align:left;padding:2px;font-weight:bold;">Tambahan Biaya</td>
+                            <td style='font-weight:700'>:</td>
+                            <td style="text-align:right;padding:2px;">Rp0</td>
+                        </tr>
+                    <?php } ?>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Pajak <?php echo $persentase_pajak; ?>%</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($pajak); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;">Grand Total</td>
+                        <td style='font-weight:700;border-top:2px solid #000;border-bottom:2px solid #000'>:</td>
+                        <td style="text-align:right;padding:2px;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;">
+                            Rp<?php echo rupiah_format($grand_total); ?>
+                        </td>
+                    </tr>
+
+                    <?php if (substr($id_transaksi, 0, 2) === "BO") { ?>
+                        <tr>
+                            <td style="text-align:left;padding:2px;font-weight:bold;color:#2196f3">DP Booking</td>
+                            <td style='font-weight:700;color:#2196f3'>:</td>
+                            <td style="text-align:right;padding:2px;color:#2196f3">Rp <?php echo rupiah_format(baca_database("", "nominal_bayar", "select * from data_booking where id_transaksi='$id_transaksi'")); ?></td>
+                        </tr>
+                    <?php } ?>
+
+
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;color:#c02b27">Deposit</td>
+                        <td style='font-weight:700;color:#c02b27'>:</td>
+                        <td style="text-align:right;padding:2px;color:#c02b27">Rp <?php echo $deposit; ?></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Bayar</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($nominal_bayar); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;padding:2px;font-weight:bold;">Kembalian</td>
+                        <td style='font-weight:700'>:</td>
+                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($kembalian); ?></td>
+                    </tr>
+
+
+                </table>
             </div>
 
-            <table id="table-bottom" style="width:60%;float:right;border:none;font-size:12px">
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Harga Kamar</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($total_harga_kamar_semua); ?></td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Diskon <?php echo $discount; ?>%</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($disc_nominal); ?></td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Potongan Harga</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($potongan_harga); ?></td>
-                </tr>
-                <?php if ($biaya_tambahan_checkin > 0) { ?>
-                    <tr>
-                        <td style="text-align:left;padding:2px;font-weight:bold;">Biaya Tambahan Check-in</td>
-                        <td style='font-weight:700'>:</td>
-                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($biaya_tambahan_checkin); ?></td>
-                    </tr>
-                <?php } ?>
-                <?php if ($biaya_tambahan_checkout > 0) { ?>
-                    <tr>
-                        <td style="text-align:left;padding:2px;font-weight:bold;">Biaya Tambahan Check-out</td>
-                        <td style='font-weight:700'>:</td>
-                        <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($biaya_tambahan_checkout); ?></td>
-                    </tr>
-                <?php } ?>
-                <?php if ($biaya_tambahan_checkin == 0 && $biaya_tambahan_checkout == 0) { ?>
-                    <tr>
-                        <td style="text-align:left;padding:2px;font-weight:bold;">Tambahan Biaya</td>
-                        <td style='font-weight:700'>:</td>
-                        <td style="text-align:right;padding:2px;">Rp0</td>
-                    </tr>
-                <?php } ?>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Pajak <?php echo $persentase_pajak; ?>%</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($pajak); ?></td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;">Grand Total</td>
-                    <td style='font-weight:700;border-top:2px solid #000;border-bottom:2px solid #000'>:</td>
-                    <td style="text-align:right;padding:2px;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;">
-                        Rp<?php echo rupiah_format($grand_total); ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;color:#c02b27">Deposit</td>
-                    <td style='font-weight:700;color:#c02b27'>:</td>
-                    <td style="text-align:right;padding:2px;color:#c02b27">Rp <?php echo $deposit; ?></td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Bayar</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($nominal_bayar); ?></td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;padding:2px;font-weight:bold;">Kembalian</td>
-                    <td style='font-weight:700'>:</td>
-                    <td style="text-align:right;padding:2px;">Rp<?php echo rupiah_format($kembalian); ?></td>
-                </tr>
-            </table>
-        </div>
+            <?php
+            if (!isset($_GET['id_trx'])) {
+                // Update status kamar & transaksi jika diakses via API
+                foreach ($daftar_kamar as $k) {
+                    mysql_query("UPDATE data_kamar SET status_kamar='Kosong' WHERE id_kamar='{$k['id_kamar']}'");
+                }
+                mysql_query("UPDATE data_transaksi SET status_transaksi='Selesai' WHERE id_transaksi='$id_transaksi'");
+                echo json_encode('true');
+            } else {
+            ?>
+                <script>
+                    /* window.print(); */
+                </script>
+            <?php } ?>
 
-        <?php
-        if (!isset($_GET['id_trx'])) {
-            // Update status kamar & transaksi jika diakses via API
-            foreach ($daftar_kamar as $k) {
-                mysql_query("UPDATE data_kamar SET status_kamar='Kosong' WHERE id_kamar='{$k['id_kamar']}'");
-            }
-            mysql_query("UPDATE data_transaksi SET status_transaksi='Selesai' WHERE id_transaksi='$id_transaksi'");
-            echo json_encode('true');
-        } else {
-        ?>
+            <style>
+                * {
+                    text-transform: none !important;
+                }
+            </style>
+
+            <?php if ($read != "detail") { ?>
+                <div id="print-area-btn" class="no-print" style="margin-top:20px;text-align:right;">
+                    <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;"><i class="fa fa-print"></i> Print</button>
+                    <button id="btnSelesai" class="btn btn-secondary">Selesai</button>
+                </div>
+            <?php } ?>
+
             <script>
-                /* window.print(); */
+                document.getElementById('btnPrint').addEventListener('click', function() {
+                    window.print();
+                });
+                document.getElementById('btnSelesai').addEventListener('click', function() {
+                    window.location.href = '../home/index.php';
+                });
             </script>
-        <?php } ?>
+        </body>
 
-        <style>
-            * {
-                text-transform: none !important;
-            }
-        </style>
+        </html>
 
-        <?php if ($read != "detail") { ?>
-            <div id="print-area-btn" class="no-print" style="margin-top:20px;text-align:right;">
-                <button id="btnPrint" class="btn btn-danger" style="margin-right:10px;"><i class="fa fa-print"></i> Print</button>
-                <button id="btnSelesai" class="btn btn-secondary">Selesai</button>
-            </div>
-        <?php } ?>
-
-        <script>
-            document.getElementById('btnPrint').addEventListener('click', function() {
-                window.print();
-            });
-            document.getElementById('btnSelesai').addEventListener('click', function() {
-                window.location.href = '../home/index.php';
-            });
-        </script>
-    </body>
-
-    </html>
-
-<?php
+    <?php
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
-?>
+    ?>

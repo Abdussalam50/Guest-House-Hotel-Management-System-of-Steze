@@ -1114,10 +1114,7 @@
 FROM data_metode_pembayaran mp
 LEFT JOIN data_bank b ON mp.id_bank = b.id_bank
 WHERE b.id_hotel = '$idHotel'
-  AND (
-      LOWER(mp.metode_pembayaran) LIKE '%tunai%' 
-      OR LOWER(mp.metode_pembayaran) LIKE '%transfer%'
-  )") or die(mysql_error());
+  ") or die(mysql_error());
                         $no = 0;
                         while ($data = mysql_fetch_array($query_metode_bayar)) {
                             $no++;

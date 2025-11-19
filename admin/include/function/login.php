@@ -11,15 +11,17 @@
 		if ($id_hotel == "") {
 
 			$r = mysql_query("select * from data_pengelola where $field_password_login='$password' and $field_username_login='$username' ");
-
-		}elseif($id_hotel=='operasional'){
-				$r=mysql_query("select * from data_pengelola where $field_password_login='$password' AND $field_username_login='$username'");
-				$op=encrypt("operasional");
-		}elseif($id_hotel=='cs'){
-		    	$r=mysql_query("select * from data_customer_service where $field_password_login='$password' AND $field_username_login='$username'");
+		} elseif ($id_hotel == 'operasional') {
+			$r = mysql_query("select * from data_pengelola where $field_password_login='$password' AND $field_username_login='$username'");
+			$op = encrypt("operasional");
+		} elseif ($id_hotel == 'customer_service') {
+			$r = mysql_query("select * from data_pengelola where $field_password_login='$password' AND $field_username_login='$username'");
+			$cs = encrypt("customer_service");
 		} else {
 			$r = mysql_query("select * from $tabel_login where $field_password_login='$password' and $field_username_login='$username' and id_hotel='$id_hotel'");
 		}
+
+
 
 		$data = mysql_fetch_array($r);
 		if (empty($username) && empty($password)) {
@@ -55,12 +57,12 @@ if (mysql_num_rows($r) == 1) {
 					setcookie('token', $token, time() + (6000 * 6000), '/');
 					if ($id_hotel == "") {
 						setcookie('id_hotel', "", time() + (6000 * 6000), '/');
-
-					}elseif(isset($op)){
-							setcookie('id_hotel', "", time() + (6000 * 6000), '/');
-							setcookie('operasional',$op,time()+(6000*6000),'/');
-					}elseif($id_hotel=="cs"){
-					    setcookie('id_hotel',$id_hotel,time()+(6000*6000));
+					} elseif ($id_hotel == 'operasional') {
+						setcookie('id_hotel', "", time() + (6000 * 6000), '/');
+						setcookie('operasional', $op, time() + (6000 * 6000), '/');
+					} elseif ($id_hotel == "customer_service") {
+						setcookie('id_hotel', "", time() + (6000 * 6000), '/');
+						setcookie('customer_service', $cs, time() + (6000 * 6000), '/');
 					} else {
 						setcookie('id_hotel', (encrypt($data["id_hotel"])), time() + (6000 * 6000), '/');
 					}

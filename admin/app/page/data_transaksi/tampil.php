@@ -61,20 +61,20 @@ if ($id_hotel == "") {
                             <th>Kode&nbsp;Transaksi</th>
                             <th>Pelanggan</th>
                             <th>Kamar</th>
+                            <th>Jenis&nbsp;Trx</th>
                             <th>Check&nbsp;In</th>
                             <th>Check&nbsp;Out</th>
-                            <th>Harga/Hari</th>
-                            <th>Jumlah&nbsp;Hari</th>
+                            <th>Harga</th>
+                            <th>Jumlah&nbsp;</th>
                             <th>Harga&nbsp;Kamar&nbsp;Total</th>
-                            <th>Disc&nbsp;Kamar%</th>
-                            <th>Disc&nbsp;Nominal</th>
-                            <th>Harga&nbsp;Setelah&nbsp;Disc</th>
+                            <th>Diskon</th>
+                            <th>Potongan</th>
                             <th>Tambahan&nbsp;In</th>
                             <th>Tambahan&nbsp;Out</th>
-                            <th>Potongan&nbsp;Harga</th>
-                            <th>Sub&nbsp;Total</th>
+                            <th>Dp&nbsp;Booking</th>
+                            <th>Deposit</th>
                             <th>Pajak</th>
-                            <th>Total&nbsp;Bayar</th>
+                            <th>Grand&nbsp;Total</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -108,51 +108,69 @@ if ($id_hotel == "") {
                                        LIMIT " . (($page - 1) * $dataPerPage) . ", $dataPerPage";
 
 
-
-
-
                         $proses = mysql_query($querytabel);
                         while ($data = mysql_fetch_array($proses)) {
                             $no++;
+
+                            $id_transaksi = $data['id_transaksi'];
+
+                            $jenis_group = "non_group";
+                            if (json_check($data['no_kamar'])) {
+                                $jenis_group = "group";
+                            }
+
+                            $jenis_transaksi = $data['jenis_transaksi'];
+
                             $harga_per_hari = $data['harga_kamar_harian'];
+                            $harga_per_bulan = $data['harga_kamar_bulanan'];
+
                             $tgl_checkin = new DateTime($data['waktu_checkin']);
                             $tgl_checkout = new DateTime($data['waktu_checkout']);
+
                             $jumlah_hari = $data['jumlah_hari'];
 
+                            $harga_kamar_total = 0;
 
 
-                            $harga_kamar_total = json_count_sum($harga_per_hari, $jumlah_hari);
+                            if ($jenis_group == "group") {
+                                $query_kamar = " SELECT * FROM data_transaksi_list_kamar 
+                                            WHERE id_transaksi = '$id_transaksi' 
+                                            ORDER BY waktu DESC ";
 
-                            // Apply discount only to room price
-                            $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
-                            $harga_setelah_disc = $harga_kamar_total - $disc_nominal;
+                                $proses_kamar = mysql_query($query_kamar);
+                                while ($datakamar = mysql_fetch_array($proses_kamar)) {
 
-                            // Additional fees and price cut
-                            $tambahan_in = $data['biaya_tambahan_checkin'];
-                            $tambahan_out = $data['biaya_tambahan_checkout'];
-                            $potongan_harga = $data['potongan_harga'];
+                                    if ($jenis_transaksi == "harian") {
+                                        $harga_kamar_total =  $harga_kamar_total + ($datakamar['harga_kamar_harian'] * $jumlah_hari);
+                                    } else {
+                                        $harga_kamar_total =  $harga_kamar_total +  ($datakamar['harga_kamar_bulanan'] * $jumlah_hari);
+                                    }
+                                }
+                            } else {
 
-                            // Calculate subtotal (discounted room price + additional fees - price cut)
-                            $sub_total = $harga_setelah_disc + $tambahan_in + $tambahan_out - $potongan_harga;
+                                if ($jenis_transaksi == "harian") {
+                                    $harga_kamar_total = $harga_per_hari * $jumlah_hari;
+                                } else {
+                                    $harga_kamar_total = $harga_per_bulan * $jumlah_hari;
+                                }
+                            }
 
-                            // Calculate tax
-                            $pajak = ($sub_total * $data['persentase_pajak']) / 100;
 
-                            // Total price
-                            $total_bayar = $sub_total + $pajak;
+
                         ?>
                             <tr class="event2" style="text-align:left;">
                                 <td><?= $no ?></td>
                                 <td align="left"><a href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
                                         <?= $data['id_transaksi']; ?></a>
 
-                                    <?php if (json_check($data['no_kamar'])) {
-                                        echo "Group Transaksi";
-                                    }
-                                    ?>
+
                                 </td>
                                 <td align="left"><?= ucwords($data['nama']); ?></td>
                                 <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
+                                <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php if ($jenis_group == "group") {
+                                                                                            echo "(Group)";
+                                                                                        }
+                                                                                        ?></b></td>
                                 <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>
                                 <td><?php
                                     $today = strtotime(date('Y-m-d'));
@@ -181,18 +199,51 @@ if ($id_hotel == "") {
                                     }
                                     ?>
                                 </td>
-                                <td><?= json_preview_rupiah_br($harga_per_hari); ?></td>
-                                <td><?= $jumlah_hari; ?></td>
+                                <td><?php
+                                    if ($jenis_transaksi == "harian") {
+                                        echo  json_preview_rupiah_br($harga_per_hari);
+                                    } else {
+                                        echo  json_preview_rupiah_br($harga_per_bulan);
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    if ($jenis_transaksi == "harian") {
+                                        echo  $jumlah_hari . " Hari";
+                                    } else {
+                                        echo  $jumlah_hari . " Bulan";
+                                    }
+                                    ?>
+
+                                </td>
                                 <td><?= rupiah($harga_kamar_total); ?></td>
                                 <td><?= $data['discount']; ?>%</td>
-                                <td><?= rupiah($disc_nominal); ?></td>
-                                <td><?= rupiah($harga_setelah_disc); ?></td>
-                                <td><?= rupiah($tambahan_in); ?></td>
-                                <td><?= rupiah($tambahan_out); ?></td>
-                                <td><?= rupiah($potongan_harga); ?></td>
-                                <td><?= rupiah($sub_total); ?></td>
-                                <td><?= rupiah($pajak); ?></td>
-                                <td><b><?= rupiah($total_bayar); ?></b></td>
+                                <td><?= rupiah($data['potongan_harga']); ?></td>
+                                <td><?= rupiah($data['biaya_tambahan_checkin']); ?></td>
+                                <td><?= rupiah($data['biaya_tambahan_checkout']); ?></td>
+                                <td>
+
+                                    <?php if (substr($id_transaksi, 0, 2) === "BO") { ?>
+                                        <font color="blue">
+                                            Rp<?php echo rupiah_format(baca_database("", "nominal_bayar", "select * from data_booking where id_transaksi='$id_transaksi'")); ?>
+                                        </font>
+                                    <?php } else {
+                                        echo "Rp0";
+                                    } ?>
+
+
+                                </td>
+                                <td>
+                                    <font color="red">
+                                        <?= rupiah($data['nominal_deposit']); ?>
+                                    </font>
+                                </td>
+                                <td><?= ($data['persentase_pajak']); ?>%</td>
+                                <td><?= rupiah($data['total_bayar']); ?></td>
+
+
+
                                 <td style="background-color: <?php
                                                                 if ($data['status_transaksi'] == 'Selesai') {
                                                                     echo '#f3ffe6';

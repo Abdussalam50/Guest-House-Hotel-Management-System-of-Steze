@@ -69,9 +69,9 @@ if ($id_hotel == "") {
                         <th align="left" class="th_border cell">Nama Hotel</th>
                         <th align="left" class="th_border cell">Kapasitas </th>
                         <th align="left" class="th_border cell">Harga Harian </th>
-                        <?php if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") { ?>
+                        
                             <th align="left" class="th_border cell">Harga Bulanan </th>
-                        <?php } ?>
+                        
 
                         <th align="left" class="th_border cell">Tipe Kamar </th>
                         <th align="left" class="th_border cell">Status Kamar </th>
@@ -87,20 +87,10 @@ if ($id_hotel == "") {
                         if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
                             $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
                             $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel' ORDER BY  CASE
-    WHEN no_kamar LIKE 'KOST%' THEN 1   -- kelompok KOST dulu
-    WHEN no_kamar LIKE '%GH' THEN 2     -- kelompok GH sesudahnya
-    ELSE 3                              -- sisanya paling belakang
-  END,
-  CAST(REGEXP_SUBSTR(no_kamar, '[0-9]+') AS UNSIGNED) ASC;";
+                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
                         } else {
-                            $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' ORDER BY  CASE
-    WHEN no_kamar LIKE 'KOST%' THEN 1   -- kelompok KOST dulu
-    WHEN no_kamar LIKE '%GH' THEN 2     -- kelompok GH sesudahnya
-    ELSE 3                              -- sisanya paling belakang
-  END,
-  CAST(REGEXP_SUBSTR(no_kamar, '[0-9]+') AS UNSIGNED) ASC;";
+                             $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' ";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar WHERE id_hotel='id_hotel'";
                         }
                         $proses = mysql_query($querytabel);
@@ -142,9 +132,9 @@ if ($id_hotel == "") {
                                 <td align="left"><?php echo $data['kapasitas']; ?></td>
                                 <td align="left"><?php echo rupiah($data['harga_harian']); ?></td>
 
-                                <?php if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") { ?>
+                                
                                     <td align="left"><?php echo rupiah($data['harga_bulanan']); ?></td>
-                                <?php } ?>
+                                
 
                                 <td align="left"><?php echo baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$data[id_tipe_kamar]'")  ?></td>
 

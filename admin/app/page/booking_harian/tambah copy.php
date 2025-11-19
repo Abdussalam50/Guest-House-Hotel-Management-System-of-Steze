@@ -49,7 +49,7 @@
                     .room-badge {
                         cursor: pointer;
                         padding: 10px;
-                        background-color: #3bc3b6;
+                        background-color: #2196f3;
                         color: white;
                         font-size: 1rem;
                         font-weight: bold;
@@ -127,23 +127,23 @@
                                                                     }
                                                                     echo $id_admin;
                                                                     ?>'>
-                        <input type="hidden" name="id_hotel" value='<?php echo decrypt($_COOKIE['id_hotel']) ?>'>
+                        <input type="hidden" name="id_hotel" value='<?php echo $idHotel; ?>'>
                         <div class="mb-4">
                             <div class="cardcheckin-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
 
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="room-badge" data-full="">
-                                            Group
+                                            Booking
                                         </div>
                                         <h4 class="mb-0">
-                                            <i class="fas fa-sign-in-alt text-success"></i>
-                                            Check-in <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?>
+                                            <i class="fas fa-sign-in-alt text-primary"></i>
+                                            Booking <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$idHotel'") ?>
                                         </h4>
                                     </div>
 
-                                    <h4 class="mb-0 fw-bold text-warning">
-                                        Transaksi group harian
+                                    <h4 class="mb-0 fw-bold text-primary    ">
+                                        Booking harian
                                     </h4>
                                 </div>
 
@@ -175,11 +175,6 @@
 
                                                 <label class="form-label">Nama</label>
 
-                                                <!-- 
-                                                <select onclick='cari_pelanggan("<?php echo $idHotel ?>","<?php echo $namaHotel ?>")' class="form-select mb-2" type="text" name="id_pelanggan" id="id_pelanggan" placeholder="Id Pelanggan " required="required">
-                                                    <option value="">Pilih Pelanggan</option>
-
-                                                </select> -->
 
 
                                                 <div class="input-group mb-2">
@@ -212,37 +207,61 @@
                                                     <?php combo_database_v2("data_channel", "id_channel", "channel", ""); ?>
                                                 </select>
 
+                                                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                                                <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+                                                <style>
+                                                    .booking-date {
+                                                        background: #d8eaff !important;
+                                                        color: #003f8c !important;
+                                                        border-radius: 10px !important;
+                                                        font-weight: 600;
+                                                    }
 
+                                                    .transaksi-date {
+                                                        background: #ffd8d6 !important;
+                                                        color: #8c0000 !important;
+                                                        border-radius: 10px !important;
+                                                        font-weight: 600;
+                                                    }
 
+                                                    .today-date {
+                                                        background: #eaf7d8 !important;
+                                                        color: #3f6b00 !important;
+                                                        border-radius: 10px !important;
+                                                        border: 2px solid #9bd354 !important;
+                                                        font-weight: 700;
+                                                    }
 
+                                                    .flatpickr-day.selected,
+                                                    .flatpickr-day.startRange,
+                                                    .flatpickr-day.endRange {
+                                                        border-radius: 10px !important;
+                                                    }
 
+                                                    .flatpickr-day.selected:hover,
+                                                    .flatpickr-day.startRange:hover,
+                                                    .flatpickr-day.endRange:hover {
+                                                        border-radius: 10px !important;
+                                                    }
 
+                                                    .flatpickr-day:hover {
+                                                        border-radius: 10px !important;
+                                                        background: #e5e5e5 !important;
+                                                    }
 
-
-
-
-
-
-
-
-
-
+                                                    .swal2-container {
+                                                        z-index: 99999 !important;
+                                                    }
+                                                </style>
 
                                                 <label class="form-label">Tanggal Cek In</label>
-                                                <input class="form-control mb-2" value="<?php echo date("Y-m-d") ?>" type="date" name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
+                                                <input id="waktu_checkin_preview" class="form-control mb-2" placeholder="Pilih tanggal..." required>
+                                                <input id="waktu_checkin" name="waktu_checkin" type="hidden" required>
 
                                                 <label class="form-label">Tanggal Cek Out</label>
-
-                                                <input class="form-control mb-2"
-                                                    type="date"
-
-                                                    value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>"
-                                                    name="waktu_check_out"
-                                                    id="waktu_check_out"
-                                                    placeholder="Waktu Check Out"
-                                                    required="required">
-
+                                                <input id="waktu_check_out_preview" class="form-control" placeholder="Pilih Check-in..." readonly>
+                                                <input id="waktu_check_out" name="waktu_check_out" type="hidden" required>
 
                                                 <label class="form-label">Jumlah Hari</label>
                                                 <div class="input-group mb-2">
@@ -250,6 +269,160 @@
                                                     <input class="form-control" style="height: 38px;text-align: center;" type="number" name="jumlah_hari" min="1" id="jumlah_hari" value="1" placeholder="Jumlah Hari" required>
                                                     <button id="btn-plus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">+</button>
                                                 </div>
+                                                <script>
+                                                    function toLocalDateString(date) {
+                                                        const d = String(date.getDate()).padStart(2, '0');
+                                                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const y = date.getFullYear();
+                                                        return `${d}/${m}/${y}`;
+                                                    }
+
+                                                    function toDateInputString(date) {
+                                                        const d = String(date.getDate()).padStart(2, '0');
+                                                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const y = date.getFullYear();
+                                                        return `${y}-${m}-${d}`;
+                                                    }
+
+                                                    let dateMap = {};
+                                                    const today = new Date();
+                                                    today.setHours(0, 0, 0, 0);
+                                                    const todayStr = toLocalDateString(today);
+                                                    const disableBeforeToday = [d => {
+                                                        d.setHours(0, 0, 0, 0);
+                                                        return d < today;
+                                                    }];
+
+                                                    let fpCheckIn;
+
+                                                    // Ambil schedule
+                                                    fetch('schedule.php')
+                                                        .then(res => res.json())
+                                                        .then(data => {
+                                                            data.forEach(i => {
+                                                                let cur = new Date(i.checkin);
+                                                                const last = new Date(i.checkout);
+                                                                while (cur <= last) {
+                                                                    const str = toLocalDateString(cur);
+                                                                    if (!dateMap[str] || i.type === "transaksi") dateMap[str] = {
+                                                                        type: i.type,
+                                                                        info: i.info
+                                                                    };
+                                                                    cur.setDate(cur.getDate() + 1);
+                                                                }
+                                                            });
+                                                            initFlatpickr();
+                                                        });
+
+                                                    function initFlatpickr() {
+                                                        fpCheckIn = flatpickr("#waktu_checkin_preview", {
+                                                            dateFormat: "d/m/Y",
+                                                            disable: disableBeforeToday,
+                                                            onChange: function(_, dateStr) {
+                                                                if (!dateStr) return;
+                                                                const maxHari = getMaxDays(dateStr);
+                                                                document.getElementById("jumlah_hari").max = maxHari;
+
+                                                                const parts = dateStr.split('/');
+                                                                const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                                document.getElementById("waktu_checkin").value = toDateInputString(checkin);
+
+                                                                let checkout = new Date(checkin);
+                                                                checkout.setDate(checkin.getDate() + 1);
+                                                                document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+                                                                document.getElementById("waktu_check_out").value = toDateInputString(checkout);
+
+                                                                hitungCheckout();
+                                                            },
+                                                            onDayCreate: function(_, __, ___, dayElem) {
+                                                                const dateStr = toLocalDateString(dayElem.dateObj);
+                                                                if (dateMap[dateStr]) {
+                                                                    const {
+                                                                        type,
+                                                                        info
+                                                                    } = dateMap[dateStr];
+                                                                    dayElem.classList.add(type === "booking" ? "booking-date" : "transaksi-date");
+                                                                    dayElem.dataset.info = info;
+                                                                    dayElem.dataset.type = type;
+                                                                }
+                                                                if (dateStr === todayStr) dayElem.classList.add("today-date");
+                                                                if (dayElem.dataset.info) dayElem.title = dayElem.dataset.info;
+
+                                                                dayElem.addEventListener("click", e => {
+                                                                    if (dayElem.dataset.info && dayElem.dataset.info !== "Hari Ini") {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        fpCheckIn.open();
+                                                                        Swal.fire({
+                                                                            title: "Tidak dapat dipilih",
+                                                                            html: `Dalam hari dari tanggal <b>${dateStr}</b> terdapat ${dayElem.dataset.info} sehingga tanggal tidak dapat digunakan.`,
+                                                                            icon: dayElem.dataset.type === "booking" ? "info" : "warning"
+                                                                        }).then(() => resetInput());
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function getMaxDays(checkinStr) {
+                                                        if (!checkinStr) return 1;
+                                                        const parts = checkinStr.split('/');
+                                                        const start = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                        for (let i = 1; i <= 365; i++) {
+                                                            const temp = new Date(start);
+                                                            temp.setDate(start.getDate() + i);
+                                                            if (dateMap[toLocalDateString(temp)]) return i;
+                                                        }
+                                                        return 365;
+                                                    }
+
+                                                    function hitungCheckout() {
+                                                        const checkinStr = document.getElementById("waktu_checkin_preview").value;
+                                                        if (!checkinStr) return;
+                                                        const hari = parseInt(document.getElementById("jumlah_hari").value || 1);
+                                                        const parts = checkinStr.split('/');
+                                                        const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                        if (isNaN(checkin.getTime())) return;
+
+                                                        let checkout = new Date(checkin);
+                                                        checkout.setDate(checkin.getDate() + hari);
+
+                                                        let cur = new Date(checkin);
+                                                        let hasConflict = false;
+                                                        while (cur < checkout) {
+                                                            if (dateMap[toLocalDateString(cur)]) {
+                                                                hasConflict = true;
+                                                                break;
+                                                            }
+                                                            cur.setDate(cur.getDate() + 1);
+                                                        }
+                                                        if (hasConflict) {
+                                                            fpCheckIn.open();
+                                                            Swal.fire({
+                                                                title: "Jumlah hari tidak bisa dipilih",
+                                                                html: `Dalam <b>${hari}</b> hari dari <b>${checkinStr}</b> terdapat transaksi/booking sehingga jumlah hari tidak dapat digunakan.`,
+                                                                icon: "warning"
+                                                            }).then(() => resetInput());
+                                                            return;
+                                                        }
+
+                                                        document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+                                                        document.getElementById("waktu_check_out").value = toDateInputString(checkout);
+                                                    }
+
+                                                    function resetInput() {
+                                                        document.getElementById("waktu_checkin_preview").value = "";
+                                                        document.getElementById("waktu_checkin").value = "";
+                                                        document.getElementById("jumlah_hari").value = 1;
+                                                        document.getElementById("waktu_check_out_preview").value = "";
+                                                        document.getElementById("waktu_check_out").value = "";
+                                                        fpCheckIn.clear();
+                                                    }
+
+                                                    // Plus & Minus
+                                                    document.getElementById("jumlah_hari").addEventListener("input", hitungCheckout);
+                                                </script>
+
                                             </div>
                                         </div>
                                     </div>
@@ -334,79 +507,105 @@
                                                 <div class="modal fade" id="modalKamar" tabindex="-1">
                                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                                         <div class="modal-content">
-
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Pilih Kamar</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                                                             </div>
-
                                                             <div class="modal-body">
-                                                                <div class="row g-3">
-                                                                    <?php
-                                                                    // Asumsi $idHotel sudah didefinisikan sebelumnya
-                                                                    $query = "SELECT * FROM data_kamar 
-                                                                        WHERE id_hotel = '$idHotel'
-                                                                        ORDER BY no_kamar ASC";
-                                                                    $result = mysql_query($query);
-
-                                                                    if (!$result) {
-                                                                        die('Query Error: ' . mysql_error());
-                                                                    }
-                                                                    ?>
-
-                                                                    <style>
-                                                                        /* Buat semua kartu kamar memiliki tinggi sama */
-                                                                        .kamar-card {
-                                                                            height: 115px;
-                                                                            padding: 10px !important;
-                                                                            display: flex;
-                                                                            flex-direction: column;
-                                                                            justify-content: space-between;
-                                                                        }
-                                                                    </style>
-
-                                                                    <div class="row">
-                                                                        <?php
-                                                                        while ($row = mysql_fetch_assoc($result)) {
-                                                                            $badgeClass = ($row['status_kamar'] == 'Kosong') ? 'bg-success' : 'bg-danger';
-                                                                            $statusText = ($row['status_kamar'] == 'Kosong') ? 'Tersedia' : 'Terisi';
-                                                                            $bgcolor = ($row['status_kamar'] == 'Kosong') ? 'background-color: #ffffff;' : 'background-color: #f6f7f9;';
-                                                                        ?>
-                                                                            <div class="col-6 col-md-4 col-lg-3 mb-3">
-                                                                                <div class="card kamar-card p-2 pilih-kamar-item" data-kamar="<?= htmlspecialchars($row['no_kamar']) ?>" style="display: flex; flex-direction: column; justify-content: space-between; height: 150px; <?php echo $bgcolor; ?>">
-                                                                                    <div style="margin-top: 10px;">
-                                                                                        <div class="fw-bold text-primary text-left" style="font-size: 13px;">
-                                                                                            Kamar <?= htmlspecialchars($row['no_kamar']) ?>
-                                                                                        </div>
-
-                                                                                    </div>
-                                                                                    <!-- Badge selalu di bawah -->
-                                                                                    <div class="mt-auto" style="margin-bottom: 10px;">
-                                                                                        <div class="text-left small mb-2">
-                                                                                            <?php echo ucwords(baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$row[id_tipe_kamar]'")); ?>
-                                                                                            <br>
-                                                                                            <span class="text-dark"><?= rupiah($row['harga_harian']) ?> @ 1 Days</span>
-                                                                                        </div>
-                                                                                        <span style="color: white;" class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
-
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                        <?php
-                                                                        }
-                                                                        ?>
-                                                                    </div>
-
+                                                                <div class="row g-3" id="list-kamar">
+                                                                    <!-- Kamar akan dimuat lewat AJAX -->
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
 
+                                                <script>
+                                                    document.getElementById('btn_pilih_kamar').addEventListener('click', function() {
+                                                        const tanggalCheckin = document.getElementById('waktu_checkin').value;
+                                                        const tanggalCheckout = document.getElementById('waktu_check_out').value;
+
+                                                        if (!tanggalCheckin || !tanggalCheckout) {
+                                                            Swal.fire('Warning', 'Silahkan input waktu check-in & check-out terlebih dahulu!', 'warning');
+                                                            return; // modal tidak dibuka
+                                                        }
+
+                                                        // Buka modal
+                                                        const modal = new bootstrap.Modal(document.getElementById('modalKamar'));
+                                                        modal.show();
+
+                                                        // Load kamar via AJAX
+                                                        loadKamar();
+                                                    });
 
 
+                                                    function loadKamar() {
+                                                        const tanggalCheckin = document.getElementById('waktu_checkin').value;
+                                                        const tanggalCheckout = document.getElementById('waktu_check_out').value;
+                                                        const idHotel = "<?php echo decrypt($_COOKIE['id_hotel']); ?>";
+
+                                                        if (!tanggalCheckin || !tanggalCheckout) {
+                                                            Swal.fire('Warning', 'Check-in dan check-out harus diisi!', 'warning');
+                                                            return;
+                                                        }
+
+                                                        fetch('ajax_list_kamar.php', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json'
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    tanggal_checkin_check: tanggalCheckin,
+                                                                    tanggal_checkout_check: tanggalCheckout,
+                                                                    id_hotel: idHotel
+                                                                })
+                                                            })
+                                                            .then(res => res.json())
+                                                            .then(data => {
+                                                                const container = document.getElementById('list-kamar');
+                                                                container.innerHTML = '';
+
+                                                                if (data.length === 0) {
+                                                                    container.innerHTML = '<div class="col-12 text-center text-muted">Tidak ada kamar tersedia</div>';
+                                                                    return;
+                                                                }
+
+                                                                data.forEach(kamar => {
+                                                                    const card = document.createElement('div');
+                                                                    card.className = 'col-6 col-md-4 col-lg-3 mb-3';
+                                                                    card.innerHTML = `
+                                                                        <div class="card kamar-card p-2 pilih-kamar-item"
+                                                                            data-kamar="${kamar.no_kamar}"
+                                                                            style="height:150px;background:${kamar.bgcolor};
+                                                                            display:flex;flex-direction:column;justify-content:space-between;">
+                                                                            
+                                                                            <div style="margin-top:10px;">
+                                                                                <div class="fw-bold text-primary" style="font-size:13px;">
+                                                                                    Kamar ${kamar.no_kamar}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="mt-auto" style="margin-bottom:10px;">
+                                                                                <div class="text-left small mb-2">
+                                                                                    ${kamar.tipe_kamar}<br>
+                                                                                    <span class="text-dark">${kamar.harga_harian} @ 1 Days</span>
+                                                                                </div>
+                                                                                <span class="badge ${kamar.badgeClass}" style="color:white;">
+                                                                                    ${kamar.statusText}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    `;
+                                                                    container.appendChild(card);
+                                                                });
+                                                            })
+                                                            .catch(err => console.error(err));
+                                                    }
+
+                                                    // Jika modal dibuka manual, tetap load kamar
+                                                    document.getElementById('modalKamar').addEventListener('show.bs.modal', loadKamar);
+                                                </script>
 
 
                                                 <label class="form-label">List Kamar</label>
@@ -480,7 +679,7 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="noteModalLabel">Catatan Tambahan Biaya Check-in</h5>
+                                                                <h5 class="modal-title" id="noteModalLabel">Catatan Tambahan Biaya Booking</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
@@ -542,7 +741,7 @@
 
                                                 <div class="mt-auto d-flex justify-content-end">
                                                     <button class="btn btn-secondary me-2" type="reset">Batal</button>
-                                                    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalPembayaran"><i class="fa fa-save"></i> Check-in</button>
+                                                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalPembayaran"><i class="fa fa-save"></i> Booking</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -560,65 +759,44 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Proses Pembayaran</h5>
+                                        <h5 class="modal-title">Proses Pembayaran DP</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
 
+                                        <input type="hidden" name="id_metode_pembayaran_deposit" id="id_metode_pembayaran_deposit">
+                                        <input type="hidden" name="no_rekening_deposit" id="no_rekening_deposit" value='-'>
+                                        <input type="hidden" onclick='pilih_metode_deposit()' class="form-control" name="metode_pembayaran_deposit" id="metode_pembayaran_deposit" value='' readonly>
+                                        <input type="hidden" class="form-control" id="nominal_deposit" name="nominal_deposit">
+                                        <input class="form-control" type="hidden" name="deposit" id="deposit" value="0">
+                                        <input type="hidden" name="" id='grandtotal_ndepo_hidden'>
+                                        <input type="hidden" readonly class="form-control" id="grand_total_plus_depo" name="grand_total_plus_depo">
 
 
-                                        <label class="form-label">Informasi Deposit <label class="form-label" onclick="Swal.fire({
-                                                                                title: 'Informasi Deposit',
-                                                                                text: 'Catatan : Jumlah nominal deposit tidak dihitung dalam total transaksi yang dilakukan oleh pelanggan, melainkan hanya dicatat sebagai informasi tambahan.',
-                                                                                confirmButtonText: 'Mengerti'
-                                                                        })">
-                                                <i style="color:#bf2b2763" class="fa fa-info-circle"></i>
-
-                                            </label></label>
-
-                                        <div class="d-flex justify-content-evenly align-items-center">
-                                            <input type="hidden" name="id_metode_pembayaran_deposit" id="id_metode_pembayaran_deposit">
-                                            <input type="hidden" name="no_rekening_deposit" id="no_rekening_deposit" value='-'>
-                                            <div class="input-group mb-2 me-3">
 
 
-                                                <button type="button" onclick='pilih_metode_deposit()' class="btn btn-secondary">
-                                                    Metode
-                                                </button>
-                                                <input type="text" onclick='pilih_metode_deposit()' class="form-control" name="metode_pembayaran_deposit" id="metode_pembayaran_deposit" value='' readonly>
-                                            </div>
+                                        <div class="d-flex justify-content-between align-items-center">
 
 
-                                            <div class="input-group mb-2">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="hidden" class="form-control" id="nominal_deposit" name="nominal_deposit">
-                                                <input class="form-control" type="text" name="deposit" id="deposit" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <div class='me-3'>
+                                            <div class='d-flex align-items-center'>
+
                                                 <label class="form-label">Grand Total</label>
-                                                <div class="input-group mb-3">
-                                                    <span class="input-group-text">Rp</span>
-
-                                                    <input type="text" readonly class="form-control" id="grand_total" name="grand_total">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label class="form-label">Grand Total + Deposit</label>
-                                                <div class="input-group mb-3">
-                                                    <span class="input-group-text">Rp</span>
-                                                    <input type="hidden" name="" id='grandtotal_ndepo_hidden'>
-                                                    <input type="text" readonly class="form-control" id="grand_total_plus_depo" name="grand_total_plus_depo">
-                                                </div>
                                             </div>
                                         </div>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">Rp</span>
+
+                                            <input type="text" readonly class="form-control" id="grand_total" name="grand_total">
+                                        </div>
+
+
+
+
                                         <label class="form-label">Metode Pembayaran </label>
                                         <input type="hidden" name="id_metode_pembayaran" id="id_metode_pembayaran">
                                         <input type="hidden" name="no_rekening" id="no_rekening" value='-'>
+
                                         <div class="input-group mb-2">
-
-
                                             <button type="button" onclick='pilih_metode_pembayaran()' class="btn btn-secondary">
                                                 Metode
                                             </button>
@@ -627,10 +805,18 @@
 
 
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <label class="form-label">Nominal Pembayaran</label>
+
+                                            <label class="form-label" onclick="Swal.fire({
+                                                title: 'Informasi Downpayment',
+                                                text: 'Catatan : Jumlah nominal Dp minimal sebesar 10% dari total transaksi yang dilakukan oleh pelanggan.',
+                                                confirmButtonText: 'Mengerti'
+                                                })">
+                                                Nominal DP (Down Payment) <i style="color:#bf2b2763" class="fa fa-info-circle"></i>
+
+                                            </label>
                                             <div class='d-flex align-items-center'>
-                                                <input type="checkbox" class="form-check-input me-2" id='totalplusdepo'>
-                                                <label for="" class="form-check-label text-dark">Nominal + Deposit</label>
+
+                                                <label for="" class="form-check-label text-dark"></label>
                                             </div>
                                         </div>
                                         <div class="input-group mb-3">
@@ -640,34 +826,32 @@
                                         </div>
 
 
-                                        <div class="mb-2">
-                                            <small class="text-muted" style="font-size:0.7rem;">Estimasi Nominal Transaksi:</small>
-
-                                            <!-- Tombol Prediksi Bayar Kecil -->
-                                            <div class="mb-2" id="prediksi_buttons" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
-
-                                        </div>
 
 
 
 
 
-                                        <label class="form-label">Kembalian</label>
+
+                                        <label class="form-label">Sisa Pembayaran</label>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">Rp</span>
 
                                             <input type="hidden" class="form-control" name="kembalian" id='kembalian' value='0'>
-                                            <input type="text" class="form-control" name="kembalian_value" id='kembalian_value' value='0'>
-
+                                            <input type="hidden" class="form-control" name="kembalian_value" id='kembalian_value' value='0'>
+                                            <input type="hidden" class="form-control" name="sisa" id='sisa' value='0'>
+                                            <input type="text" class="form-control" name="sisa_value" id='sisa_value' value='0'>
                                         </div>
 
 
-                                        <input type="hidden" class="form-control" name="sisa" id='sisa' value='0'>
-                                        <input type="hidden" class="form-control" name="sisa_value" id='sisa_value' value='0'>
+
 
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" id='simpan_data'>Proses Check-in</button>
+                                            <button type="button" class="btn btn-primary" id='simpan_data'>Proses Booking</button>
                                         </div>
+
+                                        <div class="mb-2" id="prediksi_buttons" style="display:flex;gap:5px;flex-wrap:wrap;visibility: hidden;"></div>
+
+
                                     </div>
                                 </div>
                             </div>
@@ -831,7 +1015,6 @@
             form: document.getElementById('formini'),
             saveButton: document.getElementById('simpan_data'),
             grandplusdepo: document.getElementById('grand_total_plus_depo'),
-            totalplusdepo: document.getElementById('totalplusdepo'),
             grandplusdepohidden: document.getElementById('grandtotal_ndepo_hidden')
         };
 
@@ -915,9 +1098,9 @@
             refreshListKamar();
 
             // Buka modal pilih kamar
-            $('#pilih_kamar, #btn_pilih_kamar').on('click', function() {
-                new bootstrap.Modal(document.getElementById('modalKamar')).show();
-            });
+            // $('#pilih_kamar, #btn_pilih_kamar').on('click', function() {
+            //     new bootstrap.Modal(document.getElementById('modalKamar')).show();
+            // });
         });
 
         // Event klik card kamar (pakai event delegation karena card di-generate PHP)
@@ -927,6 +1110,14 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Kamar Sedang Digunakan',
+                    text: 'Anda tidak dapat melakukan transaksi untuk kamar ini.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            } else if (badge === 'Booking') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Kamar Sudah Dibooking',
                     text: 'Anda tidak dapat melakukan transaksi untuk kamar ini.',
                     confirmButtonText: 'OK'
                 });
@@ -1062,20 +1253,7 @@
         });
 
 
-        const total_plus_depo = (e) => {
-            const grandtotal = elements.priceInput.value;
-            const total_semua = elements.grandplusdepohidden.value;
-            const payment = elements.payment;
-            if (e.target.checked) {
-                payment.value = total_semua;
-                createPrediksiButtons(total_semua);
-            } else {
-                elements.payment.value = grandtotal;
-                createPrediksiButtons(grandtotal);
-            }
-            elements.change.value = 0;
-            elements.changeDisplay.value = formatRupiah(0);
-        }
+
 
 
         function createPrediksiButtons(total) {
@@ -1174,7 +1352,10 @@
             const checkin = new Date(elements.checkin.value);
             const days = parseInt(elements.days.value) || 0;
             const checkout = new Date(checkin.getTime() + days * MS_PER_DAY);
-            elements.checkout.value = checkout.toISOString().split('T')[0];
+
+            const checkinStr = document.getElementById("waktu_checkin").value;
+
+            // elements.checkout.value = checkout.toISOString().split('T')[0];
 
 
             updateFinalPrice();
@@ -1228,10 +1409,10 @@
         elements.payment.addEventListener('input', updatePaymentCalculations);
         elements.displayDeposit.addEventListener('input', updateGrandTotal);
         elements.additionalFee.addEventListener('input', () => {
-            elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
+            //elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
 
         });
-        elements.totalplusdepo.addEventListener('click', total_plus_depo);
+
 
 
         const checkbox = document.getElementById("pajakCheck");
@@ -1256,21 +1437,42 @@
 
 
         const inputHari = document.getElementById('jumlah_hari');
-        const btnMinus = document.getElementById('btn-minus');
-        const btnPlus = document.getElementById('btn-plus');
 
-        btnPlus.addEventListener('click', () => {
-            inputHari.value = parseInt(inputHari.value) + 1;
-            updateCheckoutDate();
-        });
 
-        btnMinus.addEventListener('click', () => {
-            let current = parseInt(inputHari.value);
-            if (current > 1) {
-                inputHari.value = current - 1;
+        // Tombol minus
+        document.getElementById("btn-minus").addEventListener("click", () => {
+            const input = document.getElementById("jumlah_hari");
+            const checkinStr = document.getElementById("waktu_checkin").value;
+
+            if (!checkinStr) return; // Jika check-in belum dipilih, tombol tidak berfungsi
+
+            let val = parseInt(input.value) || 1;
+            if (val > 1) {
+                val--;
+                input.value = val;
+                hitungCheckout();
+                updateCheckoutDate();
             }
-            updateCheckoutDate();
         });
+
+        // Tombol plus
+        document.getElementById("btn-plus").addEventListener("click", () => {
+            const input = document.getElementById("jumlah_hari");
+            const checkinStr = document.getElementById("waktu_checkin").value;
+
+            if (!checkinStr) return; // Jika check-in belum dipilih, tombol tidak berfungsi
+
+            let val = parseInt(input.value) || 1;
+            const max = parseInt(input.max) || 365; // Ambil dari max jumlah_hari
+            if (val < max) {
+                val++;
+                input.value = val;
+                hitungCheckout();
+                updateCheckoutDate();
+            }
+        });
+
+
 
 
 

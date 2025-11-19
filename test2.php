@@ -1,225 +1,311 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!DOCTYPE html>
+<html lang="en">
 
-<style>
-    body {
-        background: #f7f9fc;
-        font-family: 'Inter', sans-serif;
-    }
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Bulanan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    .booking-date {
-        background: #d8eaff !important;
-        color: #003f8c !important;
-        border-radius: 10px !important;
-        font-weight: 600;
-    }
+    <style>
+        .booking-end {
+            background: #d8eaff !important;
+            color: #003f8c !important;
+            border-radius: 10px !important;
+            font-weight: 600;
+        }
 
-    .transaksi-date {
-        background: #ffd8d6 !important;
-        color: #8c0000 !important;
-        border-radius: 10px !important;
-        font-weight: 600;
-    }
+        .transaksi-end {
+            background: #ffd8d6 !important;
+            color: #8c0000 !important;
+            border-radius: 10px !important;
+            font-weight: 600;
+        }
 
-    .today-date {
-        background: #eaf7d8 !important;
-        color: #3f6b00 !important;
-        border-radius: 10px !important;
-        border: 2px solid #9bd354 !important;
-        font-weight: 700;
-    }
+        .booking-date {
+            background: #d8eaff !important;
+            color: #003f8c !important;
+            border-radius: 10px !important;
+            font-weight: 600;
+        }
 
-    .flatpickr-day.selected,
-    .flatpickr-day.startRange,
-    .flatpickr-day.endRange {
-        border-radius: 10px !important;
-    }
+        .transaksi-date {
+            background: #ffd8d6 !important;
+            color: #8c0000 !important;
+            border-radius: 10px !important;
+            font-weight: 600;
+        }
 
-    .flatpickr-day:hover {
-        border-radius: 10px !important;
-        background: #e5e5e5 !important;
-    }
+        .today-date {
+            background: #eaf7d8 !important;
+            color: #3f6b00 !important;
+            border: 2px solid #9bd354 !important;
+            border-radius: 10px !important;
+            font-weight: 700;
+        }
 
-    .swal2-container {
-        z-index: 99999 !important;
-    }
+        .overlap-checkin {
+            background: #90c4fffa !important;
+            color: #030303 !important;
+            border-radius: 10px !important;
+            font-weight: 600;
+            cursor: not-allowed !important;
+            opacity: 0.9;
+        }
 
-    .btn-month {
-        width: 40px;
-        height: 38px;
-        padding: 0;
-        text-align: center;
-        font-weight: bold;
-    }
-</style>
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            border-radius: 10px !important;
+        }
 
-<div class="container mt-3">
-    <form id="formBookingBulanan" action="oke.php" method="get">
-        <label class="form-label">Tanggal Cek In</label>
-        <input id="waktu_checkin_preview" class="form-control mb-2" placeholder="Pilih tanggal..." required>
-        <input id="waktu_checkin" name="waktu_checkin" type="hidden" required>
+        .flatpickr-day:hover {
+            border-radius: 10px !important;
+            background: #e5e5e5 !important;
+        }
 
-        <label class="form-label">Tanggal Cek Out</label>
-        <input id="waktu_check_out_preview" class="form-control mb-2" placeholder="Pilih Check-in..." readonly>
-        <input id="waktu_check_out" name="waktu_check_out" type="hidden" required>
+        .btn-day {
+            width: 40px;
+            height: 38px;
+            padding: 0;
+            text-align: center;
+            font-weight: bold;
+        }
 
-        <label class="form-label">Jumlah Bulan</label>
-        <div class="input-group mb-2">
-            <button id="btn-minus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">-</button>
-            <input class="form-control" style="height: 38px;text-align: center;" type="number" name="jumlah_bulan" min="1" id="jumlah_bulan" value="1" placeholder="Jumlah Bulan" required>
-            <button id="btn-plus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">+</button>
-        </div>
+        .swal2-container {
+            z-index: 99999 !important;
+        }
+    </style>
+</head>
 
-        <button type="submit" class="btn btn-primary mt-2">Simpan / Kirim</button>
-    </form>
-</div>
+<body>
+    <div class="container mt-3">
+        <form id="formBooking" action="oke.php" method="get">
+            <div class="mb-3">
+                <label>Waktu Check-In</label>
+                <input id="waktu_checkin_preview" class="form-control" placeholder="Pilih tanggal..." required>
+                <input id="waktu_checkin" name="checkin" type="hidden" required>
+            </div>
 
-<script>
-    function toLocalDateString(date) {
-        if (!date || !(date instanceof Date) || isNaN(date.getTime())) return '';
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear();
-        return `${d}/${m}/${y}`;
-    }
+            <div class="mb-3">
+                <label>Waktu Check-Out</label>
+                <input id="waktu_check_out_preview" class="form-control" readonly>
+                <input id="waktu_check_out" name="checkout" type="hidden">
+            </div>
 
-    function toDateInputString(date) {
-        if (!date || !(date instanceof Date) || isNaN(date.getTime())) return '';
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear();
-        return `${y}-${m}-${d}`;
-    }
+            <div class="mb-3 d-flex align-items-center gap-2">
+                <label class="mb-0 me-2">Jumlah Bulan</label>
+                <button id="btn-minus" class="btn btn-secondary btn-day" type="button">-</button>
+                <input id="jumlah_bulan" name="jumlah_bulan" type="number" class="form-control text-center" min="1" value="1" style="width:80px" required>
+                <button id="btn-plus" class="btn btn-secondary btn-day" type="button">+</button>
+            </div>
 
-    const dateMap = {};
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = toLocalDateString(today);
-    const disableBeforeToday = [d => {
-        const dd = new Date(d);
-        dd.setHours(0, 0, 0, 0);
-        return dd < today;
-    }];
+            <button type="submit" class="btn btn-primary mt-2">Simpan / Kirim</button>
+        </form>
+    </div>
 
-    let fpCheckIn;
+    <script>
+        function toLocalDateString(date) {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
 
-    // Ambil schedule dari server
-    fetch('schedule.php')
-        .then(res => res.json())
-        .then(scheduleData => {
-            scheduleData.forEach(i => {
+        function toDateInputString(date) {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${y}-${m}-${d}`;
+        }
+
+        let dateMap = {};
+        let fpCheckIn;
+
+        fetch('schedule.php').then(res => res.json()).then(data => {
+            data.forEach(i => {
                 let cur = new Date(i.checkin);
                 const last = new Date(i.checkout);
                 while (cur <= last) {
-                    const dateStr = toLocalDateString(cur);
-                    if (!dateMap[dateStr] || i.type === "transaksi") dateMap[dateStr] = {
-                        type: i.type,
-                        info: i.info
-                    };
+                    const str = toLocalDateString(cur);
+                    if (!dateMap[str] || i.type === "transaksi") {
+                        dateMap[str] = {
+                            type: i.type,
+                            info: i.info,
+                            end: cur.getTime() === last.getTime(),
+                            checkin: i.checkin
+                        };
+                    }
                     cur.setDate(cur.getDate() + 1);
                 }
             });
+            initFlatpickr();
+        });
+
+        function isRangeAvailable(checkin, jumlahBulan) {
+            const checkout = new Date(checkin);
+            checkout.setMonth(checkin.getMonth() + jumlahBulan);
+            let cur = new Date(checkin);
+            while (cur < checkout) {
+                const key = toLocalDateString(cur);
+                if (dateMap[key] && !dateMap[key].end) return false;
+                cur.setDate(cur.getDate() + 1);
+            }
+            return true;
+        }
+
+        function initFlatpickr() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = toLocalDateString(today);
 
             fpCheckIn = flatpickr("#waktu_checkin_preview", {
                 dateFormat: "d/m/Y",
-                disable: disableBeforeToday,
+                disable: [d => {
+                    d.setHours(0, 0, 0, 0);
+                    return d < today;
+                }],
                 onChange: function(_, dateStr) {
                     if (!dateStr) return;
+
                     const parts = dateStr.split('/');
                     const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                    const jumlahBulan = parseInt(document.getElementById("jumlah_bulan").value || 1);
+
+                    if (!isRangeAvailable(checkin, jumlahBulan)) {
+                        Swal.fire({
+                            title: "Tanggal tidak dapat dipilih",
+                            html: `Tanggal check-in <b>${dateStr}</b> tidak dapat digunakan karena ada booking/transaksi di bulan yang dipilih.`,
+                            icon: "warning"
+                        });
+                        this.clear();
+                        document.getElementById("waktu_checkin").value = "";
+                        document.getElementById("waktu_check_out_preview").value = "";
+                        document.getElementById("waktu_check_out").value = "";
+                        return;
+                    }
+
                     document.getElementById("waktu_checkin").value = toDateInputString(checkin);
-                    hitungCheckout();
+                    const checkout = new Date(checkin);
+                    checkout.setMonth(checkin.getMonth() + jumlahBulan);
+                    document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+                    document.getElementById("waktu_check_out").value = toDateInputString(checkout);
                 },
                 onDayCreate: function(_, __, ___, dayElem) {
                     const dateStr = toLocalDateString(dayElem.dateObj);
                     if (dateMap[dateStr]) {
                         const {
                             type,
-                            info
+                            end
                         } = dateMap[dateStr];
-                        dayElem.classList.add(type === "booking" ? "booking-date" : "transaksi-date");
-                        dayElem.dataset.info = info;
-                        dayElem.dataset.type = type;
+
+                        // Styling sesuai status
+                        if (end) dayElem.classList.add(type === "booking" ? "booking-end" : "transaksi-end");
+                        else dayElem.classList.add(type === "booking" ? "booking-date" : "transaksi-date");
+
+                        // Cek overlap untuk checkin baru
+                        let isOverlap = false;
+                        if (end) {
+                            for (const key in dateMap) {
+                                if (dateMap[key].checkin && toLocalDateString(new Date(dateMap[key].checkin)) === dateStr) {
+                                    isOverlap = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (isOverlap) dayElem.classList.add("overlap-checkin");
                     }
-                    if (dateStr === todayStr) {
-                        dayElem.classList.add("today-date");
-                        dayElem.dataset.info = "Hari Ini";
-                    }
+
+                    if (dateStr === todayStr) dayElem.classList.add("today-date");
+
                     if (dayElem.dataset.info) dayElem.title = dayElem.dataset.info;
 
                     dayElem.addEventListener("click", function(e) {
-                        if (dayElem.dataset.info && dayElem.dataset.info !== "Hari Ini") {
+                        const item = dateMap[dateStr];
+                        if ((item && !item.end) || dayElem.classList.contains("overlap-checkin")) {
                             e.preventDefault();
                             e.stopPropagation();
-                            fpCheckIn.open();
                             Swal.fire({
-                                title: "Tidak dapat dipilih",
-                                html: `Dalam hari dari tanggal <b>${dateStr}</b> terdapat ${dayElem.dataset.info} sehingga tanggal tidak dapat digunakan.`,
-                                icon: dayElem.dataset.type === "booking" ? "info" : "warning"
-                            }).then(() => resetInput());
+                                title: "Tidak Dapat dipilih",
+                                html: `Dalam hari dari tanggal <b>${dateStr}</b> terdapat Booking/Transaksi sehingga tanggal tidak dapat digunakan.`,
+                                icon: "warning"
+                            });
                         }
                     });
                 }
             });
+        }
+
+        function hitungCheckout() {
+            const checkinStr = document.getElementById("waktu_checkin_preview").value;
+            if (!checkinStr) return;
+            const bulan = parseInt(document.getElementById("jumlah_bulan").value || 1);
+            const parts = checkinStr.split('/');
+            const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+            const checkout = new Date(checkin);
+            checkout.setMonth(checkin.getMonth() + bulan);
+            document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+            document.getElementById("waktu_check_out").value = toDateInputString(checkout);
+        }
+
+        const input = document.getElementById("jumlah_bulan");
+
+        input.addEventListener("input", function() {
+            let value = parseInt(this.value);
+            const max = parseInt(this.max || 12);
+            if (isNaN(value) || value < 1) value = 1;
+            if (value > max) value = max;
+
+            const checkinStr = document.getElementById("waktu_checkin_preview").value;
+            if (checkinStr) {
+                const parts = checkinStr.split('/');
+                const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                if (!isRangeAvailable(checkin, value)) {
+                    Swal.fire({
+                        title: "Tidak Dapat dipilih",
+                        html: `Dalam hari dari tanggal <b>${checkinStr}</b> terdapat Booking/Transaksi sehingga tanggal tidak dapat digunakan.`,
+                        icon: "warning"
+                    });
+                    value = parseInt(this.value) - 1;
+                }
+            }
+
+            this.value = value;
+            hitungCheckout();
         });
 
-    function hitungCheckout() {
-        const checkinStr = document.getElementById("waktu_checkin_preview").value;
-        if (!checkinStr) return;
-        const bulan = parseInt(document.getElementById("jumlah_bulan").value || 1);
-        const parts = checkinStr.split('/');
-        const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
-        if (isNaN(checkin.getTime())) return;
+        document.getElementById("btn-plus").addEventListener("click", () => {
+            const inp = document.getElementById("jumlah_bulan");
+            let nextValue = parseInt(inp.value) + 1;
+            const max = parseInt(inp.max || 12);
+            if (nextValue > max) nextValue = max;
 
-        const checkout = new Date(checkin);
-        checkout.setMonth(checkin.getMonth() + bulan);
-
-        let cur = new Date(checkin);
-        let hasConflict = false;
-        while (cur < checkout) {
-            if (dateMap[toLocalDateString(cur)]) {
-                hasConflict = true;
-                break;
+            const checkinStr = document.getElementById("waktu_checkin_preview").value;
+            if (checkinStr) {
+                const parts = checkinStr.split('/');
+                const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                if (!isRangeAvailable(checkin, nextValue)) {
+                    Swal.fire({
+                        title: "Tidak Dapat dipilih",
+                        html: `Dalam hari dari tanggal <b>${checkinStr}</b> terdapat Booking/Transaksi sehingga tanggal tidak dapat digunakan.`,
+                        icon: "warning"
+                    });
+                    return;
+                }
             }
-            cur.setDate(cur.getDate() + 1);
-        }
 
-        if (hasConflict) {
-            fpCheckIn.open();
-            Swal.fire({
-                title: "Tanggal Tidak Bisa Dipilih",
-                html: `Dalam <b>${bulan} bulan</b> dari ${checkinStr} terdapat transaksi/booking sehingga jumlah bulan tidak dapat digunakan.`,
-                icon: "warning"
-            }).then(() => resetInput());
-            return;
-        }
-
-        document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
-        document.getElementById("waktu_check_out").value = toDateInputString(checkout);
-    }
-
-    document.getElementById("jumlah_bulan").addEventListener("input", hitungCheckout);
-    document.getElementById("btn-plus").addEventListener("click", () => {
-        const input = document.getElementById("jumlah_bulan");
-        input.value = parseInt(input.value || 1) + 1;
-        hitungCheckout();
-    });
-    document.getElementById("btn-minus").addEventListener("click", () => {
-        const input = document.getElementById("jumlah_bulan");
-        if (parseInt(input.value) > 1) {
-            input.value = parseInt(input.value) - 1;
+            inp.value = nextValue;
             hitungCheckout();
-        }
-    });
+        });
 
-    function resetInput() {
-        document.getElementById("waktu_checkin_preview").value = "";
-        document.getElementById("waktu_checkin").value = "";
-        document.getElementById("jumlah_bulan").value = 1;
-        document.getElementById("waktu_check_out_preview").value = "";
-        document.getElementById("waktu_check_out").value = "";
-        if (fpCheckIn) fpCheckIn.clear();
-    }
-</script>
+        document.getElementById("btn-minus").addEventListener("click", () => {
+            const inp = document.getElementById("jumlah_bulan");
+            if (parseInt(inp.value) > 1) inp.value = parseInt(inp.value) - 1;
+            hitungCheckout();
+        });
+    </script>
+</body>
+
+</html>

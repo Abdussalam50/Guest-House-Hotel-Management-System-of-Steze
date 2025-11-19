@@ -513,79 +513,105 @@
                                                 <div class="modal fade" id="modalKamar" tabindex="-1">
                                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                                         <div class="modal-content">
-
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Pilih Kamar</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                                                             </div>
-
                                                             <div class="modal-body">
-                                                                <div class="row g-3">
-                                                                    <?php
-
-                                                                    $tanggal_check = date('Y-m-d');
-                                                                    $query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY no_kamar ASC";
-                                                                    $result = mysql_query($query) or die('Query Error: ' . mysql_error());
-
-                                                                    while ($kamar = mysql_fetch_assoc($result)) {
-                                                                        $idKamar = $kamar['id_kamar'];
-                                                                        $noKamar = $kamar['no_kamar'];
-
-                                                                        // Cek apakah kamar ini sedang dibooking hari ini (overlap dengan hari ini)
-                                                                        $qBooking = "SELECT id_transaksi FROM data_booking 
-                                                                        WHERE id_hotel = '$idHotel'
-                                                                        AND ('$tanggal_check' BETWEEN waktu_checkin AND DATE_SUB(waktu_checkout, INTERVAL 1 DAY))
-                                                                        AND (id_kamar LIKE '%" . $idKamar . "%') 
-                                                                        AND status_transaksi = 'Booking'";
-
-                                                                        $resBooking = mysql_query($qBooking);
-                                                                        $sedangDibooking = mysql_num_rows($resBooking) > 0;
-                                                                        $statusAwal = $kamar['status_kamar']; // Kosong atau Terisi
-
-                                                                        // Prioritas status: Booking > Terisi > Kosong
-                                                                        if ($sedangDibooking) {
-                                                                            $badgeClass = 'bg-primary';      // biru
-                                                                            $statusText = 'Booking';
-                                                                            $bgcolor    = 'background-color: #f6f7f9;';
-                                                                        } elseif ($statusAwal == 'Terisi') {
-                                                                            $badgeClass = 'bg-danger';
-                                                                            $statusText = 'Terisi';
-                                                                            $bgcolor    = 'background-color: #f6f7f9;';
-                                                                        } else {
-                                                                            $badgeClass = 'bg-success';
-                                                                            $statusText = 'Tersedia';
-                                                                            $bgcolor    = 'background-color: #ffffff;';
-                                                                        }
-                                                                    ?>
-                                                                        <div class="col-6 col-md-4 col-lg-3 mb-3">
-                                                                            <div class="card kamar-card p-2 pilih-kamar-item"
-                                                                                data-kamar="<?= htmlspecialchars($noKamar) ?>"
-                                                                                style="height: 150px; <?= $bgcolor ?> display: flex; flex-direction: column; justify-content: space-between;">
-
-                                                                                <div style="margin-top: 10px;">
-                                                                                    <div class="fw-bold text-primary" style="font-size: 13px;">
-                                                                                        Kamar <?= htmlspecialchars($noKamar) ?>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                                <div class="mt-auto" style="margin-bottom: 10px;">
-                                                                                    <div class="text-left small mb-2">
-                                                                                        <?= ucwords(baca_database("", "tipe_kamar", "SELECT * FROM data_tipe_kamar WHERE id_tipe_kamar='" . $kamar['id_tipe_kamar'] . "'")) ?>
-                                                                                        <br>
-                                                                                        <span class="text-dark"><?= rupiah($kamar['harga_harian']) ?> @ 1 Days</span>
-                                                                                    </div>
-                                                                                    <span style="color: white;" class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    <?php } ?>
+                                                                <div class="row g-3" id="list-kamar">
+                                                                    <!-- Kamar akan dimuat lewat AJAX -->
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
 
+                                                <script>
+                                                    document.getElementById('btn_pilih_kamar').addEventListener('click', function() {
+                                                        const tanggalCheckin = document.getElementById('waktu_checkin').value;
+                                                        const tanggalCheckout = document.getElementById('waktu_check_out').value;
+
+                                                        if (!tanggalCheckin || !tanggalCheckout) {
+                                                            Swal.fire('Warning', 'Silahkan input waktu check-in & check-out terlebih dahulu!', 'warning');
+                                                            return; // modal tidak dibuka
+                                                        }
+
+                                                        // Buka modal
+                                                        const modal = new bootstrap.Modal(document.getElementById('modalKamar'));
+                                                        modal.show();
+
+                                                        // Load kamar via AJAX
+                                                        loadKamar();
+                                                    });
+
+
+                                                    function loadKamar() {
+                                                        const tanggalCheckin = document.getElementById('waktu_checkin').value;
+                                                        const tanggalCheckout = document.getElementById('waktu_check_out').value;
+                                                        const idHotel = "<?php echo decrypt($_COOKIE['id_hotel']); ?>";
+
+                                                        if (!tanggalCheckin || !tanggalCheckout) {
+                                                            Swal.fire('Warning', 'Check-in dan check-out harus diisi!', 'warning');
+                                                            return;
+                                                        }
+
+                                                        fetch('ajax_list_kamar.php', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json'
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    tanggal_checkin_check: tanggalCheckin,
+                                                                    tanggal_checkout_check: tanggalCheckout,
+                                                                    id_hotel: idHotel
+                                                                })
+                                                            })
+                                                            .then(res => res.json())
+                                                            .then(data => {
+                                                                const container = document.getElementById('list-kamar');
+                                                                container.innerHTML = '';
+
+                                                                if (data.length === 0) {
+                                                                    container.innerHTML = '<div class="col-12 text-center text-muted">Tidak ada kamar tersedia</div>';
+                                                                    return;
+                                                                }
+
+                                                                data.forEach(kamar => {
+                                                                    const card = document.createElement('div');
+                                                                    card.className = 'col-6 col-md-4 col-lg-3 mb-3';
+                                                                    card.innerHTML = `
+                                                                        <div class="card kamar-card p-2 pilih-kamar-item"
+                                                                            data-kamar="${kamar.no_kamar}"
+                                                                            style="height:150px;background:${kamar.bgcolor};
+                                                                            display:flex;flex-direction:column;justify-content:space-between;">
+                                                                            
+                                                                            <div style="margin-top:10px;">
+                                                                                <div class="fw-bold text-primary" style="font-size:13px;">
+                                                                                    Kamar ${kamar.no_kamar}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="mt-auto" style="margin-bottom:10px;">
+                                                                                <div class="text-left small mb-2">
+                                                                                    ${kamar.tipe_kamar}<br>
+                                                                                    <span class="text-dark">${kamar.harga_harian} @ 1 Days</span>
+                                                                                </div>
+                                                                                <span class="badge ${kamar.badgeClass}" style="color:white;">
+                                                                                    ${kamar.statusText}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    `;
+                                                                    container.appendChild(card);
+                                                                });
+                                                            })
+                                                            .catch(err => console.error(err));
+                                                    }
+
+                                                    // Jika modal dibuka manual, tetap load kamar
+                                                    document.getElementById('modalKamar').addEventListener('show.bs.modal', loadKamar);
+                                                </script>
 
 
 
@@ -1096,9 +1122,9 @@
             refreshListKamar();
 
             // Buka modal pilih kamar
-            $('#pilih_kamar, #btn_pilih_kamar').on('click', function() {
-                new bootstrap.Modal(document.getElementById('modalKamar')).show();
-            });
+            // $('#pilih_kamar, #btn_pilih_kamar').on('click', function() {
+            //     new bootstrap.Modal(document.getElementById('modalKamar')).show();
+            // });
         });
 
         // Event klik card kamar (pakai event delegation karena card di-generate PHP)
@@ -1630,10 +1656,7 @@
 FROM data_metode_pembayaran mp
 LEFT JOIN data_bank b ON mp.id_bank = b.id_bank
 WHERE b.id_hotel = '$idHotel'
-  AND (
-      LOWER(mp.metode_pembayaran) LIKE '%tunai%' 
-      OR LOWER(mp.metode_pembayaran) LIKE '%transfer%'
-  )") or die(mysql_error());
+  ") or die(mysql_error());
                         $no = 0;
                         while ($data = mysql_fetch_array($query_metode_bayar)) {
                             $no++;

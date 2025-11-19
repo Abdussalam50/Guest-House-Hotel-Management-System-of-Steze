@@ -24,11 +24,15 @@ if ($jenis_transaksi == "harian") {
 ?>
 
 <?php if ($status_transaksi == "Booking") { ?>
-    <div class="text-end mt-3">
-        <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#modalBayarBooking<?= $id_transaksi ?>">
-            Bayar & Check-in
-        </button>
-    </div>
+
+    <?php if (!isset($_COOKIE['customer_service'])) { ?>
+        <div class="text-end mt-3">
+            <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#modalBayarBooking<?= $id_transaksi ?>">
+                Bayar & Check-in
+            </button>
+        </div>
+
+    <?php } ?>
 <?php } ?>
 
 <!-- MODAL (ID tetap + data-id untuk referensi) -->

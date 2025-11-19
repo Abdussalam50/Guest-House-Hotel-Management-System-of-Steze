@@ -77,20 +77,17 @@
                                 <input onkeypress='return a(event)' class="form-control" style="width:50%" type="varchar" name="harga_harian" id="harga_harian" placeholder="Harga Harian " required="required">
                             </td>
                         </tr>
-                        <?php if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") { ?>
-                            <tr>
-                                <td width="25%" class="leftrowcms">
-                                    <label>Harga Bulanan <span class="highlight"></span></label>
-                                </td>
-                                <td width="2%">:</td>
-                                <td>
-                                    <input onkeypress='return a(event)' class="form-control" style="width:50%" type="varchar" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required">
-                                </td>
-                            </tr>
-                        <?php } else { ?>
-                            <input value="0" onkeypress='return a(event)' class="form-control" style="width:50%" type="hidden" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required">
 
-                        <?php } ?>
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>Harga Bulanan <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <input onkeypress='return a(event)' class="form-control" style="width:50%" type="varchar" name="harga_bulanan" id="harga_bulanan" placeholder="Harga Bulanan " required="required">
+                            </td>
+                        </tr>
+
                         <tr>
                             <td width="25%" class="leftrowcms">
                                 <label>No Kamar <span class="highlight"></span></label>
@@ -108,12 +105,12 @@
                             <td>
                                 <select class="form-control" style="width:50%" type="text" name="id_tipe_kamar" id="id_tipe_kamar" placeholder="Id Tipe Kamar " required="required">
                                     <option></option><?php
-                                    if(isset($_COOKIE['id_hotel'])){
-                                        combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar where id_hotel = '$id_hotel' ");
-                                    }else{
+                                                        if (isset($_COOKIE['id_hotel'])) {
+                                                            combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar where id_hotel = '$id_hotel' ");
+                                                        } else {
 
-                                        combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar group by tipe_kamar"); 
-                                    }?>
+                                                            combo_database_v2('data_tipe_kamar', 'id_tipe_kamar', 'tipe_kamar', "select * from data_tipe_kamar group by tipe_kamar");
+                                                        } ?>
                                 </select>
                             </td>
                         </tr>

@@ -171,10 +171,10 @@
 
                                             </div>
                                             <label class="form-label">Tanggal</label>
-                                            <input type="text" class="form-control mb-2" readonly value="20/05/2013">
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo ($data['waktu_transaksi']); ?>">
 
                                             <label class="form-label">Channel</label>
-                                            <input type="text" class="form-control mb-2" readonly value="Walk-In Guest">
+                                            <input type="text" class="form-control mb-2" readonly value="<?php echo ($data['channel']); ?>">
 
 
                                             <label class="form-label">Tanggal Cek In</label>

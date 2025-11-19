@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<humans>
+<!-- MASTER MENU -->
+<menu><id>A</id><s>0</s><t>s</t><i>fa fa-home</i><n>Home</n><l>../home/index.php</l></menu>
+<!-- SETTING -->
+<menu><id>B</id><s>0</s><t>m</t><i>fa fa-edit</i><n>Master Data</n><l>#</l></menu>
+<menu><id>C</id><s>0</s><t>m</t><i>fa fa-calendar</i><n>Laporan</n><l>#</l></menu>
+
+<!-- MASTERDATA -->
+
+
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Booking </n><l>../data_booking/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Logout </n><l>../../../login/logout.php</l></menu>
+<!-- <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Pelanggan </n><l>../home/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Laporan </n><l>../home/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Operasional </n><l>../home/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Kamar </n><l>../home/index.php</l></menu>
+<menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Admin </n><l>../home/index.php</l></menu> -->
+
+<!-- <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Pengaturan </n><l>../data_pengaturan/index.php</l></menu> -->
+
+
+<!-- <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Payment</n><l>../data_metode_pembayaran/index.php</l></menu> -->
+
+
+
+<!-- LAPORAN -->
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Transaksi </n><l>../data_transaksi/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Operasional </n><l>../data_operasional/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Cashflow </n><l>../data_transaksi/index.php?input=cetak_cashflow</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Deposit </n><l>../data_transaksi/index.php?input=cetak_deposit</l></menu>
+<!-- <menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Pendapatan </n><l>../data_transaksi/index.php?input=cetak_pendapatan</l></menu> -->
+
+
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Pelanggan </n><l>../data_pelanggan/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Kamar </n><l>../data_kamar/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Pajak </n><l>../data_pajak/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Rekapitulasi</n><l>../grafik_rekapitulasi/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Transaksi</n><l>../grafik_transaksi/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Pendapatan</n><l>../grafik_pendapatan/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Operasional</n><l>../grafik_operasional/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Kamar</n><l>../grafik_kamar/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Type Kamar</n><l>../grafik_type_kamar/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Channel</n><l>../grafik_channel/index.php</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Grafik Payment</n><l>../grafik_metode_pembayaran/index.php</l></menu>
+
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Riwayat Admin </n><l>../data_admin/index.php?input=cetak_riwayat</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Riwayat Super Admin </n><l>../data_admin/index.php?input=cetak_riw_superadmin</l></menu>
+
+<menu><id></id><s>whitelist</s><t>x</t><i>fa fa-check</i><n>data_pengaturan_aplikasi</n><l>data_pengaturan_aplikasi</l></menu>
+
+</humans>

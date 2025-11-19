@@ -147,40 +147,20 @@
 
 
 								<div class="stat-row mb-2">
-									<strong><i class="fas fa-sign-in-alt text-success me-1"></i>Check in</strong>
+									<strong><i class="fas fa-sign-in-alt text-primary me-1"></i>Total Booking</strong>
 									<strong><?php echo baca_database("", "jumlah_transaksi_lunas", "SELECT 
                                                                                         COUNT(*) AS jumlah_transaksi_lunas
                                                                                     FROM 
                                                                                         data_booking
                                                                                     WHERE 
-                                                                                        status_transaksi = 'Lunas' and id_hotel='$idHotel';
-                                                                                    ") ?> Transaksi</strong>
-								</div>
-								<div class="stat-row mb-2">
-									<strong><i class="fas fa-sign-out-alt text-danger me-1"></i>Check Out</strong>
-									<strong><?php echo baca_database("", "jumlah_transaksi_selesai", "SELECT 
-                                                                                        COUNT(*) AS jumlah_transaksi_selesai
-                                                                                    FROM 
-                                                                                        data_booking
-                                                                                    WHERE 
-                                                                                        status_transaksi = 'Selesai' and id_hotel='$idHotel';
-                                                                                    ") ?> Transaksi</strong>
+                                                                                        status_transaksi = 'Booking' and id_hotel='$idHotel';
+                                                                                    ") ?> Booking</strong>
 								</div>
 
-								<div class="stat-row mb-2">
-									<strong><i class="fas fa-edit text-danger me-1"></i>Total</strong>
-									<strong><?php echo baca_database("", "jumlah", "SELECT 
-                                                                                        COUNT(*) AS jumlah
-                                                                                    FROM 
-                                                                                        data_booking where id_hotel='$idHotel'
-                                                                                    
-                                                                                    ") ?> Transaksi</strong>
-								</div>
 
-								<div class="stat-row mb-2">
-									<strong><i class="fas fa-wallet text-danger  me-1"></i>Cash in</strong>
-									<strong><?php echo rupiah($pendapatan['pendapatan']) ?></strong>
-								</div>
+
+
+
 
 							</div>
 						</div>

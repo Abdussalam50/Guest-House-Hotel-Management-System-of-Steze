@@ -359,6 +359,9 @@ if ($query_transaksi && $query_pajak && $query_pemasukan && $query_deposit && $q
   }
 } else {
   mysql_query("ROLLBACK");
-  echo "Terjadi kesalahan: " . mysql_error();
+  echo "<script>
+        alert('Silahkan lengkapi data!');
+        window.history.back();
+    </script>";
 }
 ?>
