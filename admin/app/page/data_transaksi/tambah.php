@@ -210,20 +210,61 @@
 
 
 
+                                                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                                                <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+                                                <style>
+                                                    .booking-date {
+                                                        background: #d8eaff !important;
+                                                        color: #003f8c !important;
+                                                        border-radius: 10px !important;
+                                                        font-weight: 600;
+                                                    }
+
+                                                    .transaksi-date {
+                                                        background: #ffd8d6 !important;
+                                                        color: #8c0000 !important;
+                                                        border-radius: 10px !important;
+                                                        font-weight: 600;
+                                                    }
+
+                                                    .today-date {
+                                                        background: #eaf7d8 !important;
+                                                        color: #3f6b00 !important;
+                                                        border-radius: 10px !important;
+                                                        border: 2px solid #9bd354 !important;
+                                                        font-weight: 700;
+                                                    }
+
+                                                    .flatpickr-day.selected,
+                                                    .flatpickr-day.startRange,
+                                                    .flatpickr-day.endRange {
+                                                        border-radius: 10px !important;
+                                                    }
+
+                                                    .flatpickr-day.selected:hover,
+                                                    .flatpickr-day.startRange:hover,
+                                                    .flatpickr-day.endRange:hover {
+                                                        border-radius: 10px !important;
+                                                    }
+
+                                                    .flatpickr-day:hover {
+                                                        border-radius: 10px !important;
+                                                        background: #e5e5e5 !important;
+                                                    }
+
+                                                    .swal2-container {
+                                                        z-index: 99999 !important;
+                                                    }
+                                                </style>
+
                                                 <label class="form-label">Tanggal Cek In</label>
-                                                <input class="form-control mb-2" value="<?php echo date("Y-m-d") ?>" type="date" name="waktu_checkin" id="waktu_checkin" placeholder="Waktu Checkin " required="required">
+                                                <input id="waktu_checkin_preview" class="form-control mb-2" placeholder="Pilih tanggal..." required>
+                                                <input id="waktu_checkin" name="waktu_checkin" type="hidden" required>
 
                                                 <label class="form-label">Tanggal Cek Out</label>
-
-                                                <input class="form-control mb-2"
-                                                    type="date"
-
-                                                    value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>"
-                                                    name="waktu_check_out"
-                                                    id="waktu_check_out"
-                                                    placeholder="Waktu Check Out"
-                                                    required="required">
-
+                                                <input id="waktu_check_out_preview" class="form-control" placeholder="Pilih Check-in..." readonly>
+                                                <input id="waktu_check_out" name="waktu_check_out" type="hidden" required>
 
                                                 <label class="form-label">Jumlah Hari</label>
                                                 <div class="input-group mb-2">
@@ -231,6 +272,160 @@
                                                     <input class="form-control" style="height: 38px;text-align: center;" type="number" name="jumlah_hari" min="1" id="jumlah_hari" value="1" placeholder="Jumlah Hari" required>
                                                     <button id="btn-plus" style="height: 38px;padding-top: 9px;" class="btn btn-secondary" type="button">+</button>
                                                 </div>
+                                                <script>
+                                                    function toLocalDateString(date) {
+                                                        const d = String(date.getDate()).padStart(2, '0');
+                                                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const y = date.getFullYear();
+                                                        return `${d}/${m}/${y}`;
+                                                    }
+
+                                                    function toDateInputString(date) {
+                                                        const d = String(date.getDate()).padStart(2, '0');
+                                                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const y = date.getFullYear();
+                                                        return `${y}-${m}-${d}`;
+                                                    }
+
+                                                    let dateMap = {};
+                                                    const today = new Date();
+                                                    today.setHours(0, 0, 0, 0);
+                                                    const todayStr = toLocalDateString(today);
+                                                    const disableBeforeToday = [d => {
+                                                        d.setHours(0, 0, 0, 0);
+                                                        return d < today;
+                                                    }];
+
+                                                    let fpCheckIn;
+
+                                                    // Ambil schedule
+                                                    fetch('schedule.php')
+                                                        .then(res => res.json())
+                                                        .then(data => {
+                                                            data.forEach(i => {
+                                                                let cur = new Date(i.checkin);
+                                                                const last = new Date(i.checkout);
+                                                                while (cur <= last) {
+                                                                    const str = toLocalDateString(cur);
+                                                                    if (!dateMap[str] || i.type === "transaksi") dateMap[str] = {
+                                                                        type: i.type,
+                                                                        info: i.info
+                                                                    };
+                                                                    cur.setDate(cur.getDate() + 1);
+                                                                }
+                                                            });
+                                                            initFlatpickr();
+                                                        });
+
+                                                    function initFlatpickr() {
+                                                        fpCheckIn = flatpickr("#waktu_checkin_preview", {
+                                                            dateFormat: "d/m/Y",
+                                                            disable: disableBeforeToday,
+                                                            onChange: function(_, dateStr) {
+                                                                if (!dateStr) return;
+                                                                const maxHari = getMaxDays(dateStr);
+                                                                document.getElementById("jumlah_hari").max = maxHari;
+
+                                                                const parts = dateStr.split('/');
+                                                                const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                                document.getElementById("waktu_checkin").value = toDateInputString(checkin);
+
+                                                                let checkout = new Date(checkin);
+                                                                checkout.setDate(checkin.getDate() + 1);
+                                                                document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+                                                                document.getElementById("waktu_check_out").value = toDateInputString(checkout);
+
+                                                                hitungCheckout();
+                                                            },
+                                                            onDayCreate: function(_, __, ___, dayElem) {
+                                                                const dateStr = toLocalDateString(dayElem.dateObj);
+                                                                if (dateMap[dateStr]) {
+                                                                    const {
+                                                                        type,
+                                                                        info
+                                                                    } = dateMap[dateStr];
+                                                                    dayElem.classList.add(type === "booking" ? "booking-date" : "transaksi-date");
+                                                                    dayElem.dataset.info = info;
+                                                                    dayElem.dataset.type = type;
+                                                                }
+                                                                if (dateStr === todayStr) dayElem.classList.add("today-date");
+                                                                if (dayElem.dataset.info) dayElem.title = dayElem.dataset.info;
+
+                                                                dayElem.addEventListener("click", e => {
+                                                                    if (dayElem.dataset.info && dayElem.dataset.info !== "Hari Ini") {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        fpCheckIn.open();
+                                                                        Swal.fire({
+                                                                            title: "Tidak dapat dipilih",
+                                                                            html: `Dalam hari dari tanggal <b>${dateStr}</b> terdapat ${dayElem.dataset.info} sehingga tanggal tidak dapat digunakan.`,
+                                                                            icon: dayElem.dataset.type === "booking" ? "info" : "warning"
+                                                                        }).then(() => resetInput());
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function getMaxDays(checkinStr) {
+                                                        if (!checkinStr) return 1;
+                                                        const parts = checkinStr.split('/');
+                                                        const start = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                        for (let i = 1; i <= 365; i++) {
+                                                            const temp = new Date(start);
+                                                            temp.setDate(start.getDate() + i);
+                                                            if (dateMap[toLocalDateString(temp)]) return i;
+                                                        }
+                                                        return 365;
+                                                    }
+
+                                                    function hitungCheckout() {
+                                                        const checkinStr = document.getElementById("waktu_checkin_preview").value;
+                                                        if (!checkinStr) return;
+                                                        const hari = parseInt(document.getElementById("jumlah_hari").value || 1);
+                                                        const parts = checkinStr.split('/');
+                                                        const checkin = new Date(parts[2], parts[1] - 1, parts[0]);
+                                                        if (isNaN(checkin.getTime())) return;
+
+                                                        let checkout = new Date(checkin);
+                                                        checkout.setDate(checkin.getDate() + hari);
+
+                                                        let cur = new Date(checkin);
+                                                        let hasConflict = false;
+                                                        while (cur < checkout) {
+                                                            if (dateMap[toLocalDateString(cur)]) {
+                                                                hasConflict = true;
+                                                                break;
+                                                            }
+                                                            cur.setDate(cur.getDate() + 1);
+                                                        }
+                                                        if (hasConflict) {
+                                                            fpCheckIn.open();
+                                                            Swal.fire({
+                                                                title: "Jumlah hari tidak bisa dipilih",
+                                                                html: `Dalam <b>${hari}</b> hari dari <b>${checkinStr}</b> terdapat transaksi/booking sehingga jumlah hari tidak dapat digunakan.`,
+                                                                icon: "warning"
+                                                            }).then(() => resetInput());
+                                                            return;
+                                                        }
+
+                                                        document.getElementById("waktu_check_out_preview").value = toLocalDateString(checkout);
+                                                        document.getElementById("waktu_check_out").value = toDateInputString(checkout);
+                                                    }
+
+                                                    function resetInput() {
+                                                        document.getElementById("waktu_checkin_preview").value = "";
+                                                        document.getElementById("waktu_checkin").value = "";
+                                                        document.getElementById("jumlah_hari").value = 1;
+                                                        document.getElementById("waktu_check_out_preview").value = "";
+                                                        document.getElementById("waktu_check_out").value = "";
+                                                        fpCheckIn.clear();
+                                                    }
+
+                                                    // Plus & Minus
+                                                    document.getElementById("jumlah_hari").addEventListener("input", hitungCheckout);
+                                                </script>
+
                                             </div>
                                         </div>
                                     </div>
@@ -886,7 +1081,7 @@
             const checkin = new Date(elements.checkin.value);
             const days = parseInt(elements.days.value) || 0;
             const checkout = new Date(checkin.getTime() + days * MS_PER_DAY);
-            elements.checkout.value = checkout.toISOString().split('T')[0];
+            // elements.checkout.value = checkout.toISOString().split('T')[0];
 
             elements.harga_kamar.value = calculateBasePrice(days);
             updateFinalPrice();
@@ -921,7 +1116,7 @@
         elements.payment.addEventListener('input', updatePaymentCalculations);
         elements.displayDeposit.addEventListener('input', updateGrandTotal);
         elements.additionalFee.addEventListener('input', () => {
-            elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
+            //elements.additionalFeeDisplay.innerHTML = formatRupiah(Number(elements.additionalFee.value) || 0);
 
         });
         elements.totalplusdepo.addEventListener('click', total_plus_depo);
@@ -952,17 +1147,37 @@
         const btnMinus = document.getElementById('btn-minus');
         const btnPlus = document.getElementById('btn-plus');
 
-        btnPlus.addEventListener('click', () => {
-            inputHari.value = parseInt(inputHari.value) + 1;
-            updateCheckoutDate();
+        // Tombol minus
+        document.getElementById("btn-minus").addEventListener("click", () => {
+            const input = document.getElementById("jumlah_hari");
+            const checkinStr = document.getElementById("waktu_checkin").value;
+
+            if (!checkinStr) return; // Jika check-in belum dipilih, tombol tidak berfungsi
+
+            let val = parseInt(input.value) || 1;
+            if (val > 1) {
+                val--;
+                input.value = val;
+                hitungCheckout();
+                updateCheckoutDate();
+            }
         });
 
-        btnMinus.addEventListener('click', () => {
-            let current = parseInt(inputHari.value);
-            if (current > 1) {
-                inputHari.value = current - 1;
+        // Tombol plus
+        document.getElementById("btn-plus").addEventListener("click", () => {
+            const input = document.getElementById("jumlah_hari");
+            const checkinStr = document.getElementById("waktu_checkin").value;
+
+            if (!checkinStr) return; // Jika check-in belum dipilih, tombol tidak berfungsi
+
+            let val = parseInt(input.value) || 1;
+            const max = parseInt(input.max) || 365; // Ambil dari max jumlah_hari
+            if (val < max) {
+                val++;
+                input.value = val;
+                hitungCheckout();
+                updateCheckoutDate();
             }
-            updateCheckoutDate();
         });
 
 

@@ -1,0 +1,1 @@
+lements.checkout.value = checkout.toISOString().split('T')[0];
