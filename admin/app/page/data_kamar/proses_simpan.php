@@ -28,6 +28,7 @@ if (pengaturan_aplikasi('transaksi_bulanan') == "aktif") {
 $no_kamar = xss($_POST['no_kamar']);
 $id_tipe_kamar = xss($_POST['id_tipe_kamar']);
 $status_kamar = xss($_POST['status_kamar']);
+$urutan = xss($_POST['urutan']);
 
 
 $query = mysql_query("insert into data_kamar values (
@@ -39,9 +40,10 @@ $query = mysql_query("insert into data_kamar values (
  ,'$no_kamar'
  ,'$id_tipe_kamar'
  ,'$status_kamar'
+ ,'$urutan'
 
 )");
-$sql="insert into data_kamar values (
+$sql = "insert into data_kamar values (
 '$id_kamar'
  ,'$id_hotel'
  ,'$kapasitas'
@@ -50,11 +52,12 @@ $sql="insert into data_kamar values (
  ,'$no_kamar'
  ,'$id_tipe_kamar'
  ,'$status_kamar'
+ ,'$urutan'
 
 )";
-$username=decrypt($_COOKIE['jenenge']);
-$id_super_admin=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
-simpan_riwayat("data_kamar","id_kamar",$id_kamar,$sql,$id_super_admin);
+$username = decrypt($_COOKIE['jenenge']);
+$id_super_admin = baca_database("", "id_pengelola", "select * from data_pengelola where username='$username'");
+simpan_riwayat("data_kamar", "id_kamar", $id_kamar, $sql, $id_super_admin);
 if ($query) {
 ?>
     <script>

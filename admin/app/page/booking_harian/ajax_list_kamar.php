@@ -13,7 +13,7 @@ if (!$tanggalCheckin || !$tanggalCheckout || !$idHotel) {
 }
 
 // Ambil semua kamar hotel
-$query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY no_kamar ASC";
+$query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY urutan ASC";
 $result = mysql_query($query) or die(mysql_error());
 
 $kamarList = [];
@@ -77,6 +77,7 @@ while ($kamar = mysql_fetch_assoc($result)) {
 
     // Simpan
     $kamarList[] = [
+        'id_kamar'      => $idKamar,
         'no_kamar'      => $noKamar,
         'tipe_kamar'    => $tipeKamar,
         'harga_harian'  => $hargaHarian,

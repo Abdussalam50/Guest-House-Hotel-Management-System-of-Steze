@@ -13,7 +13,7 @@ if (!$tanggalCheckin || !$tanggalCheckout || !$idHotel) {
 }
 
 // Ambil semua kamar hotel
-$query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY no_kamar ASC";
+$query = "SELECT * FROM data_kamar WHERE id_hotel = '$idHotel' ORDER BY urutan ASC";
 $result = mysql_query($query) or die(mysql_error());
 
 $kamarList = [];
@@ -73,10 +73,11 @@ while ($kamar = mysql_fetch_assoc($result)) {
     $tipeKamar = $tipe['tipe_kamar'] ?? '-';
 
     // Harga rupiah tanpa koma
-    $hargaHarian = "Rp " . number_format($kamar['harga_harian'], 0, '', '.');
+    $hargaHarian = "Rp " . number_format($kamar['harga_bulanan'], 0, '', '.');
 
     // Simpan
     $kamarList[] = [
+        'id_kamar'      => $idKamar,
         'no_kamar'      => $noKamar,
         'tipe_kamar'    => $tipeKamar,
         'harga_harian'  => $hargaHarian,

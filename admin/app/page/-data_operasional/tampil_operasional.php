@@ -95,6 +95,8 @@
     SELECT SUM(biaya) AS total
     FROM data_operasional
     WHERE id_hotel = '$idHotel'
+      AND MONTH(tanggal) = MONTH(CURRENT_DATE())
+      AND YEAR(tanggal) = YEAR(CURRENT_DATE())
 ");
 
 				$biaya = mysql_fetch_assoc($queryBiaya);

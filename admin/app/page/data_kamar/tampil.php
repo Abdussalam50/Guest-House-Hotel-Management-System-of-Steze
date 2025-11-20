@@ -74,6 +74,7 @@ if ($id_hotel == "") {
                         
 
                         <th align="left" class="th_border cell">Tipe Kamar </th>
+                        <th align="left" class="th_border cell">Urutan </th>
                         <th align="left" class="th_border cell">Status Kamar </th>
 
                     </tr>
@@ -87,10 +88,10 @@ if ($id_hotel == "") {
                         if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
                             $berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
                             $isi = mysql_real_escape_string($_GET['isi']);
-                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
+                            $querytabel = "SELECT * FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'  order by urutan asc";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar where $berdasarkan like '%$isi%' AND id_hotel='$id_hotel'";
                         } else {
-                             $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' ";
+                             $querytabel = "SELECT * FROM data_kamar  WHERE  id_hotel='$id_hotel' order by urutan asc";
                             $querypagination = "SELECT COUNT(*) AS total FROM data_kamar WHERE id_hotel='id_hotel'";
                         }
                         $proses = mysql_query($querytabel);
@@ -137,7 +138,7 @@ if ($id_hotel == "") {
                                 
 
                                 <td align="left"><?php echo baca_database("", "tipe_kamar", "select * from data_tipe_kamar where id_tipe_kamar='$data[id_tipe_kamar]'")  ?></td>
-
+                        <td align="left"><?php echo ($data['urutan']); ?></td>
 
                                 <?php if ($data['status_kamar'] == "Kosong") { ?>
 

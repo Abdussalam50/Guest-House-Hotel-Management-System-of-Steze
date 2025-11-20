@@ -4,15 +4,7 @@ if ((isset($_COOKIE['operasional']) || $_COOKIE['id_hotel']=='') && !isset($_GET
     die();
 } elseif ( (isset($_COOKIE['operasional'])||$_COOKIE['id_hotel']=='')&& isset($_GET['id_hotel'])) {
     // Proceed with rendering the page content below
-}elseif(isset($_COOKIE['id_hotel'])&&$_COOKIE['id_hotel']){
-    ?>
-    <script>
-        alert('Maaf Anda Tidak Dapat Mengakses Menu Operasional !');
-        window.location.href='../index.php';
-    </script>
-<?php
 }
-
 ?>
 <div class="action-buttons" style="display: flex; justify-content: flex-end; margin-top: -59px; gap: 8px;">
     <?php if (!isset($_COOKIE['id_hotel'])) { ?>
@@ -111,80 +103,7 @@ if ((isset($_COOKIE['operasional']) || $_COOKIE['id_hotel']=='') && !isset($_GET
                 </table>
             </div>
 
-            <?php Pagination_current($page, $dataPerPage, $querypagination,$id_hotel,$_GET['nama_hotel']); 
- function Pagination_current($pagedefault, $limit, $querypagination,$id,$nama)
-{
-    $id=encrypt($id);
-	if (isset($_GET['page']) && !empty($_GET['page'])) {
-		$page = (int)$_GET['page'];
-	} else {
-		$page = 1;
-	}
-	if (isset($_GET['perPage']) && !empty($_GET['perPage'])) {
-		$dataPerPage = (int)$_GET['perPage'];
-	} else {
-		$dataPerPage = 10;
-	}
-
-	$queryParams = [];
-	if (isset($_GET['Berdasarkan']) && !empty($_GET['Berdasarkan']) && isset($_GET['isi']) && !empty($_GET['isi'])) {
-		$berdasarkan = mysql_real_escape_string($_GET['Berdasarkan']);
-		$isi = mysql_real_escape_string($_GET['isi']);
-		$queryParams['Berdasarkan'] = $berdasarkan;
-		$queryParams['isi'] = $isi;
-		$countTotalRow = mysql_query($querypagination);
-	} else {
-		$countTotalRow = mysql_query($querypagination);
-	}
-
-	$queryResult = mysql_fetch_assoc($countTotalRow);
-	$totalRow = $queryResult['total'];
-	$item_per_page = mysql_real_escape_string($dataPerPage);
-	$current_page = mysql_real_escape_string($page);
-	$total_records = $totalRow;
-	$total_pages = floor($totalRow / $dataPerPage) + 1;
-
-	$queryParams['perPage'] = $item_per_page;
-
-	$base_url = strtok($_SERVER["REQUEST_URI"], '?');
-	$query_string = http_build_query($queryParams);
-
-	echo "Jumlah " . $totalRow . " data, ";
-	echo "Halaman " . $current_page . " Dari " . $total_pages . " Halaman<br><br>";
-
-	$pagination = '';
-	$right_links = $current_page + 3;
-	$previous = $current_page - 3;
-	$next = $current_page + 1;
-
-	$previous_link = ($previous == 0) ? 1 : $previous;
-	$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?&id_hotel='.$id.'&nama_hotel='.$nama.'&'. $query_string . '&page=1" title="First">«</a> ';
-	$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?&id_hotel='.$id.'&nama_hotel='.$nama.'&' . $query_string . '&page=' . $previous_link . '" title="Previous">« Sebelumnya</a> ';
-
-	for ($i = ($current_page - 2); $i < $current_page; $i++) {
-		if ($i > 0) {
-			$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?id_hotel='.$id.'&nama_hotel='.$nama.'&' . $query_string . '&page=' . $i . '">' . $i . '</a> ';
-		}
-	}
-
-	$pagination .= '<a class="btn btn-default btn-xs">' . $current_page . '</a> ';
-
-	for ($i = $current_page + 1; $i < $right_links; $i++) {
-		if ($i <= $total_pages) {
-			$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?id_hotel='.$id.'&nama_hotel='.$nama.'&' . $query_string . '&page=' . $i . '">' . $i . '</a> ';
-		}
-	}
-
-	$next_link = ($i > $total_pages) ? $total_pages : $i;
-	$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?id_hotel='.$id.'&nama_hotel='.$nama.'&' . $query_string . '&page=' . $next_link . '" >berikutnya »</a> ';
-	$pagination .= '<a class="btn btn-sm btn-secondary fw-semibold" href="' . $base_url . '?id_hotel='.$id.'&nama_hotel='.$nama.'&' . $query_string . '&page=' . $total_pages . '" title="Last">»</a> ';
-
-	echo $pagination;
-}
-           
-            
-            ?>
-
+            <?php Pagination($page, $dataPerPage, $querypagination); ?>
         </div>
     </div>
 </div>

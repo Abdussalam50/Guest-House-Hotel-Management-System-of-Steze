@@ -120,15 +120,11 @@ if ($id_hotel == "") {
                             }
 
                             $jenis_transaksi = $data['jenis_transaksi'];
-
                             $harga_per_hari = $data['harga_kamar_harian'];
                             $harga_per_bulan = $data['harga_kamar_bulanan'];
-
                             $tgl_checkin = new DateTime($data['waktu_checkin']);
                             $tgl_checkout = new DateTime($data['waktu_checkout']);
-
                             $jumlah_hari = $data['jumlah_hari'];
-
                             $harga_kamar_total = 0;
 
 

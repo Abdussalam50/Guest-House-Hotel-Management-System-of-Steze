@@ -10,6 +10,7 @@
 
 
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Booking </n><l>../data_booking/index.php</l></menu>
+
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Logout </n><l>../../../login/logout.php</l></menu>
 <!-- <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Pelanggan </n><l>../home/index.php</l></menu>
 <menu><id></id><s>B</s><t>sm</t><i>fa fa-edit</i><n>Laporan </n><l>../home/index.php</l></menu>

@@ -3,12 +3,12 @@ include '../../../include/all_include.php';
 
 if (!isset($_POST['id_kamar'])) {
         
-    ?>
+?>
     <script>
         alert("AKSES DITOLAK");
         location.href = "index.php";
     </script>
-    <?php
+<?php
     die();
 }
 
@@ -20,6 +20,7 @@ $harga_bulanan = xss($_POST['harga_bulanan']);
 $no_kamar = xss($_POST['no_kamar']);
 $id_tipe_kamar = xss($_POST['id_tipe_kamar']);
 $status_kamar = xss($_POST['status_kamar']);
+$urutan = xss($_POST['urutan']);
 
 
 $query = mysql_query("update data_kamar set 
@@ -29,26 +30,30 @@ harga_harian='$harga_harian',
 harga_bulanan='$harga_bulanan',
 no_kamar='$no_kamar',
 id_tipe_kamar='$id_tipe_kamar',
-status_kamar='$status_kamar'
+status_kamar='$status_kamar',
+urutan='$urutan'
 
 where id_kamar='$id_kamar' ") or die(mysql_error());
-$sql="update data_kamar set 
+$sql = "update data_kamar set 
 id_hotel='$id_hotel',
 kapasitas='$kapasitas',
 harga_harian='$harga_harian',
 harga_bulanan='$harga_bulanan',
 no_kamar='$no_kamar',
 id_tipe_kamar='$id_tipe_kamar',
-status_kamar='$status_kamar'
+status_kamar='$status_kamar',
+urutan='$urutan'
 
 where id_kamar='$id_kamar'";
-$username=decrypt($_COOKIE['jenenge']);
-$id_super_admin=baca_database("","id_pengelola","select * from data_pengelola where username='$username'");
-simpan_riwayat("data_kamar","id_kamar",$id_kamar,$sql,$id_super_admin);
+$username = decrypt($_COOKIE['jenenge']);
+$id_super_admin = baca_database("", "id_pengelola", "select * from data_pengelola where username='$username'");
+simpan_riwayat("data_kamar", "id_kamar", $id_kamar, $sql, $id_super_admin);
 if ($query) {
-    ?>
-    <script>location.href = "<?php index(); ?>?input=popup_edit";</script>
-    <?php
+?>
+    <script>
+        location.href = "<?php index(); ?>?input=popup_edit";
+    </script>
+<?php
 } else {
     echo "GAGAL DIPROSES";
 }

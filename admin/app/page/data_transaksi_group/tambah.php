@@ -582,7 +582,7 @@
                                                                     card.className = 'col-6 col-md-4 col-lg-3 mb-3';
                                                                     card.innerHTML = `
                                                                         <div class="card kamar-card p-2 pilih-kamar-item"
-                                                                            data-kamar="${kamar.no_kamar}"
+                                                                            data-kamar="${kamar.id_kamar}"
                                                                             style="height:150px;background:${kamar.bgcolor};
                                                                             display:flex;flex-direction:column;justify-content:space-between;">
                                                                             
@@ -1162,7 +1162,7 @@
 
         function showJumlahTamu(kamarDipilih) {
             Swal.fire({
-                title: "Jumlah Tamu - Kamar " + kamarDipilih,
+                title: "Jumlah Tamu ",
                 width: 500,
                 html: `
                                                                             <style>
@@ -1197,20 +1197,20 @@
                     $.post('proses_simpan_list.php', {
                         id_transaksi: idTransaksi,
                         jumlah_hari: document.getElementById('jumlah_hari').value,
-                        no_kamar: kamarDipilih,
+                        id_kamar: kamarDipilih,
                         jumlah_dewasa: result.value.dewasa,
                         jumlah_anak_anak: result.value.anak
                     }, function(res) {
                         if (res.status === 'success') {
                             // Update field yang terlihat
-                            $('#pilih_kamar').val(kamarDipilih);
+                            //$('#pilih_kamar').val(kamarDipilih);
                             $('#jumlah_dewasa').val(result.value.dewasa);
                             $('#jumlah_anak_anak').val(result.value.anak);
 
                             // Refresh tabel list kamar
                             refreshListKamar();
 
-                            Swal.fire('Berhasil!', 'Kamar ' + kamarDipilih + ' ditambahkan ke daftar', 'success');
+                            Swal.fire('Berhasil!', 'Kamar ditambahkan ke daftar', 'success');
 
                         } else {
                             Swal.fire('Gagal', res.msg || 'Terjadi kesalahan saat menyimpan', 'error');

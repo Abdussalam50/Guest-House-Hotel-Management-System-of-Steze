@@ -140,7 +140,7 @@
 														if (isset($_GET['hotel'])) {
 															$idhotel = decrypt($_GET['hotel']);
 
-															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$idhotel' ");
+															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$idhotel' order by urutan asc");
 															while ($dataKamar = mysql_fetch_array($queryKamar)) {
 																if ($dataKamar['status_kamar'] == 'Kosong') {
 
@@ -312,7 +312,7 @@
 															}
 
 
-															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$id_hotel' ");
+															$queryKamar = mysql_query("SELECT * FROM data_kamar WHERE id_hotel = '$id_hotel' order by urutan asc ");
 															while ($data_kamar = mysql_fetch_array($queryKamar)) {
 																if ($data_kamar['status_kamar'] == 'Kosong') {
 																?>

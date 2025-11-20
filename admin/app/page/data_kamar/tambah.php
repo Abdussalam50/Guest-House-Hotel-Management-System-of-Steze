@@ -126,6 +126,35 @@
                             </td>
                         </tr>
 
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>Urutan <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <?php
+
+                                $qJumlah = mysql_query("SELECT COUNT(*) as total FROM data_kamar WHERE id_hotel = '$id_hotel'");
+                                $dJumlah = mysql_fetch_assoc($qJumlah);
+                                $totalKamar = (int)$dJumlah['total'];
+                                if ($totalKamar == 0) {
+                                    $totalKamar = 100;
+                                }
+                                ?>
+
+                                <select style="width:50%" name="urutan" id="urutan" class="form-control" required>
+                                    <option value="">-- Pilih Urutan --</option>
+
+                                    <?php
+                                    for ($i = 1; $i <= $totalKamar; $i++) {
+                                        echo "<option value='$i'>$i</option>";
+                                    }
+                                    ?>
+                                </select>
+
+                            </td>
+                        </tr>
+
 
 
                     </tbody>

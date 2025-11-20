@@ -35,6 +35,8 @@
                         $proses = decrypt(mysql_real_escape_string($_GET['proses']));
                         $sql = mysql_query("SELECT * FROM data_kamar where id_kamar = '$proses'");
                         $data = mysql_fetch_array($sql);
+
+                        $id_hotel = $data['id_hotel'];
                         ?>
                         <!--h
                     <tr>
@@ -44,7 +46,7 @@
                         <td width="2%">:</td>
                         <td>
                            <?php
-                            $id_hotel = decrypt($_COOKIE['id_hotel']);
+
                             echo $data['id_kamar']; ?>	
                         </td>
                     </tr>
@@ -58,7 +60,7 @@
                             <td width="2%">:</td>
                             <td>
                                 <select class="form-control" style="width:50%" type="text" name="id_hotel" id="id_hotel" placeholder="Id Hotel " required="required">
-                                    <option value="">-- --</option>
+
                                     <option value="<?php echo ($data['id_hotel']); ?>"> <?php echo baca_database("", "nama", "select * from data_hotel where id_hotel='$data[id_hotel]'"); ?> </option>
                                 </select>
                             </td>
@@ -123,6 +125,33 @@
                                 <select class="form-control" style="width:50%" type="text" name="status_kamar" id="status_kamar" placeholder="Status Kamar " required="required">
                                     <option value="<?php echo ($data['status_kamar']); ?>">- <?php echo ($data['status_kamar']); ?> -</option><?php combo_enum('data_kamar', 'status_kamar', ''); ?>
                                 </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="25%" class="leftrowcms">
+                                <label>Urutan <span class="highlight"></span></label>
+                            </td>
+                            <td width="2%">:</td>
+                            <td>
+                                <?php
+
+                                $qJumlah = mysql_query("SELECT COUNT(*) as total FROM data_kamar WHERE id_hotel = '$data[id_hotel]'");
+                                $dJumlah = mysql_fetch_assoc($qJumlah);
+                                $totalKamar = (int)$dJumlah['total'];
+
+                                ?>
+
+                                <select style="width:50%" name="urutan" id="urutan" class="form-control" required>
+                                    <option value="<?php echo ($data['urutan']); ?>">-- Urutan <?php echo ($data['urutan']); ?> --</option>
+                                    <option value='0'>0</option>
+                                    <?php
+                                    for ($i = 1; $i <= $totalKamar; $i++) {
+                                        echo "<option value='$i'>$i</option>";
+                                    }
+                                    ?>
+                                </select>
+
                             </td>
                         </tr>
 
