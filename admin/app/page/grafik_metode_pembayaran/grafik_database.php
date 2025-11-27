@@ -21,8 +21,14 @@ while ($row = mysql_fetch_assoc($hotels_query)) {
 	$hotels[$row['id_hotel']] = $row['nama'];
 }
 
-// Fetch distinct years
-$q_tahun = mysql_query("SELECT DISTINCT YEAR(waktu_checkin) AS tahun FROM data_transaksi ORDER BY tahun DESC") or die('Year query failed: ' . mysql_error());
+// Fetch distinc_oke years
+$q_tahun = mysql_query("
+    SELECT YEAR(waktu_checkin) AS tahun 
+    FROM data_transaksi 
+    GROUP BY YEAR(waktu_checkin) 
+    ORDER BY tahun DESC
+") or die('Year query failed: ' . mysql_error());
+
 $tahun_list = [];
 while ($r = mysql_fetch_assoc($q_tahun)) {
 	$tahun_list[] = $r['tahun'];

@@ -25,6 +25,7 @@
 
 <!-- LAPORAN -->
 <menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Transaksi </n><l>../data_transaksi/index.php?input=cetak</l></menu>
+<menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Booking </n><l>../data_booking/index.php?input=cetak</l></menu>
 <menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Operasional </n><l>../data_operasional/index.php?input=cetak</l></menu>
 <menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Cashflow </n><l>../data_transaksi/index.php?input=cetak_cashflow</l></menu>
 <menu><id></id><s>C</s><t>sm</t><i>fa fa-calendar</i><n>Deposit </n><l>../data_transaksi/index.php?input=cetak_deposit</l></menu>

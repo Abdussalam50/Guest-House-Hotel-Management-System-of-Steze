@@ -18,13 +18,15 @@ while ($row = mysql_fetch_assoc($hotels_query)) {
     $hotels[$row['id_hotel']] = $row['nama'];
 }
 
-// Fetch distinct years and months from data_operasional for combobox
+// Fetch distinc_oke years and months from data_operasional for combobox
 $year_month_query = mysql_query("
-    SELECT DISTINCT YEAR(tanggal) AS year, MONTH(tanggal) AS month 
+    SELECT YEAR(tanggal) AS year, MONTH(tanggal) AS month 
     FROM data_operasional 
     WHERE 1=1 $filter_hotel
+    GROUP BY YEAR(tanggal), MONTH(tanggal)
     ORDER BY year DESC, month DESC
-");
+") or die('Query failed: ' . mysql_error());
+
 $years = [];
 while ($row = mysql_fetch_assoc($year_month_query)) {
     $years[$row['year']] = $row['year'];
@@ -124,7 +126,7 @@ if (empty($expenses) || array_sum($expenses) == 0) {
 
 <body>
     <h3 style="text-align: left;">
-        Grafik Operasional Harian 
+        Grafik Operasional Harian
         <?php echo date('F Y', mktime(0, 0, 0, $selected_month, 1, $selected_year)); ?>
         <?php if ($selected_hotel === 'all') echo ' (All Hotels)';
         elseif (!empty($selected_hotel)) echo ' (' . htmlspecialchars($hotels[$selected_hotel]) . ')'; ?>

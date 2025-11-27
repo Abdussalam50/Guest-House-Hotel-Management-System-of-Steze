@@ -24,16 +24,7 @@ if (isset($_GET['input'])) {
                             <td>Pilih Tahun :</td>
                             <td>
                                 <select name="tahun" id="tahun" class="form-control">
-                                    <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(waktu_transaksi) AS tahun FROM data_transaksi ORDER BY waktu_transaksi DESC");
-                                    if (mysql_num_rows($query)) {
-                                        while ($data = mysql_fetch_array($query)) {
-                                    ?>
-                                            <option value="<?php echo $data['tahun'] ?>"><?php echo $data['tahun'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                    <?php echo select_tahun(); ?>
                                 </select>
                             </td>
                         </tr>
@@ -126,19 +117,7 @@ if (isset($_GET['input'])) {
                             <td>Pilih Tahun:</td>
                             <td>
                                 <select class="form-control selectpicker" name="tahun" id="tahun">
-                                    <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(waktu_transaksi) AS tahun
-FROM data_transaksi
-ORDER BY tahun DESC;
-");
-                                    if (mysql_num_rows($query)) {
-                                        while ($data = mysql_fetch_array($query)) {
-                                    ?>
-                                            <option value="<?php echo $data['tahun'] ?>"><?php echo $data['tahun'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                    <?php echo select_tahun(); ?>
 
                                 </select>
                             </td>

@@ -1,4 +1,3 @@
-
 <?php
 
 if (isset($_GET['input'])) {
@@ -26,16 +25,7 @@ if (isset($_GET['input'])) {
                             <td>Pilih Tahun :</td>
                             <td>
                                 <select name="tahun" id="tahun" class="form-control">
-                                    <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(tanggal) AS tahun FROM data_operasional ORDER BY tanggal DESC");
-                                    if (mysql_num_rows($query)) {
-                                        while ($data = mysql_fetch_array($query)) {
-                                    ?>
-                                            <option value="<?php echo $data['tahun'] ?>"><?php echo $data['tahun'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                    <?php echo select_tahun(); ?>
                                 </select>
                             </td>
                         </tr>
@@ -103,16 +93,7 @@ if (isset($_GET['input'])) {
                             <td>Pilih Tahun:</td>
                             <td>
                                 <select class="form-control selectpicker" name="tahun" id="tahun">
-                                    <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(tanggal) AS tahun FROM data_operasional ORDER BY tanggal DESC");
-                                    if (mysql_num_rows($query)) {
-                                        while ($data = mysql_fetch_array($query)) {
-                                    ?>
-                                            <option value="<?php echo $data['tahun'] ?>"><?php echo $data['tahun'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                    <?php echo select_tahun(); ?>
                                 </select>
                             </td>
                         </tr>
@@ -231,7 +212,7 @@ if (isset($_GET['input'])) {
             if (isset($_GET['type']) && $_GET['type'] == 'tahunan' && isset($_GET['tahun']) && !empty($_GET['tahun'])) {
                 $report_title = "Laporan Tahunan " . $_GET['tahun'];
             } elseif (isset($_GET['bulan']) && !empty($_GET['bulan'])) {
-                $month_name = isset($month_names[$_GET['bulan']]) ? $_GET['bulan']:'Januari';
+                $month_name = isset($month_names[$_GET['bulan']]) ? $_GET['bulan'] : 'Januari';
                 $report_title = "Laporan Bulanan " . $_GET['tahun'] . " Bulan " . $month_name;
             } elseif (isset($_GET['tanggal1']) && !empty($_GET['tanggal1'])) {
                 $tanggal1_indo = format_indo($_GET['tanggal1']);
@@ -249,7 +230,7 @@ if (isset($_GET['input'])) {
                 </td>
                 <td class="auto-style1">
                     <center>
-                        <h1 class="auto-style1" style='font-size:25px;color:#D92C09'><?php echo $judul ; ?> <?php echo $hotel_name; ?></h1>
+                        <h1 class="auto-style1" style='font-size:25px;color:#D92C09'><?php echo $judul; ?> <?php echo $hotel_name; ?></h1>
                     </center>
                 </td>
                 <td class="auto-style1" rowspan="3" width="101">
@@ -345,7 +326,7 @@ if (isset($_GET['input'])) {
                 $hotel = mysql_real_escape_string($_GET['hotel']);
                 $tahun = mysql_real_escape_string($_GET['tahun']);
                 $bulan = mysql_real_escape_string($_GET['bulan']);
-                $month_name = isset($month_names[$bulan]) ? $bulan:'Januari';
+                $month_name = isset($month_names[$bulan]) ? $bulan : 'Januari';
                 if ($hotel == 'semua') {
                     $querytabel .= " AND YEAR(do.tanggal)='$tahun' AND MONTH(do.tanggal)='$bulan'";
                     echo "<center>Cetak Laporan Bulanan <b>$tahun</b> Bulan <b>$month_name</b> untuk Semua Hotel</center><br>";

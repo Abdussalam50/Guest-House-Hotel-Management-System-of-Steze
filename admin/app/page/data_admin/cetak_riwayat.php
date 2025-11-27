@@ -1,14 +1,14 @@
 <?php
-if(isset($_COOKIE['operasional'])){
-     $akses=baca_database("","value","select * from data_pengaturan_aplikasi where nama_pengaturan='akses_riwayat_admin'");
-     if($akses==0){
-    ?>
-    <script>
-        alert('Perhatian! \nAnda tidak dapat mengakses riwayat admin\n');
-        window.location.href='../../index.php'
-    </script>
-<?php
-     }
+if (isset($_COOKIE['operasional'])) {
+    $akses = baca_database("", "value", "select * from data_pengaturan_aplikasi where nama_pengaturan='akses_riwayat_admin'");
+    if ($akses == 0) {
+?>
+        <script>
+            alert('Perhatian! \nAnda tidak dapat mengakses riwayat admin\n');
+            window.location.href = '../../index.php'
+        </script>
+    <?php
+    }
 }
 
 if (isset($_GET['input'])) {
@@ -21,93 +21,84 @@ if (isset($_GET['input'])) {
     function action_cetak_riwayat($tabel)
     {
     ?>
-    <form name="formcari" id="formcari" action="cetak_riwayat.php" method="get" target="_blank">
-        <fieldset>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><b>CETAK RIWAYAT</b></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Pilih Bulan :</td>
-                        <td>
-                            <select name="bulan" id="bulan" class="form-control">
-                                <option value="1">Januari</option>
-                                <option value="2">Februari</option>
-                                <option value="3">Maret</option>
-                                <option value="4">April</option>
-                                <option value="5">Mei</option>
-                                <option value="6">Juni</option>
-                                <option value="7">Juli</option>
-                                <option value="8">Agustus</option>
-                                <option value="9">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Pilih Tahun :</td>
-                        <td>
-                            <select name="tahun" id="tahun" class="form-control">
+        <form name="formcari" id="formcari" action="cetak_riwayat.php" method="get" target="_blank">
+            <fieldset>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><b>CETAK RIWAYAT</b></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Pilih Bulan :</td>
+                            <td>
+                                <select name="bulan" id="bulan" class="form-control">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pilih Tahun :</td>
+                            <td>
+                                <select name="tahun" id="tahun" class="form-control">
+                                    <?php echo select_tahun(); ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:40%">Pilih Hotel :</td>
+                            <td>
+                                <select class="form-control selectpicker" name="hotel" id="hotel">
+                                    <?php
+                                    combo_database_v2("data_hotel", "id_hotel", "nama", "");
+                                    ?>
+                                    <option value='semua'>Semua</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:40%">Pilih Aksi :</td>
+                            <td>
+                                <select class="form-control selectpicker" name="aksi" id="aksi">
+                                    <option value="INSERT">Tambah Data</option>
+                                    <option value="UPDATE">Update Data</option>
+                                    <option value="DELETE">Hapus Data</option>
+                                    <option value='semua'>Semua</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:40%"></td>
+                            <td>
+                                <?php btn_preview_laporan('Print Preview'); ?>
                                 <?php
-                                $query = mysql_query("SELECT DISTINCT YEAR(waktu) AS tahun FROM data_riwayat_admin ORDER BY waktu DESC")or die(mysql_error());
-
-                                if (mysql_num_rows($query)) {
-                                    while ($data = mysql_fetch_array($query)) {
-                                ?>
-                                        <option value="<?php echo $data['tahun'] ?>"><?php echo $data['tahun'] ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:40%">Pilih Hotel :</td>
-                        <td>
-                            <select class="form-control selectpicker" name="hotel" id="hotel">
-                                <?php
-                                combo_database_v2("data_hotel", "id_hotel", "nama", "");
-                                ?>
-                                <option value='semua'>Semua</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:40%">Pilih Aksi :</td>
-                        <td>
-                            <select class="form-control selectpicker" name="aksi" id="aksi">
-                                <option value="INSERT">Tambah Data</option>
-                                <option value="UPDATE">Update Data</option>
-                                <option value="DELETE">Hapus Data</option>
-                                <option value='semua'>Semua</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:40%"></td>
-                        <td>
-                            <?php btn_preview_laporan('Print Preview'); ?>
-                            <?php
-                            if($tabel=='data_pelanggan'){
-                                btn_export_laporan('Export Excel');
-                            } ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </fieldset>
-    </form>
-    <br>
+                                if ($tabel == 'data_pelanggan') {
+                                    btn_export_laporan('Export Excel');
+                                } ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+        </form>
+        <br>
     <?php
     }
     action_cetak_riwayat("data_riwayat_admin");
 } else {
-    function location() {
+    function location()
+    {
         return "cetak";
     }
     include '../../../include/all_include.php';
@@ -118,10 +109,27 @@ if (isset($_GET['input'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .view-more-btn { cursor: pointer; color: blue; text-decoration: underline; }
-        .swal-table { width: 100%; border-collapse: collapse; }
-        .swal-table th, .swal-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .swal-table th { background-color: #f2f2f2; }
+        .view-more-btn {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .swal-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .swal-table th,
+        .swal-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .swal-table th {
+            background-color: #f2f2f2;
+        }
     </style>
 
     <!-- HEADER -->
@@ -129,24 +137,26 @@ if (isset($_GET['input'])) {
         <?php
         if (isset($_GET['export'])) {
         } else {
-            ?>
+        ?>
             <tr>
                 <td class="auto-style1" rowspan="3" width="101">
-                    <img alt="" height="100" src="<?php echo $logo_laporan1; ?>" width="100"></td>
+                    <img alt="" height="100" src="<?php echo $logo_laporan1; ?>" width="100">
+                </td>
                 <td class="auto-style1">
                     <center>
                         <?php
-                            if(isset($_GET['hotel'])){
-                                $hotel="Cabang ".ucwords(baca_database("","nama","select * from data_hotel where id_hotel='$_GET[hotel]'"));
-                            }else{
-                                $hotel='';
-                            }
+                        if (isset($_GET['hotel'])) {
+                            $hotel = "Cabang " . ucwords(baca_database("", "nama", "select * from data_hotel where id_hotel='$_GET[hotel]'"));
+                        } else {
+                            $hotel = '';
+                        }
                         ?>
-                        <h2 class="auto-style1"><?php echo $judul." ".$hotel; ?></h2>
+                        <h2 class="auto-style1"><?php echo $judul . " " . $hotel; ?></h2>
                     </center>
                 </td>
                 <td class="auto-style1" rowspan="3" width="101">
-                    <img alt="" height="100" src="<?php echo $logo_laporan2; ?>" width="100"></td>
+                    <img alt="" height="100" src="<?php echo $logo_laporan2; ?>" width="100">
+                </td>
             </tr>
         <?php } ?>
         <tr>
@@ -166,12 +176,12 @@ if (isset($_GET['input'])) {
         </tr>
         <tr>
             <td class="auto-style2"><?php
-            if(!isset($_COOKIE['id_hotel'])){
-                echo "";
-            }else{
-                $idHotel=decrypt($_COOKIE['id_hotel']);
-                echo baca_database("","alamat","select * from data_hotel where id_hotel='$idHotel'"); 
-            }?></td>
+                                    if (!isset($_COOKIE['id_hotel'])) {
+                                        echo "";
+                                    } else {
+                                        $idHotel = decrypt($_COOKIE['id_hotel']);
+                                        echo baca_database("", "alamat", "select * from data_hotel where id_hotel='$idHotel'");
+                                    } ?></td>
         </tr>
     </table>
     <!-- HEADER -->
@@ -202,36 +212,35 @@ if (isset($_GET['input'])) {
                 '12' => 'Desember',
             ];
             $no = 1;
-            if ($_GET['hotel']=='semua' && $_GET['aksi']=='semua') {
+            if ($_GET['hotel'] == 'semua' && $_GET['aksi'] == 'semua') {
                 $tahun = mysql_real_escape_string($_GET['tahun']);
                 $bulan = mysql_real_escape_string($_GET['bulan']);
-                echo '<center> Cetak <b>Semua Riwayat di Seluruh Hotel Dibulan '.$month[$bulan].' dan Tahun '.$tahun.'</b></center>';
+                echo '<center> Cetak <b>Semua Riwayat di Seluruh Hotel Dibulan ' . $month[$bulan] . ' dan Tahun ' . $tahun . '</b></center>';
                 $querytabel = "SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan";
-            }elseif($_GET['aksi']=='semua' && $_GET['hotel']!=='semua'){
+            } elseif ($_GET['aksi'] == 'semua' && $_GET['hotel'] !== 'semua') {
                 $tahun = mysql_real_escape_string($_GET['tahun']);
                 $bulan = mysql_real_escape_string($_GET['bulan']);
-                $hotel= mysql_real_escape_string($_GET['hotel']);
-                $aksi=mysql_real_escape_string($_GET['aksi']);
-                echo '<center> Cetak <b>Semua Riwayat di Hotel '.baca_database("","nama","select * from data_hotel where id_hotel='$hotel'").' Dibulan '.$month[$bulan].' dan Tahun '.$tahun.'</b></center>';
-               
-                $querytabel="SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND id_hotel='$hotel'";
-                
-            }elseif($_GET['aksi']!=='semua' && $_GET['hotel']=='semua'){
+                $hotel = mysql_real_escape_string($_GET['hotel']);
+                $aksi = mysql_real_escape_string($_GET['aksi']);
+                echo '<center> Cetak <b>Semua Riwayat di Hotel ' . baca_database("", "nama", "select * from data_hotel where id_hotel='$hotel'") . ' Dibulan ' . $month[$bulan] . ' dan Tahun ' . $tahun . '</b></center>';
+
+                $querytabel = "SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND id_hotel='$hotel'";
+            } elseif ($_GET['aksi'] !== 'semua' && $_GET['hotel'] == 'semua') {
                 $tahun = mysql_real_escape_string($_GET['tahun']);
                 $bulan = mysql_real_escape_string($_GET['bulan']);
-                $hotel= mysql_real_escape_string($_GET['hotel']);
-                $aksi=mysql_real_escape_string($_GET['aksi']);
-                echo '<center> Cetak <b>Semua Riwayat di Seluruh Hotel Dibulan '.$month[$bulan].' dan Tahun '.$tahun.'</b></center>';
-               
-                $querytabel="SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND action='$aksi'";
-            }else{
+                $hotel = mysql_real_escape_string($_GET['hotel']);
+                $aksi = mysql_real_escape_string($_GET['aksi']);
+                echo '<center> Cetak <b>Semua Riwayat di Seluruh Hotel Dibulan ' . $month[$bulan] . ' dan Tahun ' . $tahun . '</b></center>';
+
+                $querytabel = "SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND action='$aksi'";
+            } else {
                 $tahun = mysql_real_escape_string($_GET['tahun']);
                 $bulan = mysql_real_escape_string($_GET['bulan']);
-                $hotel= mysql_real_escape_string($_GET['hotel']);
-                $aksi=mysql_real_escape_string($_GET['aksi']);
-                echo '<center> Cetak <b>Semua Riwayat di Hotel '. baca_database("","nama","select * from data_hotel where id_hotel='$hotel'").' Dibulan '.$month[$bulan].' dan Tahun '.$tahun.'</b></center>';
-               
-                $querytabel="SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND action='$aksi' AND id_hotel='$hotel'"; 
+                $hotel = mysql_real_escape_string($_GET['hotel']);
+                $aksi = mysql_real_escape_string($_GET['aksi']);
+                echo '<center> Cetak <b>Semua Riwayat di Hotel ' . baca_database("", "nama", "select * from data_hotel where id_hotel='$hotel'") . ' Dibulan ' . $month[$bulan] . ' dan Tahun ' . $tahun . '</b></center>';
+
+                $querytabel = "SELECT * FROM data_riwayat_admin WHERE YEAR(waktu)=$tahun AND MONTH(waktu)=$bulan AND action='$aksi' AND id_hotel='$hotel'";
             }
             $proses = mysql_query($querytabel);
             $rows = [];
@@ -243,18 +252,18 @@ if (isset($_GET['input'])) {
                     'lain'       => $data['data_json']
                 ];
             }
-            foreach($rows as $index => $content){
+            foreach ($rows as $index => $content) {
                 echo "<tr id='row-$index'>";
-                echo "<td>".$no++."</td>";
-                echo "<td>".$content['action']."</td>";
-                echo "<td>".($content['waktu_buat'])."</td>";
-                if(cek_database("","","","select * from data_admin where id_admin='$content[pelaku]'")=='ada'){
-                    echo "<td>".ucwords(baca_database("","nama","select * from data_admin where id_admin='$content[pelaku]'"))."</td>";
-                }else{
-                     echo "<td>".ucwords(baca_database("","nama","select * from data_pengelola where id_pengelola='$content[pelaku]'"))."</td>";
+                echo "<td>" . $no++ . "</td>";
+                echo "<td>" . $content['action'] . "</td>";
+                echo "<td>" . ($content['waktu_buat']) . "</td>";
+                if (cek_database("", "", "", "select * from data_admin where id_admin='$content[pelaku]'") == 'ada') {
+                    echo "<td>" . ucwords(baca_database("", "nama", "select * from data_admin where id_admin='$content[pelaku]'")) . "</td>";
+                } else {
+                    echo "<td>" . ucwords(baca_database("", "nama", "select * from data_pengelola where id_pengelola='$content[pelaku]'")) . "</td>";
                 }
                 echo "<td>";
-                if($content['lain']){
+                if ($content['lain']) {
                     $decode = json_decode($content['lain'], true);
                     if ($decode) {
                         $column_count = count($decode);
@@ -262,9 +271,9 @@ if (isset($_GET['input'])) {
                         $hidden_data = [];
                         echo "<table border='1' cellpadding='3' cellspacing='0' style='width: 100%;'>";
                         echo "<thead><tr>";
-                        foreach($decode as $key => $val){
+                        foreach ($decode as $key => $val) {
                             if ($col_index < 4) {
-                                echo "<th>".htmlspecialchars($key)."</th>";
+                                echo "<th>" . htmlspecialchars($key) . "</th>";
                             } else {
                                 $hidden_data[$key] = $val;
                             }
@@ -276,9 +285,9 @@ if (isset($_GET['input'])) {
                         echo "</tr></thead>";
                         echo "<tbody><tr>";
                         $col_index = 0;
-                        foreach($decode as $key => $val){
+                        foreach ($decode as $key => $val) {
                             if ($col_index < 4) {
-                                echo "<td>".htmlspecialchars($val)."</td>";
+                                echo "<td>" . htmlspecialchars($val) . "</td>";
                             }
                             $col_index++;
                         }
@@ -314,6 +323,7 @@ if (isset($_GET['input'])) {
         function showMoreData(rowId, hiddenData) {
             try {
                 const data = JSON.parse(hiddenData);
+
                 function format_rupiah(value) {
                     // Convert value to a number, default to 0 if not a valid number
                     const numericValue = parseFloat(value) || 0;

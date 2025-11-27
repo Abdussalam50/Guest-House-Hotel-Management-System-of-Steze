@@ -1768,4 +1768,18 @@ function json_count_sum($str, $kali)
 }
 
 
+
+function select_tahun($start_year = 2024, $selected = null)
+{
+	$end_year = date("Y"); // Tahun saat ini
+	$html = "";
+
+	for ($tahun = $end_year; $tahun >= $start_year; $tahun--) {
+		$isSelected = ($selected == $tahun) ? "selected" : "";
+		$html .= '<option value="' . $tahun . '" ' . $isSelected . '>' . $tahun . '</option>';
+	}
+
+	return $html;
+}
+
 ?>

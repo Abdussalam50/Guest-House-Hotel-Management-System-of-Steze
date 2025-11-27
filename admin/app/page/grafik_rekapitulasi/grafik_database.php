@@ -20,17 +20,21 @@ $filter_hotel_operasional = $id_hotel != "" ? "AND id_hotel = '$id_hotel'" : (is
 $filter_hotel_transaksi = $id_hotel != "" ? "AND t.id_hotel = '$id_hotel'" : (isset($_POST['hotel']) && $_POST['hotel'] != 'all' ? "AND t.id_hotel = '" . mysql_real_escape_string($_POST['hotel']) . "'" : "");
 $filter_hotel_transaksi2 = $id_hotel != "" ? "AND id_hotel = '$id_hotel'" : (isset($_POST['hotel']) && $_POST['hotel'] != 'all' ? "AND id_hotel = '" . mysql_real_escape_string($_POST['hotel']) . "'" : "");
 
-// Fetch distinct years
+// Fetch distinc_oke years
 $year_query = mysql_query("
-    SELECT DISTINCT YEAR(tanggal) AS year 
+    SELECT YEAR(tanggal) AS year 
     FROM data_operasional 
     WHERE 1=1 $filter_hotel_operasional
-    UNION 
-    SELECT DISTINCT YEAR(waktu_checkin) AS year 
+    GROUP BY YEAR(tanggal)
+    UNION
+    SELECT YEAR(waktu_checkin) AS year 
     FROM data_transaksi 
     WHERE 1=1 $filter_hotel_transaksi2
+    GROUP BY YEAR(waktu_checkin)
+
     ORDER BY year DESC
 ") or die('Year query failed: ' . mysql_error());
+
 $years = [];
 while ($row = mysql_fetch_assoc($year_query)) {
 	$years[] = $row['year'];
@@ -179,7 +183,7 @@ if (array_sum($cashflow_data) == 0 && array_sum($revenue_data) == 0 && array_sum
 				<?php endforeach; ?>
 			</select>
 		<?php endif; ?>
-		<label for="year">	Pilih Tahun: </label>
+		<label for="year"> Pilih Tahun: </label>
 		<select name="year" id="year" onchange="this.form.submit()">
 			<?php foreach ($years as $year): ?>
 				<option value="<?php echo htmlspecialchars($year); ?>" <?php echo $year == $selected_year ? 'selected' : ''; ?>>

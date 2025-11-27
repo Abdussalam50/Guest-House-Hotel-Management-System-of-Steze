@@ -23,7 +23,7 @@ if (isset($_GET['input'])) {
                             <td>
                                 <select name="tahun" id="tahun" class="form-control">
                                     <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(waktu_transaksi) AS tahun FROM data_transaksi ORDER BY waktu_transaksi DESC");
+                                    $query = mysql_query("SELECT  YEAR(waktu_transaksi) AS tahun FROM data_transaksi group by tahun ORDER BY tahun DESC");
                                     if (mysql_num_rows($query)) {
                                         while ($data = mysql_fetch_array($query)) {
                                     ?>
@@ -110,7 +110,7 @@ if (isset($_GET['input'])) {
                             <td>
                                 <select class="form-control selectpicker" name="tahun" id="tahun">
                                     <?php
-                                    $query = mysql_query("SELECT DISTINCT YEAR(waktu_transaksi) AS tahun FROM data_transaksi ORDER BY waktu_transaksi DESC");
+                                    $query = mysql_query("SELECT  YEAR(waktu_transaksi) AS tahun FROM data_transaksi group by tahun ORDER BY tahun DESC");
                                     if (mysql_num_rows($query)) {
                                         while ($data = mysql_fetch_array($query)) {
                                     ?>
@@ -269,23 +269,23 @@ if (isset($_GET['input'])) {
             <thead>
                 <tr style="background-color: #f9f9f9; text-align:center;">
                     <th>No</th>
-                    <th>Kode Transaksi</th>
+                    <th>Kode&nbsp;Transaksi</th>
                     <th>Pelanggan</th>
                     <th>Kamar</th>
-                    <th>Check In</th>
-                    <th>Check Out</th>
-                    <th>Harga/Hari</th>
-                    <th>jml Hari</th>
-                    <th>Harga Kamar</th>
-                    <th>Disc %</th>
-                    <th>Total Disc</th>
-                    <th>Setelah Disc</th>
-                    <th>Tambahan In</th>
-                    <th>Tambahan Out</th>
-                    <th>Potongan Harga</th>
-                    <th>Sub<br>Total</th>
-                    <th>Total<br>Pajak</th>
-                    <th>Total Bayar</th>
+                    <th>Jenis&nbsp;Trx</th>
+                    <th>Check&nbsp;In</th>
+                    <th>Check&nbsp;Out</th>
+                    <th>Harga</th>
+                    <th>Jumlah&nbsp;</th>
+                    <th>Harga&nbsp;Kamar&nbsp;Total</th>
+                    <th>Diskon</th>
+                    <th>Potongan</th>
+                    <th>Tambahan&nbsp;In</th>
+                    <th>Tambahan&nbsp;Out</th>
+                    <th>Dp&nbsp;Booking</th>
+                    <th>Deposit</th>
+                    <th>Pajak</th>
+                    <th>Grand&nbsp;Total</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -364,94 +364,153 @@ if (isset($_GET['input'])) {
 
                 while ($data = mysql_fetch_array($proses)) {
                     $no++;
-                    $harga_per_hari = $data['harga_kamar_harian'];
-                    $jumlah_hari = $data['jumlah_hari'];
 
-                    // Harga kamar total
-                    if ($data['jenis_transaksi'] == 'bulanan') {
-                        $harga_kamar_total = $data['harga_kamar_bulanan'] * ($jumlah_hari / 30);
-                    } else {
-                        $harga_kamar_total = $harga_per_hari * $jumlah_hari;
+                    $id_transaksi = $data['id_transaksi'];
+
+                    $jenis_group = "non_group";
+                    if (json_check($data['no_kamar'])) {
+                        $jenis_group = "group";
                     }
 
-                    // Diskon
-                    $disc_nominal = ($harga_kamar_total * $data['discount']) / 100;
-                    $harga_setelah_disc = $harga_kamar_total - $disc_nominal;
+                    $jenis_transaksi = $data['jenis_transaksi'];
+                    $harga_per_hari = $data['harga_kamar_harian'];
+                    $harga_per_bulan = $data['harga_kamar_bulanan'];
+                    $tgl_checkin = new DateTime($data['waktu_checkin']);
+                    $tgl_checkout = new DateTime($data['waktu_checkout']);
+                    $jumlah_hari = $data['jumlah_hari'];
+                    $harga_kamar_total = 0;
 
-                    // Biaya tambahan & potongan
-                    $tambahan_in = $data['biaya_tambahan_checkin'];
-                    $tambahan_out = $data['biaya_tambahan_checkout'];
-                    $potongan_harga = $data['potongan_harga'];
 
-                    // Subtotal
-                    $sub_total = $harga_setelah_disc + $tambahan_in + $tambahan_out - $potongan_harga;
+                    if ($jenis_group == "group") {
+                        $query_kamar = " SELECT * FROM data_transaksi_list_kamar 
+                                            WHERE id_transaksi = '$id_transaksi' 
+                                            ORDER BY waktu DESC ";
 
-                    // Pajak & total bayar
-                    $pajak = ($sub_total * $data['persentase_pajak']) / 100;
-                    $total_bayar = $sub_total + $pajak;
+                        $proses_kamar = mysql_query($query_kamar);
+                        while ($datakamar = mysql_fetch_array($proses_kamar)) {
 
-                    // Akumulasi total
-                    $total_disc_nominal += $disc_nominal;
-                    $total_tambahan_in += $tambahan_in;
-                    $total_tambahan_out += $tambahan_out;
-                    $total_potongan_harga += $potongan_harga;
-                    $total_pajak += $pajak;
-                    $total_bayar_all += $total_bayar;
+                            if ($jenis_transaksi == "harian") {
+                                $harga_kamar_total =  $harga_kamar_total + ($datakamar['harga_kamar_harian'] * $jumlah_hari);
+                            } else {
+                                $harga_kamar_total =  $harga_kamar_total +  ($datakamar['harga_kamar_bulanan'] * $jumlah_hari);
+                            }
+                        }
+                    } else {
+
+                        if ($jenis_transaksi == "harian") {
+                            $harga_kamar_total = $harga_per_hari * $jumlah_hari;
+                        } else {
+                            $harga_kamar_total = $harga_per_bulan * $jumlah_hari;
+                        }
+                    }
+
+
+
                 ?>
-                    <tr style="text-align:center;">
+                    <tr class="event2" style="text-align:left;">
                         <td><?= $no ?></td>
-                        <td><?= $data['id_transaksi']; ?></td>
-                        <td><?= ucwords($data['nama']); ?></td>
-                        <td><?= $data['no_kamar']; ?></td>
-                        <td><?= format_indo($data['waktu_checkin']); ?></td>
+                        <td align="left"><a href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
+                                <?= $data['id_transaksi']; ?></a>
+
+
+                        </td>
+                        <td align="left"><?= ucwords($data['nama']); ?></td>
+                        <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
+                        <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php if ($jenis_group == "group") {
+                                                                                    echo "(Group)";
+                                                                                }
+                                                                                ?></b></td>
+                        <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>
                         <td><?php
                             $today = strtotime(date('Y-m-d'));
                             $checkout = strtotime($data['waktu_checkout']);
                             $hari_tersisa = ($checkout - $today) / (60 * 60 * 24);
+
                             if ($hari_tersisa > 0) {
                                 $hari_tersisa = ceil($hari_tersisa);
                                 if ($data['status_transaksi'] == 'Selesai') {
-                                    echo str_replace(" ", " ", format_indo($data['waktu_checkout']));
+                                    echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
                                 } else {
-                                    echo str_replace(" ", " ", format_indo($data['waktu_checkout']))
-                                        . "<br><b style='color:red'> {$hari_tersisa} hari lagi</b>";
+                                    echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']))
+                                        . "<b style='color:red'>&nbsp;{$hari_tersisa}&nbsp;hari&nbsp;lagi</b>";
                                 }
                             } elseif ($hari_tersisa == 0) {
                                 if ($data['status_transaksi'] == 'Selesai') {
-                                    echo str_replace(" ", " ", format_indo($data['waktu_checkout']));
+                                    echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
                                 } else {
-                                    echo str_replace(" ", " ", format_indo($data['waktu_checkout']))
-                                        . "<br><b style='color:green'> Hari ini</b>";
+                                    // Hari ini
+                                    echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']))
+                                        . "<b style='color:green'>&nbsp;Hari ini</b>";
                                 }
                             } else {
-                                echo str_replace(" ", " ", format_indo($data['waktu_checkout']));
+                                // Lewat
+                                echo str_replace(" ", "&nbsp;", format_indo($data['waktu_checkout']));
                             }
                             ?>
                         </td>
-                        <td><?= rupiah($harga_per_hari); ?></td>
-                        <td><?= $jumlah_hari; ?></td>
+                        <td><?php
+                            if ($jenis_transaksi == "harian") {
+                                echo  json_preview_rupiah_br($harga_per_hari);
+                            } else {
+                                echo  json_preview_rupiah_br($harga_per_bulan);
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            if ($jenis_transaksi == "harian") {
+                                echo  $jumlah_hari . " Hari";
+                            } else {
+                                echo  $jumlah_hari . " Bulan";
+                            }
+                            ?>
+
+                        </td>
                         <td><?= rupiah($harga_kamar_total); ?></td>
                         <td><?= $data['discount']; ?>%</td>
-                        <td><?= rupiah($disc_nominal); ?></td>
-                        <td><?= rupiah($harga_setelah_disc); ?></td>
-                        <td><?= rupiah($tambahan_in); ?></td>
-                        <td><?= rupiah($tambahan_out); ?></td>
-                        <td><?= rupiah($potongan_harga); ?></td>
-                        <td><?= rupiah($sub_total); ?></td>
-                        <td><?= rupiah($pajak); ?></td>
-                        <td><b><?= rupiah($total_bayar); ?></b></td>
-                        <td><?= $data['status_transaksi']; ?></td>
+                        <td><?= rupiah($data['potongan_harga']); ?></td>
+                        <td><?= rupiah($data['biaya_tambahan_checkin']); ?></td>
+                        <td><?= rupiah($data['biaya_tambahan_checkout']); ?></td>
+                        <td>
+
+                            <?php if (substr($id_transaksi, 0, 2) === "BO") { ?>
+                                <font color="blue">
+                                    Rp<?php echo rupiah_format(baca_database("", "nominal_bayar", "select * from data_booking where id_transaksi='$id_transaksi'")); ?>
+                                </font>
+                            <?php } else {
+                                echo "Rp0";
+                            } ?>
+
+
+                        </td>
+                        <td>
+                            <font color="red">
+                                <?= rupiah($data['nominal_deposit']); ?>
+                            </font>
+                        </td>
+                        <td><?= ($data['persentase_pajak']); ?>%</td>
+                        <td><?= rupiah($data['total_bayar']);
+
+                            $total_bayar_all += $data['total_bayar'];
+                            ?></td>
+
+
+
+                        <td style="background-color: <?php
+                                                        if ($data['status_transaksi'] == 'Selesai') {
+                                                            echo '#f3ffe6';
+                                                        } elseif ($data['status_transaksi'] == 'Lunas') {
+                                                            echo '#fffee6';
+                                                        } else {
+                                                            echo '#ffe8e8';
+                                                        } ?>">
+                            <?= $data['status_transaksi']; ?>
+                        </td>
                     </tr>
                 <?php } ?>
                 <tr style="background-color:#f1f1f1; font-weight:bold; text-align:center;">
-                    <td colspan="10">Total Keseluruhan</td>
-                    <td><?= rupiah($total_disc_nominal); ?></td>
-                    <td></td>
-                    <td><?= rupiah($total_tambahan_in); ?></td>
-                    <td><?= rupiah($total_tambahan_out); ?></td>
-                    <td><?= rupiah($total_potongan_harga); ?></td>
-                    <td></td>
-                    <td><?= rupiah($total_pajak); ?></td>
+                    <td colspan="17">Total Keseluruhan</td>
+
                     <td><b><?= rupiah($total_bayar_all); ?></b></td>
                     <td></td>
                 </tr>

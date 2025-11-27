@@ -10,8 +10,7 @@ class ModelGrafikLabaRugi extends BaseModel
     public function get_total_penjualan(
         $bulan,
         $tahun
-    )
-    {
+    ) {
         $total_penjualan = 0;
         $total_modal = 0;
         $total_laba_kotor = 0;
@@ -19,24 +18,22 @@ class ModelGrafikLabaRugi extends BaseModel
 
         foreach ($penjualans as $penjualan) {
             // $total_penjualan += $penjualan->get_total_penjualan();
-            $total_modal += $penjualan->harga_modal*$penjualan->jumlah*$penjualan->item;
+            $total_modal += $penjualan->harga_modal * $penjualan->jumlah * $penjualan->item;
 
             if (!isset($displayed_tax[$penjualan->get_kode_transaksi()])) {
                 $sql2 = "SELECT pajak,jumlah FROM data_transaksi WHERE kode_transaksi = '" . $penjualan->get_kode_transaksi() . "'";
                 $result2 = mysql_query($sql2);
-                
+
                 if (mysql_num_rows($result2) > 0) {
                     $row2 = mysql_fetch_assoc($result2);
                     // $total_penjualan = $row2["jumlah"];
                     $displayed_tax[$penjualan->get_kode_transaksi()] = true;
-        
+
                     $total_penjualan  += $row2["jumlah"];
                     // $pajak += $row2["pajak"]; 
-                    
+
                 }
-
-        }
-
+            }
         }
         $total_laba_kotor = $total_penjualan - $total_modal;
 
@@ -51,8 +48,7 @@ class ModelGrafikLabaRugi extends BaseModel
     public function get_total_operasional(
         $bulan,
         $tahun
-    )
-    {
+    ) {
         $total_operasional = 0;
         $operasionals = $this->get_operasional($bulan, $tahun);
         foreach ($operasionals as $operasional) {
@@ -66,12 +62,12 @@ class ModelGrafikLabaRugi extends BaseModel
     public function get_tahun()
     {
         $stmt = $this->dbh->prepare("
-            SELECT DISTINCT
-                year(tanggal_penjualan) AS tahun
-            FROM
-                data_penjualan
-            ORDER BY
-                tahun DESC");
+    SELECT YEAR(tanggal_penjualan) AS tahun
+    FROM data_penjualan
+    GROUP BY YEAR(tanggal_penjualan)
+    ORDER BY tahun DESC
+");
+
         $stmt->execute();
         return $stmt->fetchAll();
     }

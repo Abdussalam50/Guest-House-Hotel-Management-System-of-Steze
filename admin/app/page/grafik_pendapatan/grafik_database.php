@@ -13,13 +13,15 @@ if ($id_hotel == "") {
 // === buat kondisi filter hotel ===
 $filter_hotel = ($id_hotel != "") ? "AND id_hotel = '$id_hotel'" : (isset($_POST['hotel']) && $_POST['hotel'] != 'all' ? "AND id_hotel = '" . mysql_real_escape_string($_POST['hotel']) . "'" : "");
 
-// Fetch distinct years and months from data_pemasukan for combobox
+// Fetch distinc_oke years and months from data_pemasukan for combobox
 $year_month_query = mysql_query("
-    SELECT DISTINCT YEAR(waktu) AS year, MONTH(waktu) AS month 
+    SELECT YEAR(waktu) AS year, MONTH(waktu) AS month 
     FROM data_pemasukan
     WHERE 1=1 $filter_hotel
+    GROUP BY YEAR(waktu), MONTH(waktu)
     ORDER BY year DESC, month DESC
-");
+") or die('Query failed: ' . mysql_error());
+
 $years = [];
 $months = [];
 while ($row = mysql_fetch_assoc($year_month_query)) {
@@ -153,7 +155,7 @@ if (empty($revenues) || array_sum($revenues) == 0) {
 		<canvas id="revenueChart" style="max-height: 400px;"></canvas>
 	</div>
 	<div class="total-revenue">
-		Total Pendapatan: <?php echo "Rp ".number_format($total_revenue, 0); ?>
+		Total Pendapatan: <?php echo "Rp " . number_format($total_revenue, 0); ?>
 	</div>
 
 	<table>

@@ -30,25 +30,27 @@
                 <table <?php tabel(100, '%', 1, 'left'); ?>>
                     <tr style="background-color: #f9f9f9;">
 
-                        <th></th>
+                    <tr style="background-color: #f9f9f9; text-align:center;">
+                        <th>No</th>
                         <th>Kode&nbsp;Transaksi</th>
-                        <!--h <th>Id Transaksi </th> h-->
-                        <th align="left" class="th_border cell">Pelanggan </th>
-                        <th align="left" class="th_border cell">Kamar </th>
-                        <th align="left" class="th_border cell">Check&nbsp;in </th>
-                        <th align="left" class="th_border cell">Check&nbsp;Out </th>
-                        <!-- <th align="left" class="th_border cell">Rekening </th> -->
-                        <th align="left" class="th_border cell">Harga</th>
-                        <!-- <th align="left" class="th_border cell">Metode&nbsp;Transaksi </th>
-                        <th align="left" class="th_border cell">Dewasa </th>
-                        <th align="left" class="th_border cell">Anak&nbsp;Anak </th> -->
-                        <th align="left" class="th_border cell">Hari</th>
-                        <th align="left" class="th_border cell">Disc</th>
-                        <th align="left" class="th_border cell">Biaya Kamar</th>
-                        <th align="left" class="th_border cell">Biaya Tambahan In</th>
-                        <th align="left" class="th_border cell">Biaya Tambahan Out</th>
-                        <th align="left" class="th_border cell">Total</th>
-                        <th align="left" class="th_border cell">Status</th>
+                        <th>Pelanggan</th>
+                        <th>Kamar</th>
+                        <th>Jenis&nbsp;Trx</th>
+                        <th>Check&nbsp;In</th>
+                        <th>Check&nbsp;Out</th>
+                        <th>Harga</th>
+                        <th>Jumlah&nbsp;</th>
+                        <th>Harga&nbsp;Kamar&nbsp;Total</th>
+                        <th>Diskon</th>
+                        <th>Potongan</th>
+                        <th>Tambahan&nbsp;In</th>
+                        <th>Tambahan&nbsp;Out</th>
+                        <th>Dp&nbsp;Booking</th>
+                        <th>Deposit</th>
+                        <th>Pajak</th>
+                        <th>Grand&nbsp;Total</th>
+                        <th>Status</th>
+                    </tr>
 
                     </tr>
 
@@ -73,7 +75,7 @@
                             <tr class="event2">
 
 
-                               <td align="center" width="50">&nbsp;&nbsp;<?php $no = (($no + 1));
+                                <td align="center" width="50">&nbsp;&nbsp;<?php $no = (($no + 1));
                                                                             echo $no; ?></td>
                                 <td align="left"><a href="<?php index(); ?>?input=detail&proses=<?= encrypt($data['id_transaksi']); ?>" class='mx-2'><?php echo $data['id_transaksi']; ?></a></td>
                                 <td align="left"><?php echo ucwords(baca_database("", "nama", "select * from data_pelanggan where id_pelanggan='$data[id_pelanggan]'"))  ?></td>
@@ -91,17 +93,17 @@
                                                     $tgl_checkout = new DateTime($data['waktu_checkout']);
                                                     $selisih = $tgl_checkin->diff($tgl_checkout);
                                                     $jumlah_hari = $selisih->days;
-                                 $id_kamar = $data['id_kamar'];
-                                    $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$id_kamar'");
-                                    $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$id_kamar'");
-                                    if($jumlah_hari >=30){
-                                        $jumlah_bulan = floor($jumlah_hari/30);
-                                        $harga_fix=$harga_bulanan;
-                                    }else{
-                                        $harga_fix=$harga_harian;
-                                    }
-                                 echo rupiah($harga_fix); ?></td>
-                                <!-- <td align="left"><?php echo $data['metode_transaksi']!=='-'?baca_database("", "metode_pembayaran", "select * from data_metode_pembayaran where id_metode_pembayaran='{$data['metode_transaksi']}'"):'-'; ?></td> -->
+                                                    $id_kamar = $data['id_kamar'];
+                                                    $harga_harian = baca_database("", "harga_harian", "select * from data_kamar where id_kamar='$id_kamar'");
+                                                    $harga_bulanan = baca_database("", "harga_bulanan", "select * from data_kamar where id_kamar='$id_kamar'");
+                                                    if ($jumlah_hari >= 30) {
+                                                        $jumlah_bulan = floor($jumlah_hari / 30);
+                                                        $harga_fix = $harga_bulanan;
+                                                    } else {
+                                                        $harga_fix = $harga_harian;
+                                                    }
+                                                    echo rupiah($harga_fix); ?></td>
+                                <!-- <td align="left"><?php echo $data['metode_transaksi'] !== '-' ? baca_database("", "metode_pembayaran", "select * from data_metode_pembayaran where id_metode_pembayaran='{$data['metode_transaksi']}'") : '-'; ?></td> -->
                                 <!-- <td align="left"><?php echo $data['jumlah_dewasa']; ?></td>
                                 <td align="left"><?php echo $data['jumlah_anak_anak']; ?></td> -->
                                 <td align="left"><?php
@@ -110,23 +112,23 @@
                                 <td align="left"><?php echo $data['discount']; ?>%</td>
                                 <td align="left">
                                     <?php if ($data['discount'] > 0) { ?>
-                                        <strike><?php 
-                                            if($jumlah_hari>=30){
-                                                $jumlah_bulan=floor($jumlah_hari/30);
-                                                $data_harga = $jumlah_bulan * $harga_bulanan;
-                                            }else{
-                                                $data_harga = $jumlah_hari * $harga_harian;
-                                            }
-                                            echo rupiah($data_harga); ?></strike>
+                                        <strike><?php
+                                                if ($jumlah_hari >= 30) {
+                                                    $jumlah_bulan = floor($jumlah_hari / 30);
+                                                    $data_harga = $jumlah_bulan * $harga_bulanan;
+                                                } else {
+                                                    $data_harga = $jumlah_hari * $harga_harian;
+                                                }
+                                                echo rupiah($data_harga); ?></strike>
 
                                     <?php } ?>
                                     <?php
-    
+
                                     echo rupiah($data['harga']);                                ?>
                                 </td>
                                 <td align="left"><?php echo rupiah($data['biaya_tambahan_checkin']); ?></td>
                                 <td align="left"><?php echo rupiah($data['biaya_tambahan_checkout']); ?></td>
-                                <td align="left"><?php echo rupiah($data['harga']+$data['biaya_tambahan_checkin']+$data['biaya_tambahan_checkout']); ?></td>
+                                <td align="left"><?php echo rupiah($data['harga'] + $data['biaya_tambahan_checkin'] + $data['biaya_tambahan_checkout']); ?></td>
 
                                 <?php if ($data['status_transaksi'] == "Selesai") { ?>
 

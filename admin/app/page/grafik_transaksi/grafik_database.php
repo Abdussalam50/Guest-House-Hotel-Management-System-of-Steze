@@ -13,13 +13,15 @@ if ($id_hotel == "") {
 // Build dynamic filter
 $filter_hotel = ($id_hotel != "") ? "AND id_hotel = '$id_hotel'" : (isset($_POST['hotel']) && $_POST['hotel'] != 'all' ? "AND id_hotel = '" . mysql_real_escape_string($_POST['hotel']) . "'" : "");
 
-// Fetch distinct years and months from data_transaksi for combobox
+// Fetch distinc_oke years and months from data_transaksi for combobox
 $year_month_query = mysql_query("
-    SELECT DISTINCT YEAR(waktu_checkin) AS year, MONTH(waktu_checkin) AS month 
+    SELECT YEAR(waktu_checkin) AS year, MONTH(waktu_checkin) AS month 
     FROM data_transaksi 
     WHERE 1=1 $filter_hotel
+    GROUP BY YEAR(waktu_checkin), MONTH(waktu_checkin)
     ORDER BY year DESC, month DESC
-");
+") or die('Query failed: ' . mysql_error());
+
 $years = [];
 $months = [];
 while ($row = mysql_fetch_assoc($year_month_query)) {

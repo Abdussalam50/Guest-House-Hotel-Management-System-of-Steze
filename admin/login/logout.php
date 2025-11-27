@@ -6,6 +6,10 @@ setcookie('token', '', 0, '/');
 setcookie('jenenge', '', 0, '/');
 setcookie('kodene', '', 0, '/');
 setcookie('hak_akses', '', 0, '/');
+setcookie('id_hotel', '', 0, '/');
+setcookie('costumer_service', '', 0, '/');
+
+
 if (isset($_COOKIE['operasional'])) {
     setcookie('operasional', '', 0, '/');
 }

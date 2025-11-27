@@ -63,7 +63,7 @@
 								<i class="fas fa-sign-in-alt text-danger"></i> Booking Transaksi
 							</button>
 
-							<?php if (!isset($_COOKIE['customer_service'])) { ?>
+							<?php if (isset($_COOKIE['id_hotel'])) { ?>
 
 								<button onclick="pilihGroup()" class="btn btn-secondary btn-sm">
 									<i class="fas fa-sign-in-alt text-danger"></i> Transaksi Group
