@@ -7,9 +7,9 @@
 //include 'domain.php';
 // Variabel utama (kosong dulu)
 $db_server	= "localhost";
-$db_username = "ridikc";
-$db_password = "ridikc";
-$database    = "databases_2025_steze_manajemen_hotel";
+$db_username = "root";
+$db_password = "";
+$database    = "ridikcco_databases_2025_steze_manajemen_hotel";
 
 date_default_timezone_set("Asia/Jakarta");
 

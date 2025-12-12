@@ -109,6 +109,9 @@ if ($total_tambahan_non_pajak > 0) {
 
     // Update transaksi
     $status_transaksi = ($sisa > 0) ? 'Belum Lunas' : 'Selesai';
+    //     echo $status_transaksi; 
+    // echo $id_transaksi;
+    // die();
     $query_transaksi = mysql_query("
         UPDATE data_transaksi SET 
             biaya_tambahan_checkout='" . mysql_real_escape_string($biaya_checkout) . "',
@@ -120,7 +123,7 @@ if ($total_tambahan_non_pajak > 0) {
             jumlah_kembalian='" . (int)$kembalian . "',
             sisa_pembayaran='" . (int)$sisa . "',
             status_transaksi='" . mysql_real_escape_string($status_transaksi) . "'
-        WHERE id_transaksi='" . mysql_real_escape_string($id_transaksi) . "'
+        WHERE id_transaksi='$id_transaksi'
     ");
     if (!$query_transaksi) die("Error: Gagal update transaksi - " . mysql_error());
 
@@ -142,7 +145,7 @@ if ($total_tambahan_non_pajak > 0) {
                 jenis_pajak = 'PPN',
                 persentase_pajak = '" . (float)$persentase_pajak . "',
                 pajak = '" . (int)$pajak_total . "'
-            WHERE id_transaksi = '" . mysql_real_escape_string($id_transaksi) . "' 
+            WHERE id_transaksi = '$id_transaksi' 
               AND id_hotel = '" . mysql_real_escape_string($id_hotel) . "'
             LIMIT 1
         ");
@@ -154,7 +157,7 @@ if ($total_tambahan_non_pajak > 0) {
     $query_kamar = mysql_query("UPDATE data_kamar SET status_kamar='Kosong' WHERE id_kamar='$id_kamar'");
     if (!$query_kamar) die("Error: Gagal update status kamar - " . mysql_error());
 
-    $query_transaksi = mysql_query("UPDATE data_transaksi SET status_transaksi='Selesai' WHERE id_transaksi='" . mysql_real_escape_string($id_transaksi) . "'");
+    $query_transaksi = mysql_query("UPDATE data_transaksi SET status_transaksi='Selesai' WHERE id_transaksi='$id_transaksi'");
     if (!$query_transaksi) die("Error: Gagal update transaksi - " . mysql_error());
 }
 ?>

@@ -2,8 +2,8 @@
 include '../../../include/koneksi/koneksi.php';
 
 $postData = json_decode(file_get_contents('php://input'), true);
-$tanggal_check = $postData['tanggal_check'] ?? '';
-$idHotel = $postData['id_hotel'] ?? '';
+$tanggal_check = isset($postData['tanggal_check']) ?$postData['tanggal_check']: '';
+$idHotel = isset($postData['id_hotel']) ?$postData['id_hotel']: '';
 
 if (!$tanggal_check) {
     echo json_encode([]);
@@ -52,7 +52,7 @@ while ($kamar = mysql_fetch_assoc($result)) {
     $tipeQuery = "SELECT tipe_kamar FROM data_tipe_kamar WHERE id_tipe_kamar='" . $kamar['id_tipe_kamar'] . "'";
     $tipeResult = mysql_query($tipeQuery);
     $tipeRow = mysql_fetch_assoc($tipeResult);
-    $tipeKamar = $tipeRow['tipe_kamar'] ?? '-';
+    $tipeKamar = isset($tipeRow['tipe_kamar']) ?$tipeRow['tipe_kamar']: '-';
 
     // Format harga harian menjadi Rupiah dengan titik
     $hargaHarian = "Rp " . number_format($kamar['harga_harian'], 0, '', '.');

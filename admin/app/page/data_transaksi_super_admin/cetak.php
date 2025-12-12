@@ -416,7 +416,9 @@ if (isset($_GET['input'])) {
                         </td>
                         <td align="left"><?= ucwords($data['nama']); ?></td>
                         <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
-                        <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php if ($jenis_group == "group") {
+                        <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php
+                        
+                        if ($jenis_group == "group") {
                                                                                     echo "(Group)";
                                                                                 }
                                                                                 ?></b></td>

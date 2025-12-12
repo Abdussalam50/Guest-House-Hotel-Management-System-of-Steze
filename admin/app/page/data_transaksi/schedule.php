@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 include '../../../include/koneksi/koneksi.php';
 
 $post = json_decode(file_get_contents("php://input"), true);
-$idKamar = $post['id_kamar'] ?? '';
+$idKamar = isset($post['id_kamar']) ?$post['id_kamar']: '';
 
 if (!$idKamar) {
     echo json_encode([]);
