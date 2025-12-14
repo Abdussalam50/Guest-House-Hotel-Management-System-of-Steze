@@ -129,7 +129,7 @@ if ($id_hotel == "") {
 
 
                             if ($jenis_group == "group") {
-                                $query_kamar = " SELECT * FROM data_transaksi_list_kamar 
+                                $query_kamar = "SELECT * FROM data_transaksi_list_kamar 
                                             WHERE id_transaksi = '$id_transaksi' 
                                             ORDER BY waktu DESC ";
 
@@ -144,7 +144,7 @@ if ($id_hotel == "") {
                                 }
                             } else {
 
-                                if ($jenis_transaksi == "harian") {
+                                if ($jenis_transaksi == "harian"){
                                     $harga_kamar_total = $harga_per_hari * $jumlah_hari;
                                 } else {
                                     $harga_kamar_total = $harga_per_bulan * $jumlah_hari;
@@ -156,17 +156,20 @@ if ($id_hotel == "") {
                         ?>
                             <tr class="event2" style="text-align:left;">
                                 <td><?= $no ?></td>
-                                <td align="left"><a href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
+                                <td align="left"                                                                 <?php
+                                                                    if($data['status_transaksi']=='Lunas'){
+                                                                        echo "onclick='ubah_status(this)'";
+                                                                    }
+                                                                
+                                                                ?>><a id='id_table_transaksi' href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
                                         <?= $data['id_transaksi']; ?></a>
-
-
                                 </td>
                                 <td align="left"><?= ucwords($data['nama']); ?></td>
                                 <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
                                 <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php if ($jenis_group == "group") {
                                                                                             echo "(Group)";
                                                                                         }
-                                                                                        ?></b></td>
+                                                                                      ?></b></td>
                                 <td><?= str_replace(" ", "&nbsp;", format_indo($data['waktu_checkin'])); ?></td>
                                 <td><?php
                                     $today = strtotime(date('Y-m-d'));
@@ -247,7 +250,8 @@ if ($id_hotel == "") {
                                                                     echo '#fffee6';
                                                                 } else {
                                                                     echo '#ffe8e8';
-                                                                } ?>">
+                                                                } ?>"
+                                                                >
                                     <?= $data['status_transaksi']; ?>
                                 </td>
                             </tr>
@@ -346,4 +350,68 @@ if ($id_hotel == "") {
             }
         });
     }
+
+    function ubah_status(id){
+       
+        const parent=id;
+        const id_transaksi=parent.querySelector("a").innerText;
+        console.log(id_transaksi);
+        Swal.fire({
+            title:'Ubah Status',
+            text:'Peringatan! fitur ini hanya dapat digunakan oleh developer',
+            html:`
+            <div class="container">
+    <form action="" method="post" id='form_status'>
+        <input type="hidden" name="id_transaksi" value='${id_transaksi}'>
+        <label class='form-label'>Status Transaksi</label>
+        <select name="status_transaksi" id="status_transaksi" class="form-control mb-3">
+            <?php
+                combo_enum("data_transaksi","status_transaksi","");
+            ?>
+        </select>
+        <label class='form-label'>Password</label>
+        <input type="password" name="password" id="password"placeholder="password" class='form-control mb-3'>
+        <button type="button" id="submit_status" class='btn btn-danger'>Ubah Status</button>
+    </form>
+</div>
+            `,
+            showConfirmButton:false,
+            showCancelButton:false,
+            didOpen:()=>{
+        document.getElementById('submit_status').addEventListener('click',function(){
+            const formdata=new FormData(document.getElementById('form_status'));
+             console.log([...formdata.entries()]);
+
+             fetch("ubah_status.php",{
+                method:'POST',
+                body:formdata
+             })
+             .then(response=>response.json())
+             .then(data=>{
+                console.log(data);
+                if(data.response=='true'){
+                    Swal.fire({
+                        title:'Proses Berhasil',
+                        text:'Status berhasil diubah!',
+                        showConfirmButton:false,
+                        showCancelButton:false,
+                        icon:'success'
+                    })
+                }else{
+                    Swal.fire({
+                        title:'Proses Gagal',
+                        text:'Status gagal diubah!',
+                        showConfirmButton:false,
+                        showCancelButton:false,
+                        icon:'error'
+                    })
+                }
+            })
+             .catch(error=>console.error(error))
+        })                
+            }
+        })
+    }
+
+
 </script>

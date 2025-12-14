@@ -482,7 +482,12 @@ try {
                 </button>
 
             </div>
-        <?php } ?>
+        <?php } else{?>
+            
+
+        <?php
+            
+        }?>
 
         <script>
             document.getElementById('btnPrint').addEventListener('click', function() {
@@ -493,6 +498,7 @@ try {
                 // Jika ingin langsung selesai tanpa print
                 window.location.href = '../home/index.php';
             });
+
         </script>
 
         <?php if ($read != "detail") { ?>

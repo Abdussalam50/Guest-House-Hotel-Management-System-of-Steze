@@ -104,10 +104,9 @@ if (isset($_GET['input'])) {
                 $no = 0;
 
                 // Initialize the base query
-                $querytabel = "SELECT dt.*, dp.nama, dk.no_kamar 
+                $querytabel = "SELECT dt.*, dp.nama 
                    FROM data_transaksi dt
                    JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
-                   JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
                    WHERE 1=1"; // Start with a true condition for dynamic WHERE clause
 
                 // Add id_hotel filter only if it is not empty
@@ -144,17 +143,35 @@ if (isset($_GET['input'])) {
                 $total_potongan_harga = 0;
                 $total_pajak = 0;
                 $total_bayar_all = 0;
-
+                $harga_kamar_total=0;
                 while ($data = mysql_fetch_array($proses)) {
                     $no++;
                     $harga_per_hari = $data['harga_kamar_harian'];
                     $jumlah_hari = $data['jumlah_hari'];
-
+                    
+                    $cek_json="";
+                    if(json_check($data['no_kamar'])){
+                        $cek_json="group";
+                    }
                     // Harga kamar total
-                    if ($data['jenis_transaksi'] == 'bulanan') {
-                        $harga_kamar_total = $data['harga_kamar_bulanan'] * ($jumlah_hari / 30);
-                    } else {
-                        $harga_kamar_total = $harga_per_hari * $jumlah_hari;
+                    if($cek_json=="group"){
+                        $q_kamar="SELECT * FROM data_transaksi_list_kamar WHERE id_transaksi='$data[id_transaksi]'";
+                        $result_kamar=mysql_query($q_kamar);
+                        while($datakamar=mysql_fetch_array($result_kamar)){
+                            if($data['jenis_transaksi']=='harian'){
+                                $harga_kamar_total=$harga_kamar_total+($datakamar['harga_kamar_harian']*$jumlah_hari);
+                                
+                            }else{
+                                $harga_kamar_total=$harga_kamar_total+($datakamar['harga_kamar_bulanan']*$jumlah_hari);
+                            }                         
+                        }
+
+                    }else{
+                        if ($data['jenis_transaksi'] == 'bulanan') {
+                            $harga_kamar_total = $data['harga_kamar_bulanan'] * ($jumlah_hari );
+                        } else {
+                            $harga_kamar_total = $harga_per_hari * $jumlah_hari;
+                        }
                     }
 
                     // Diskon
@@ -185,7 +202,13 @@ if (isset($_GET['input'])) {
                         <td><?= $no ?></td>
                         <td><?= $data['id_transaksi']; ?></td>
                         <td><?= ucwords($data['nama']); ?></td>
-                        <td><?= $data['no_kamar']; ?></td>
+                        <td><?php
+                        if($cek_json=="group"){
+                            echo json_preview_br($data['no_kamar']);
+                        }else{
+                          echo $data['no_kamar'];  
+                        }
+                          ?></td>
                         <td><?= format_indo($data['waktu_checkin']); ?></td>
                         <td><?php
 
@@ -208,19 +231,22 @@ if (isset($_GET['input'])) {
                                 } else {
                                     // Hari ini
                                     echo str_replace(" ", " ", format_indo($data['waktu_checkout']))
-                                        . "<br><b style='color:green'> Hari ini</b>";
+                                        ."<br><b style='color:green'> Hari ini</b>";
                                 }
                             } else {
                                 // Lewat
                                 echo str_replace(" ", " ", format_indo($data['waktu_checkout']));
                             }
 
-
-
-
                             ?>
                         </td>
-                        <td><?= rupiah($harga_per_hari); ?></td>
+                        <td><?php
+                        if($cek_json=='group'){
+                            echo json_preview_rupiah_br($harga_per_hari);
+                        }else{
+                           echo  rupiah($harga_per_hari);
+                        }
+                         ?></td>
                         <td><?= $jumlah_hari; ?></td>
                         <td><?= rupiah($harga_kamar_total); ?></td>
                         <td><?= $data['discount']; ?>%</td>

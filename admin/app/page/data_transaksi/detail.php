@@ -312,8 +312,8 @@ if ($jenis_transaksi == "harian" && $jenis_group == "non_group") {
                     $metode   = htmlspecialchars(ucwords($m['metode_pembayaran']), ENT_QUOTES);
                     $namaBank = $m['nama_bank'] ? htmlspecialchars(ucwords($m['nama_bank']), ENT_QUOTES) : '-';
                     $idBank = $m['id_bank'];
-                    $rek      = htmlspecialchars($m['rekening'] ?? '-', ENT_QUOTES);
-                    $atasNama = htmlspecialchars($m['atas_nama'] ?? '', ENT_QUOTES);
+                    $rek      = htmlspecialchars(isset($m['rekening']) ? $m['rekening']:'-', ENT_QUOTES);
+                    $atasNama = htmlspecialchars($m['atas_nama'] ? $m['atas_nama']:'', ENT_QUOTES);
 
                     // Tambahkan data-nama_bank di sini!
                     echo "<tr>
@@ -370,8 +370,8 @@ if ($jenis_transaksi == "harian" && $jenis_group == "non_group") {
                     $metode   = htmlspecialchars(ucwords($m['metode_pembayaran']), ENT_QUOTES);
                     $namaBank = $m['nama_bank'];
                     $idBank = $m['id_bank'];
-                    $rek      = htmlspecialchars($m['rekening'] ?? '-', ENT_QUOTES);
-                    $atasNama = htmlspecialchars($m['atas_nama'] ?? '', ENT_QUOTES);
+                    $rek      = htmlspecialchars(isset($m['rekening']) ?$m['rekening'] :'-', ENT_QUOTES);
+                    $atasNama = htmlspecialchars(isset($m['atas_nama']) ? $m['rekening']:'', ENT_QUOTES);
 
                     echo "<tr>
                         <td>{$metode}</td>
@@ -437,6 +437,8 @@ if ($jenis_transaksi == "harian" && $jenis_group == "non_group") {
         // Tutup SweetAlert
         Swal.close();
     }
+
+
 </script>
 <hr>
 <?php
@@ -466,11 +468,10 @@ if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
         <?php
         }
 
-
-
+        
         ?>
 
-
+        <button class="btn btn-danger btn-sm" onclick="modal_hapus('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select * from data_transaksi where id_transaksi='$id_transaksi'") ?>')"> Batalkan Transaksi</button>
 
         <!-- <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $id_kamar ?>&trx=<?php echo encrypt($id_transaksi) ?>'">Check Out</button>
  -->
@@ -522,3 +523,57 @@ if ($jam <= $jam_default && $data['status_transaksi'] == 'Lunas') {
 <?php
 }
 ?>
+<script>
+    function modal_hapus(id, nama_pelanggan){
+    Swal.fire({
+        title: 'Perhatian!',
+        text: `Apakah Anda yakin menghapus transaksi an. ${nama_pelanggan}?`,
+        showConfirmButton: true,
+        showCancelButton: true,
+        icon: 'warning',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+
+        // Jika user menekan tombol confirm
+        if (result.isConfirmed) {
+            fetch("hapus_transaksi.php", {
+                method: 'POST',
+                body: JSON.stringify({
+                    request: id
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                if (data.response === true) {
+                    Swal.fire({
+                        title: 'Proses Hapus Berhasil',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'index.php';
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: 'Proses Hapus Gagal',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+
+            })
+            .catch(error => {
+                console.error(error);
+                Swal.fire({
+                    title: 'Terjadi Kesalahan Server',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+</script>
