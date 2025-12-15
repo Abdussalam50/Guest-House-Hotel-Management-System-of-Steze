@@ -122,8 +122,8 @@ if ($total_tambahan_non_pajak > 0) {
             nominal_bayar='" . (int)$nominal . "',
             jumlah_kembalian='" . (int)$kembalian . "',
             sisa_pembayaran='" . (int)$sisa . "',
-            status_transaksi='" . mysql_real_escape_string($status_transaksi) . "'
-        WHERE id_transaksi='" . mysql_real_escape_string($id_transaksi) . "'
+            status_transaksi='$status_transaksi'
+        WHERE id_transaksi='$id_transaksi'
     ");
     if (!$query_transaksi) die("Error: Gagal update transaksi - " . mysql_error());
 
@@ -145,8 +145,8 @@ if ($total_tambahan_non_pajak > 0) {
                 jenis_pajak = 'PPN',
                 persentase_pajak = '" . (float)$persentase_pajak . "',
                 pajak = '" . (int)$pajak_total . "'
-            WHERE id_transaksi = '" . mysql_real_escape_string($id_transaksi) . "' 
-              AND id_hotel = '" . mysql_real_escape_string($id_hotel) . "'
+            WHERE id_transaksi = '$id_transaksi' 
+              AND id_hotel = '$id_hotel'
             LIMIT 1
         ");
         if (!$query_pajak) die("Error: Gagal update pajak - " . mysql_error());
