@@ -156,15 +156,15 @@ if ($id_hotel == "") {
                         ?>
                             <tr class="event2" style="text-align:left;">
                                 <td><?= $no ?></td>
-                                <td align="left"                                                                 <?php
-                                                                    if($data['status_transaksi']=='Lunas'){
-                                                                        echo "onclick='ubah_status(this)'";
-                                                                    }
-                                                                
-                                                                ?>><a id='id_table_transaksi' href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
+                                <td align="left"><a id='id_table_transaksi' href="<?php index(); ?>?input=detail&id_trx=<?= ($data['id_transaksi']); ?>">
                                         <?= $data['id_transaksi']; ?></a>
                                 </td>
-                                <td align="left"><?= ucwords($data['nama']); ?></td>
+                                <td <?php
+if ($data['status_transaksi'] == 'Lunas') {
+    echo "onclick=\"ubah_status('{$data['id_transaksi']}')\"";
+}
+                                                                
+                                                                ?> align="left"><?= ucwords($data['nama']); ?></td>
                                 <td align="left"><?= json_preview_br($data['no_kamar']); ?></td>
                                 <td align="left"><b><?= ucwords($jenis_transaksi); ?> <?php if ($jenis_group == "group") {
                                                                                             echo "(Group)";
@@ -353,8 +353,8 @@ if ($id_hotel == "") {
 
     function ubah_status(id){
        
-        const parent=id;
-        const id_transaksi=parent.querySelector("a").innerText;
+        
+        const id_transaksi=id;
         console.log(id_transaksi);
         Swal.fire({
             title:'Ubah Status',
@@ -396,7 +396,8 @@ if ($id_hotel == "") {
                         showConfirmButton:false,
                         showCancelButton:false,
                         icon:'success'
-                    })
+                    });
+                    window.location.href='index.php'
                 }else{
                     Swal.fire({
                         title:'Proses Gagal',

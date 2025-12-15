@@ -25,33 +25,43 @@ if(checking("data_booking_list_kamar",$id_transaksi)=="true"){
     DELETE FROM data_booking_list_kamar 
     WHERE id_transaksi = '$id_transaksi'
 ");   
+}else{
+    $delete_list_booking=true;
 }
 
-
+if(checking('data_pajak',$id_transaksi)){
 $delete_pajak = mysql_query("
     DELETE FROM data_pajak 
     WHERE id_transaksi = '$id_transaksi'
 ");
+}else{
+    $delete_pajak=true;
+}
+
 $delete_pemasukan = mysql_query("
     DELETE FROM data_pemasukan 
     WHERE id_transaksi = '$id_transaksi'
 ");
 
+if(checking('data_deposit',$id_transaksi)){
+
 $delete_deposit = mysql_query("
     DELETE FROM data_deposit 
     WHERE id_transaksi = '$id_transaksi'
 ");
+}else{
+    $delete_deposit=true;
+}
 
-
-$delete_transaksi = mysql_query("
-    DELETE FROM data_transaksi 
-    WHERE id_transaksi = '$id_transaksi'
-");
 $delete_transaksi_list_kamar = mysql_query("
     DELETE FROM data_transaksi_list_kamar 
     WHERE id_transaksi = '$id_transaksi'
 ");
 
+$delete_transaksi = mysql_query("
+    DELETE FROM data_transaksi 
+    WHERE id_transaksi = '$id_transaksi'
+");
 
 // Hapus data utama
 if(checking("data_booking",$id_transaksi)=="true"){
@@ -59,6 +69,8 @@ $delete_booking = mysql_query("
     DELETE FROM data_booking 
     WHERE id_transaksi = '$id_transaksi'
 ");
+}else{
+    $delete_booking=true;
 }
 // Validasi seluruh proses
 if ($delete_list_booking && $delete_pajak && $delete_booking && $delete_pemasukan && $delete_deposit) {

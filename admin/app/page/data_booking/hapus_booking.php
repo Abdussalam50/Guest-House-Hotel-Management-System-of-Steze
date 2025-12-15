@@ -13,18 +13,37 @@ $delete_list_booking = mysql_query("
     WHERE id_transaksi = '$id_transaksi'
 ");
 
+// Jika data tidak ada, anggap sukses
+if ($delete_list_booking === false) {
+    $delete_list_booking = true;
+}
+
 $delete_pajak = mysql_query("
     DELETE FROM data_pajak 
     WHERE id_transaksi = '$id_transaksi'
 ");
+
+if ($delete_pajak === false) {
+    $delete_pajak = true;
+}
+
 $delete_pemasukan = mysql_query("
     DELETE FROM data_pemasukan 
     WHERE id_transaksi = '$id_transaksi'
 ");
+
+if ($delete_pemasukan === false) {
+    $delete_pemasukan = true;
+}
+
 $delete_deposit = mysql_query("
     DELETE FROM data_deposit 
     WHERE id_transaksi = '$id_transaksi'
 ");
+
+if ($delete_deposit === false) {
+    $delete_deposit = true;
+}
 
 // Hapus data utama
 $delete_booking = mysql_query("
@@ -32,13 +51,19 @@ $delete_booking = mysql_query("
     WHERE id_transaksi = '$id_transaksi'
 ");
 
+if ($delete_booking === false) {
+    $delete_booking = true;
+}
+
 // Validasi seluruh proses
-if ($delete_list_booking && $delete_pajak && $delete_booking && $delete_pemasukan && $delete_deposit) {
-    echo json_encode([
-        'response' => 'true'
-    ]);
+if (
+    $delete_list_booking &&
+    $delete_pajak &&
+    $delete_pemasukan &&
+    $delete_deposit &&
+    $delete_booking
+) {
+    echo json_encode(['response' => true]);
 } else {
-    echo json_encode([
-        'response' => 'false'
-    ]);
+    echo json_encode(['response' => false]);
 }

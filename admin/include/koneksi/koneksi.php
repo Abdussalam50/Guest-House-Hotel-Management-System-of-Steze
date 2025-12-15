@@ -632,19 +632,20 @@ if ($koneksi && mysql_select_db($database, $koneksi)) {
 	$db_username = $db_username;
 	$db_password = $db_password;
 	$database    = $database;
-} else {
-	// Jika gagal, coba koneksi ke server cadangan
-	$koneksi = mysql_connect($db_server2, $db_username2, $db_password2);
-	if ($koneksi && mysql_select_db($database2, $koneksi)) {
-		// Berhasil pakai server cadangan
-		$db_server   = $db_server2;
-		$db_username = $db_username2;
-		$db_password = $db_password2;
-		$database    = $database2;
-	} else {
-		die("Koneksi database gagal pada server utama maupun cadangan.");
-	}
 }
+//  else {
+// 	// Jika gagal, coba koneksi ke server cadangan
+// 	$koneksi = mysql_connect($db_server2, $db_username2, $db_password2);
+// 	if ($koneksi && mysql_select_db($database2, $koneksi)) {
+// 		// Berhasil pakai server cadangan
+// 		$db_server   = $db_server2;
+// 		$db_username = $db_username2;
+// 		$db_password = $db_password2;
+// 		$database    = $database2;
+// 	} else {
+// 		die("Koneksi database gagal pada server utama maupun cadangan.");
+// 	}
+// }
 
 mysql_connect($db_server, $db_username, $db_password) or die("Gagal konek ke server.");
 mysql_select_db($database) or die("Gagal membuka database.");

@@ -22,7 +22,9 @@ if ($jenis_transaksi == "harian") {
 }
 
 ?>
-
+<div class="container mt-3 d-flex" style='background-color:#F8EDEE'>
+    <p class="text-start text-danger mt-3 mb-0"><b>Perhatian!</b> Transaksi Booking dapat dibatalkan jika waktu booking yang sudah berjalan belum mencapai 24 jam</p>
+</div>
 <?php if ($status_transaksi == "Booking") { ?>
 
     <?php if (!isset($_COOKIE['customer_service'])) { ?>
@@ -30,12 +32,43 @@ if ($jenis_transaksi == "harian") {
             <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#modalBayarBooking<?= $id_transaksi ?>">
                 Bayar & Check-in
             </button>
-            <button class="btn btn-danger btn-lg" onclick="modal_batal('<?= $id_transaksi ?>','<?= baca_database(``,`nama_pelanggan`,`select* from data_booking where id_transaksi='$id_transaksi'`) ?>')">Batalkan Booking</button>
-        </div>
+           
+
+        
 
     <?php } ?>
-<?php } ?>
 
+                <?php
+            $jam_default = baca_database("", "value", "select * from data_pengaturan_aplikasi where nama_pengaturan='jam_batal_transaksi'");
+                if((time()-strtotime($bk['waktu_transaksi']))/3600<=$jam_default){
+
+                
+            ?>
+            <div class="text-end mt-3">
+            <button class="btn btn-danger btn-lg" onclick="modal_batal('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select* from data_booking where id_transaksi='$id_transaksi'") ?>')">Batalkan Booking</button>
+            <?php
+            }
+            ?>
+            </div>
+<?php } ?>
+<style>
+    .confirm_button{
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-right:15px;
+    }
+
+.cancel_button {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+</style>
 <!-- MODAL (ID tetap + data-id untuk referensi) -->
 <div class="modal fade" id="modalBayarBooking<?= $id_transaksi ?>" tabindex="-1" data-id-transaksi="<?= $id_transaksi ?>">
     <div class="modal-dialog modal-dialog-centered modal-md">
@@ -435,6 +468,11 @@ function modal_batal(id, nama_pelanggan){
         showConfirmButton: true,
         showCancelButton: true,
         icon: 'warning',
+        customClass:{
+            confirmButton:'confirm_button',
+            cancelButton:'cancel_button'
+        },
+        buttonsStyling:false,
         confirmButtonText: 'Ya, hapus',
         cancelButtonText: 'Batal'
     }).then((result) => {

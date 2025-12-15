@@ -1,7 +1,7 @@
 <?php
 
 $read = "detail";
-
+date_default_timezone_set("Asia/Jakarta");
 $id_transaksi = mysql_escape_string($_GET['id_trx']);
 
 $query = mysql_query("SELECT * FROM data_transaksi WHERE id_transaksi='$id_transaksi'") or die(mysql_error());
@@ -448,7 +448,7 @@ $jam_default = baca_database("", "value", "select * from data_pengaturan_aplikas
 if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
 ?>
     <p class="text-start text-danger">
-        <span style='font-weight:700'>Information!:</span> Fitur hapus transaksi hanya dapat digunakan <?= $jam_default ?> jam dari waktu checkin.
+        <span style='font-weight:700'>Information!:</span> Fitur batal transaksi hanya dapat digunakan <?= $jam_default ?> jam dari waktu checkin.
     </p>
 <?php
 } ?>
@@ -468,16 +468,16 @@ if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
         <?php
         }
 
-        
+        if((time()-strtotime($bk['waktu_transaksi']))/3600<=$jam_default ){
         ?>
 
         <button class="btn btn-danger btn-sm" onclick="modal_hapus('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select * from data_transaksi where id_transaksi='$id_transaksi'") ?>')"> Batalkan Transaksi</button>
 
         <!-- <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $id_kamar ?>&trx=<?php echo encrypt($id_transaksi) ?>'">Check Out</button>
  -->
-
-
         <?php
+        }
+        
     }
 } elseif (isset($_COOKIE['operasional'])) {
     echo "";
