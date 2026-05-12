@@ -9,7 +9,7 @@
 $db_server	= "localhost";
 $db_username = "root";
 $db_password = "";
-$database    = "ridikcco_databases_2025_steze_manajemen_hotel";
+$database    = "databases_2025_steze";
 
 date_default_timezone_set("Asia/Jakarta");
 

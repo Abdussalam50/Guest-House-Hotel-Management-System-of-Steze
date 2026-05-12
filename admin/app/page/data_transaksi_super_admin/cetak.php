@@ -295,10 +295,9 @@ if (isset($_GET['input'])) {
                 $no = 0;
 
                 // Initialize the base query
-                $querytabel = "SELECT dt.*, dp.nama, dk.no_kamar 
+                $querytabel = "SELECT dt.*, dp.nama 
                    FROM data_transaksi dt
                    JOIN data_pelanggan dp ON dt.id_pelanggan = dp.id_pelanggan
-                   JOIN data_kamar dk ON dt.id_kamar = dk.id_kamar
                    WHERE 1=1";
 
                 // Add id_hotel filter only if it is not empty

@@ -448,16 +448,16 @@ $jam_default = baca_database("", "value", "select * from data_pengaturan_aplikas
 if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
 ?>
     <p class="text-start text-danger">
-        <span style='font-weight:700'>Information!:</span> Fitur batal transaksi hanya dapat digunakan <?= $jam_default ?> jam dari waktu checkin.
+        <span style='font-weight:700'>Information!:</span> Fitur hapus transaksi hanya dapat digunakan selama <?= $jam_default ?> jam sejak waktu transaksi dibuat.
     </p>
 <?php
-} ?>
+}
 
-
-<?php if (isset($_COOKIE['id_hotel']) && $id_hotel == decrypt($_COOKIE['id_hotel'])) { ?>
-    <?php if ($data['status_transaksi'] == "Selesai") {
+ if (isset($_COOKIE['id_hotel']) && $id_hotel == decrypt($_COOKIE['id_hotel'])) { 
+     
+     if ($bk['status_transaksi'] == "Selesai") {
     } else {
-
+        
         if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
     ?>
             <button class="btn btn-light-danger btn-sm" onclick="window.location.href='<?php echo $link; ?>?id_trx=<?php echo $id_transaksi; ?>&status=checkin'">Cetak Ulang Nota</button>
@@ -468,21 +468,22 @@ if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
         <?php
         }
 
-        if((time()-strtotime($bk['waktu_transaksi']))/3600<=$jam_default ){
-        ?>
+//         if((time()-strtotime($bk['waktu_transaksi']))/3600<=$jam_default){
+//         ?>
 
-        <button class="btn btn-danger btn-sm" onclick="modal_hapus('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select * from data_transaksi where id_transaksi='$id_transaksi'") ?>')"> Batalkan Transaksi</button>
+         <!--<button class="btn btn-danger btn-sm" onclick="modal_hapus('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select * from data_transaksi where id_transaksi='$id_transaksi'") ?>')"> Hapus Transaksi</button>-->
 
-        <!-- <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $id_kamar ?>&trx=<?php echo encrypt($id_transaksi) ?>'">Check Out</button>
- -->
-        <?php
-        }
-        
+       <!-- <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $id_kamar ?>&trx=<?php echo encrypt($id_transaksi) ?>'">Check Out</button>
+//  -->
+      <?php
+//         }
+     
     }
 } elseif (isset($_COOKIE['operasional'])) {
     echo "";
+    
 } else {
-    if ($data['status_transaksi'] == "Selesai") {
+    if ($bk['status_transaksi'] == "Selesai") {
     } else {
 
         if (pengaturan_printer("ukuran_kertas", $id_hotel) == "A4") {
@@ -507,22 +508,20 @@ if ($jam < $jam_default && $data['status_transaksi'] !== 'Selesai') {
 
 <?php
     }
-} ?>
-
-<?php
-
-if ($jam <= $jam_default && $data['status_transaksi'] == 'Lunas') {
-    $jenenge = decrypt($_COOKIE['jenenge']);
-
-    $id_admin = baca_database("", "id_admin", "select * from data_admin where username='$jenenge'");
-    if ($id_admin == null) {
-        $id_admin = baca_database("", "id_pengelola", "select * from data_pengelola where username='$jenenge'");
-    }
-?>
-    <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../data_transaksi/index.php?input=hapus&proses=<?php echo encrypt($data['id_transaksi']) ?>&admin=<?= $id_admin ?>'"> Hapus Transaksi</button>
-<?php
 }
+
+        if((time()-strtotime($bk['waktu_transaksi']))/3600<=$jam_default){
+        ?>
+
+        <button class="btn btn-danger btn-sm" onclick="modal_hapus('<?= $id_transaksi ?>','<?= baca_database('','nama_pelanggan',"select * from data_transaksi where id_transaksi='$id_transaksi'") ?>')"> Hapus Transaksi</button>
+
+        <!-- <button class="btn btn-light-danger btn-sm" onclick="window.location.href='../checkout/index.php?input=tampil&id=<?php echo $id_kamar ?>&trx=<?php echo encrypt($id_transaksi) ?>'">Check Out</button>
+ -->
+        <?php
+        }
 ?>
+
+
 <script>
     function modal_hapus(id, nama_pelanggan){
     Swal.fire({

@@ -1,0 +1,45 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Database & Konfigurasi (Sangat Penting untuk Dirahasiakan)
+/admin/include/koneksi/koneksi.php
+/database/
+*.sql
+*.sqlite
+.env
+
+# File Testing & Catatan Internal (Tidak perlu di-upload)
+/test.php
+/test2.php
+/test copy.php
+/note.php
+/note.txt
+
+# Log Files (Pesan Error yang bisa membocorkan path server)
+error_log
+/admin/error_log
+*.log
+
+# Folder Upload / User Data (Jangan upload file dari user)
+/admin/upload/*
+!/admin/upload/.gitkeep
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================================================================
+# Logika Bisnis & Admin (Dirahasiakan)
+# =========================================================================
+# Mengabaikan seluruh logika pemrosesan di dalam folder admin
+/admin/app/
+/admin/data/
+/admin/include/
+/admin/login/
+
+# Jika Anda ingin menyembunyikan SELURUH folder admin, cukup gunakan baris di bawah ini (hilangkan tanda pagar):
+# /admin/
+

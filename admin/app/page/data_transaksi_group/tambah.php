@@ -292,6 +292,7 @@
 
                                                     let dateMap = {};
                                                     const today = new Date();
+                                                    today.setDate(today.getDate()-1);
                                                     today.setHours(0, 0, 0, 0);
                                                     const todayStr = toLocalDateString(today);
                                                     const disableBeforeToday = [d => {
