@@ -1,8 +1,0 @@
-[04-Nov-2025 10:05:36 Asia/Jakarta] PHP Deprecated:  Array and string offset access syntax with curly braces is deprecated in /home/ridikcco/steze.id/admin/include/function/all.php on line 88
-[04-Nov-2025 10:05:36 Asia/Jakarta] PHP Deprecated:  Array and string offset access syntax with curly braces is deprecated in /home/ridikcco/steze.id/admin/include/function/all.php on line 93
-[04-Nov-2025 10:05:36 Asia/Jakarta] PHP Deprecated:  Array and string offset access syntax with curly braces is deprecated in /home/ridikcco/steze.id/admin/include/function/all.php on line 98
-[04-Nov-2025 10:05:36 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'ScriptTemplate' not found in /home/ridikcco/steze.id/admin/data/tmp/mikro-stay/index.php:1032
-Stack trace:
-#0 /home/ridikcco/steze.id/admin/app/page/backuprestore/index.php(18): include()
-#1 {main}
-  thrown in /home/ridikcco/steze.id/admin/data/tmp/mikro-stay/index.php on line 1032
